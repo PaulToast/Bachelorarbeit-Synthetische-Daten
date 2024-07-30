@@ -1,46 +1,32 @@
 # Effective Data Augmentation With Diffusion Models
 
-This is a modified version of the [official DA-Fusion repository](https://github.com/brandontrabucco/da-fusion).
+This is a modified version of the [original DA-Fusion repository](https://github.com/brandontrabucco/da-fusion).
 
-- [ ] Collect data via script
-- [ ] Output augmentations
+It is embedded into the main repository for this thesis work, but is used in isolation.
 
----
-
-Data augmentation is one of the most prevalent tools in deep learning, underpinning many recent advances. The standard approach to data augmentation combines simple transformations like rotations and flips to generate new images from existing ones. However, current augmentations cannot alter the high-level semantic attributes, such as animal species present in a scene, to enhance the diversity of data. We improve diversity in data augmentation with image-to-image transformations parameterized by pre-trained text-to-image diffusion models. Our method edits images using an off-the-shelf diffusion model, and generalizes to novel visual concepts from a few labelled examples.
-
-[ICLR 2024 Manuscript](https://openreview.net/forum?id=ZWzUA9zeAg)    |    [Site](btrabuc.co/da-fusion)    |    [Leafy Spurge Dataset](leafy-spurge-dataset.github.io)
+[DA-Fusion Website](btrabuc.co/da-fusion)     |     [Paper](https://openreview.net/forum?id=ZWzUA9zeAg)
 
 ## Installation
 
-To install the package, first create a `conda` environment.
+First create a `conda` environment.
 
 ```bash
-conda create -n da-fusion python=3.7 pytorch==1.12.1 torchvision==0.13.1 cudatoolkit=11.6 -c pytorch
+conda create -n da-fusion python=3.7 pytorch==1.12.1 torchvision==0.13.1 cudatoolkit=11.6 -c pytorch -c nvidia
 conda activate da-fusion
 pip install diffusers["torch"] transformers pycocotools pandas matplotlib seaborn scipy
 ```
 
-Then download and install the source code.
+Then install the source code of this repository.
 
 ```bash
-git clone git@github.com:brandontrabucco/da-fusion.git
 pip install -e da-fusion
 ```
 
-## Datasets
+## Setting up the Dataset
 
-We benchmark DA-Fusion on few-shot image classification problems, including a Leafy Spurge weed recognition task, and classification tasks derived from COCO and PASCAL VOC. For the latter two, we label images with the classes corresponding to the largest object in the image.
+First we benchmark DA-Fusion on a classification task derived from COCO (2017).
 
 Custom datasets can be evaluated by implementing subclasses of `semantic_aug/few_shot_dataset.py`.
-
-## Setting Up PASCAL VOC
-
-Data for the PASCAL VOC task is adapted from the [2012 PASCAL VOC Challenge](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar). Once this dataset has been downloaded and extracted, the PASCAL dataset class `semantic_aug/datasets/pascal.py` should be pointed to the downloaded dataset via the `PASCAL_DIR` config variable located [here](https://github.com/brandontrabucco/da-fusion/blob/main/semantic_aug/datasets/pascal.py#L14).
-
-Ensure that `PASCAL_DIR` points to a folder containing `ImageSets`, `JPEGImages`, `SegmentationClass`, and `SegmentationObject` subfolders.
-
-## Setting Up COCO
 
 To setup COCO, first download the [2017 Training Images](http://images.cocodataset.org/zips/train2017.zip), the [2017 Validation Images](http://images.cocodataset.org/zips/val2017.zip), and the [2017 Train/Val Annotations](http://images.cocodataset.org/annotations/annotations_trainval2017.zip). These files should be unzipped into the following directory structure.
 
@@ -51,15 +37,11 @@ coco2017/
     annotations/
 ```
 
-`COCO_DIR` located [here](https://github.com/brandontrabucco/da-fusion/blob/main/semantic_aug/datasets/coco.py#L15) should be updated to point to the location of `coco2017` on your system.
-
-## Setting Up The Spurge Dataset
-
-We are planning to release this dataset in the next few months. Check back for updates!
+`COCO_DIR` located at `semantic_aug/datasets/coco.py` (Line 15) should be updated to point to the location of `coco2017` on your system.
 
 ## Fine-Tuning Tokens
 
-We perform textual inversion (https://arxiv.org/abs/2208.01618) to adapt Stable Diffusion to the classes present in our few-shot datasets. The implementation in `fine_tune.py` is adapted from the [Diffusers](https://github.com/huggingface/diffusers/blob/main/examples/textual_inversion/textual_inversion.py) example. 
+We perform [Textual Inversio]n(https://arxiv.org/abs/2208.01618) to adapt Stable Diffusion to the classes present in our few-shot datasets. The implementation in `fine_tune.py` is adapted from the [Diffusers](https://github.com/huggingface/diffusers/blob/main/examples/textual_inversion/textual_inversion.py) example. 
 
 We wrap this script for distributing experiments on a slurm cluster in a set of `sbatch` scripts located at `scripts/fine_tuning`. These scripts will perform multiple runs of Textual Inversion in parallel, subject to the number of available nodes on your slurm cluster.
 
