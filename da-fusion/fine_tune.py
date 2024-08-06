@@ -65,7 +65,6 @@ else:
         "lanczos": PIL.Image.LANCZOS,
         "nearest": PIL.Image.NEAREST,
     }
-# ------------------------------------------------------------------------------
 
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
@@ -75,6 +74,7 @@ check_min_version("0.10.0.dev0")
 logger = get_logger(__name__)
 
 
+# Saves the learned embeddings from the text encoder
 def save_progress(text_encoder, placeholder_token_id, accelerator, args, save_path):
     logger.info("Saving embeddings")
     learned_embeds = accelerator.unwrap_model(text_encoder).get_input_embeddings().weight[placeholder_token_id]
@@ -84,6 +84,7 @@ def save_progress(text_encoder, placeholder_token_id, accelerator, args, save_pa
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
+
     parser.add_argument(
         "--save_steps",
         type=int,
@@ -116,31 +117,54 @@ def parse_args():
         default=None,
         help="Pretrained tokenizer name or path if not the same as model_name",
     )
-    parser.add_argument("--learnable_property", type=str, default="object", help="Choose between 'object' and 'style'")
-    parser.add_argument("--repeats", type=int, default=100, help="How many times to repeat the training data.")
+    parser.add_argument(
+        "--learnable_property",
+        type=str, default="object",
+        help="Choose between 'object' and 'style'",
+    )
+    parser.add_argument(
+        "--repeats",
+        type=int,
+        default=100,
+        help="How many times to repeat the training data.",
+    )
     parser.add_argument(
         "--output_dir",
         type=str,
         default="./",
         help="The output directory where the model predictions and checkpoints will be written.",
     )
-    parser.add_argument("--seed", type=int, default=None, help="A seed for reproducible training.")
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="A seed for reproducible training.",
+    )
     parser.add_argument(
         "--resolution",
         type=int,
         default=512,
         help=(
-            "The resolution for input images, all the images in the train/validation dataset will be resized to this"
-            " resolution"
+            "The resolution for input images, all the images in the train/validation dataset will be"
+            "resized to this resolution"
         ),
     )
     parser.add_argument(
-        "--center_crop", action="store_true", help="Whether to center crop images before resizing to resolution"
+        "--center_crop",
+        action="store_true",
+        help="Whether to center crop images before resizing to resolution",
     )
     parser.add_argument(
-        "--train_batch_size", type=int, default=16, help="Batch size (per device) for the training dataloader."
+        "--train_batch_size",
+        type=int,
+        default=16,
+        help="Batch size (per device) for the training dataloader.",
     )
-    parser.add_argument("--num_train_epochs", type=int, default=100)
+    parser.add_argument(
+        "--num_train_epochs",
+        type=int,
+        default=100,
+    )
     parser.add_argument(
         "--max_train_steps",
         type=int,
@@ -180,14 +204,29 @@ def parse_args():
         ),
     )
     parser.add_argument(
-        "--lr_warmup_steps", type=int, default=500, help="Number of steps for the warmup in the lr scheduler."
+        "--lr_warmup_steps",
+        type=int,
+        default=500,
+        help="Number of steps for the warmup in the lr scheduler.",
     )
-    parser.add_argument("--adam_beta1", type=float, default=0.9, help="The beta1 parameter for the Adam optimizer.")
-    parser.add_argument("--adam_beta2", type=float, default=0.999, help="The beta2 parameter for the Adam optimizer.")
-    parser.add_argument("--adam_weight_decay", type=float, default=1e-2, help="Weight decay to use.")
-    parser.add_argument("--adam_epsilon", type=float, default=1e-08, help="Epsilon value for the Adam optimizer")
-    parser.add_argument("--push_to_hub", action="store_true", help="Whether or not to push the model to the Hub.")
-    parser.add_argument("--hub_token", type=str, default=None, help="The token to use to push to the Model Hub.")
+    parser.add_argument(
+        "--adam_beta1", type=float, default=0.9, help="The beta1 parameter for the Adam optimizer.",
+    )
+    parser.add_argument(
+        "--adam_beta2", type=float, default=0.999, help="The beta2 parameter for the Adam optimizer.",
+    )
+    parser.add_argument(
+        "--adam_weight_decay", type=float, default=1e-2, help="Weight decay to use.",
+    )
+    parser.add_argument(
+        "--adam_epsilon", type=float, default=1e-08, help="Epsilon value for the Adam optimizer",
+    )
+    parser.add_argument(
+        "--push_to_hub", action="store_true", help="Whether or not to push the model to the Hub.",
+    )
+    parser.add_argument(
+        "--hub_token", type=str, default=None, help="The token to use to push to the Model Hub.",
+    )
     parser.add_argument(
         "--hub_model_id",
         type=str,
@@ -231,7 +270,9 @@ def parse_args():
             ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
         ),
     )
-    parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
+    parser.add_argument(
+        "--local_rank", type=int, default=-1, help="For distributed training: local_rank",
+    )
     parser.add_argument(
         "--checkpointing_steps",
         type=int,
@@ -251,19 +292,28 @@ def parse_args():
         ),
     )
     parser.add_argument(
-        "--enable_xformers_memory_efficient_attention", action="store_true", help="Whether or not to use xformers."
+        "--enable_xformers_memory_efficient_attention", action="store_true", help="Whether or not to use xformers.",
     )
-
-    parser.add_argument("--num-trials", type=int, default=8)
-    parser.add_argument("--examples-per-class", nargs='+', type=int, default=[1, 2, 4, 8, 16])
-    
-    parser.add_argument("--dataset", type=str, default="coco", 
-                        choices=["spurge", "imagenet", "coco", "pascal"])
-
-    parser.add_argument("--unet-ckpt", type=str, default=None)
-
-    parser.add_argument("--erase-concepts", action="store_true", 
-                        help="erase text inversion concepts first")
+    parser.add_argument(
+        "--num-trials", type=int, default=8,
+    )
+    parser.add_argument(
+        "--examples-per-class", nargs='+', type=int, default=[1, 2, 4, 8, 16],
+    )
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default="coco", 
+        choices=["spurge", "imagenet", "coco", "pascal"],
+    )
+    parser.add_argument(
+        "--unet-ckpt", type=str, default=None,
+    )
+    parser.add_argument(
+        "--erase-concepts",
+        action="store_true", 
+        help="erase text inversion concepts first",
+    )
 
     args = parser.parse_args()
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
@@ -325,7 +375,8 @@ imagenet_style_templates_small = [
     "a large painting in the style of {}",
 ]
 
-
+# Defines how to handle and preprocess the chosen dataset for training.
+# (loads images, applies transformations, and generates text prompts with placeholder token)
 class TextualInversionDataset(Dataset):
     def __init__(
         self,
@@ -348,6 +399,7 @@ class TextualInversionDataset(Dataset):
         self.center_crop = center_crop
         self.flip_p = flip_p
 
+        # Creates list of all image paths in the dataset
         self.image_paths = [os.path.join(self.data_root, file_path) for file_path in os.listdir(self.data_root)]
 
         self.num_images = len(self.image_paths)
@@ -369,6 +421,10 @@ class TextualInversionDataset(Dataset):
     def __len__(self):
         return self._length
 
+    # The method for loading images
+    # Returns "example", a dict with
+    #   "input_ids": the tokenized prompt converted to ids, randomly selected from the template
+    #   "pixel_values": the tensor for values of the selected image, after pre-processing
     def __getitem__(self, i):
         example = {}
         image = Image.open(self.image_paths[i % self.num_images])
@@ -419,6 +475,7 @@ def get_full_repo_name(model_id: str, organization: Optional[str] = None, token:
         return f"{organization}/{model_id}"
 
 
+# The main function when executing the fine_tune.py script, starting the training process
 def main(args):
 
     logging_dir = os.path.join(args.output_dir, args.logging_dir)
@@ -504,7 +561,7 @@ def main(args):
     initializer_token_id = token_ids[0]
     placeholder_token_id = tokenizer.convert_tokens_to_ids(args.placeholder_token)
 
-    # Resize the token embeddings as we are adding new special tokens to the tokenizer
+    # Resize the text encoder's embedding layer to match the number of tokens in the tokenizer's vocabulary
     text_encoder.resize_token_embeddings(len(tokenizer))
 
     # Initialise the newly added placeholder token with the embeddings of the initializer token
@@ -607,7 +664,7 @@ def main(args):
     if accelerator.is_main_process:
         accelerator.init_trackers("textual_inversion", config=vars(args))
 
-    # Train!
+    # Initialize training!
     total_batch_size = args.train_batch_size * accelerator.num_processes * args.gradient_accumulation_steps
 
     logger.info("***** Running training *****")
@@ -642,9 +699,10 @@ def main(args):
     progress_bar = tqdm(range(global_step, args.max_train_steps), disable=not accelerator.is_local_main_process)
     progress_bar.set_description("Steps")
 
-    # keep original embeddings as reference
+    # Keep original embeddings as reference
     orig_embeds_params = accelerator.unwrap_model(text_encoder).get_input_embeddings().weight.data.clone()
 
+    # Training loop
     for epoch in range(first_epoch, args.num_train_epochs):
         text_encoder.train()
         for step, batch in enumerate(train_dataloader):
