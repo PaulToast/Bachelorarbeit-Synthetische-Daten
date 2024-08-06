@@ -52,7 +52,12 @@ coco2017/
 
 ## Fine-Tuning Tokens
 
-`fine_tune.py --pretrained_model_name_or_path "stable-diffusion/Stable_Diffusion_v1_Model_Card.md"`
+```bash
+python fine_tune.py
+  --pretrained_model_name_or_path "runwayml/stable-diffusion-v1-5"
+  --dataset coco
+  --train_batch_size 64
+```
 
 We perform [Textual Inversion](https://arxiv.org/abs/2208.01618) to adapt Stable Diffusion to the classes present in our few-shot datasets. The implementation in `fine_tune.py` is adapted from the [Diffusers](https://github.com/huggingface/diffusers/blob/main/examples/textual_inversion/textual_inversion.py) example.
 
