@@ -1,14 +1,20 @@
 # Effective Data Augmentation With Diffusion Models
 
-This is a modified version of the [original DA-Fusion repository](https://github.com/brandontrabucco/da-fusion).
-
-It is embedded into the main repository for this thesis work, but is used in isolation.
+Modified version of the [original DA-Fusion repository](https://github.com/brandontrabucco/da-fusion).
 
 [DA-Fusion Website](btrabuc.co/da-fusion)     |     [Paper](https://openreview.net/forum?id=ZWzUA9zeAg)
 
 ## Installation
 
-First set the following channel configuration the `/home/username/.condarc` file:
+First create the `conda` environment.
+
+```bash
+conda create -n da-fusion python=3.7 pytorch==1.12.1 torchvision==0.13.1 cudatoolkit=11.6 -c nvidia -c pytorch -c conda-forge
+conda activate da-fusion
+pip install diffusers["torch"] transformers pycocotools pandas matplotlib seaborn scipy
+```
+
+Run `conda list` to check if the correct GPU/CUDA-versions of the packages `pytorch`, `torchvision`, etc. were installed. If not, set the conda channel configuration manually in the `/home/username/.condarc` file, setting `channel_priority: strict`:
 
 ```
 channel_priority: strict
@@ -17,14 +23,6 @@ channels:
   - pytorch
   - conda-forge
   - defaults
-```
-
-Now create the `conda` environment.
-
-```bash
-conda create -n da-fusion python=3.7 pytorch==1.12.1 torchvision==0.13.1 cudatoolkit=11.6
-conda activate da-fusion
-pip install diffusers["torch"] transformers pycocotools pandas matplotlib seaborn scipy
 ```
 
 Then install the source code of this repository.
@@ -53,10 +51,7 @@ coco2017/
 ## Fine-Tuning Tokens
 
 ```bash
-python fine_tune.py
-  --pretrained_model_name_or_path "runwayml/stable-diffusion-v1-5"
-  --dataset coco
-  --train_batch_size 64
+python fine_tune.py --pretrained_model_name_or_path "runwayml/stable-diffusion-v1-5" --dataset coco --train_batch_size 64
 ```
 
 We perform [Textual Inversion](https://arxiv.org/abs/2208.01618) to adapt Stable Diffusion to the classes present in our few-shot datasets. The implementation in `fine_tune.py` is adapted from the [Diffusers](https://github.com/huggingface/diffusers/blob/main/examples/textual_inversion/textual_inversion.py) example.
