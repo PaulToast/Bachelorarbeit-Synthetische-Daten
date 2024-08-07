@@ -31,13 +31,13 @@ Then install the source code of this repository.
 pip install -e da-fusion
 ```
 
-## Setting up the Dataset
+## Setting up benchmark & custom datasets
+
+Datasets should be placed into the directory `da-fusion/projects/`.
 
 First we benchmark DA-Fusion on a classification task derived from COCO (2017).
 
-Custom datasets can be evaluated by implementing subclasses of `semantic_aug/few_shot_dataset.py`.
-
-To setup COCO, first download the [2017 Training Images](http://images.cocodataset.org/zips/train2017.zip), the [2017 Validation Images](http://images.cocodataset.org/zips/val2017.zip), and the [2017 Train/Val Annotations](http://images.cocodataset.org/annotations/annotations_trainval2017.zip). These files should be unzipped into the following directory structure.
+To setup COCO, first download the [2017 Training Images](http://images.cocodataset.org/zips/train2017.zip), the [2017 Validation Images](http://images.cocodataset.org/zips/val2017.zip), and the [2017 Train/Val Annotations](http://images.cocodataset.org/annotations/annotations_trainval2017.zip). These files should be unzipped into the following directory structure:
 
 ```
 coco2017/
@@ -48,21 +48,66 @@ coco2017/
 
 `COCO_DIR` located at `semantic_aug/datasets/coco.py` (Line 15) should be updated to point to the location of `coco2017` on your system.
 
+To set up custom datasets, add them to the same `projects` directory and implement a subclass of `semantic_aug/few_shot_dataset.py` - you can take `semantic_aug/datasets/coco.py` as an example.
+
 ## Fine-Tuning Tokens
 
 We perform [Textual Inversion](https://arxiv.org/abs/2208.01618) to adapt Stable Diffusion to the classes present in our few-shot datasets. The implementation in `fine_tune.py` is adapted from the [Diffusers](https://github.com/huggingface/diffusers/blob/main/examples/textual_inversion/textual_inversion.py) example.
 
-E.g.:
+Execute the `fine_tune.py` script with the according parameters, for example:
 
 ```bash
-python fine_tune.py --pretrained_model_name_or_path "runwayml/stable-diffusion-v1-5"
+--dataset=coco
+--pretrained_model_name_or_path="runwayml/stable-diffusion-v1-5"
+--resolution=512
+--train_batch_size=4
+--lr_warmup_steps=0
+--gradient_accumulation_steps=1
+--max_train_steps=1000
+--learning_rate=5.0e-04
+--scale_lr
+--lr_scheduler="constant"
+--mixed_precision=fp16
+--revision=fp16
+--gradient_checkpointing
+--only_save_embeds
+--num-trials 8
+--examples-per-class 1 2 4 8 16 
 ```
 
-We wrap this script for distributing experiments on a slurm cluster in a set of `sbatch` scripts located at `scripts/fine_tuning`. These scripts will perform multiple runs of Textual Inversion in parallel, subject to the number of available nodes on your slurm cluster.
+## Aggregate Embeddings
 
-If `sbatch` is not available in your system, you can run these scripts with `bash` and manually set `SLURM_ARRAY_TASK_ID` and `SLURM_ARRAY_TASK_COUNT` for each parallel job (these are normally set automatically by slurm to control the job index, and the number of jobs respectively, and can be set to 0, 1).
+After the previous step, we should be able to find the learned class tokens in the directory `fine-tuned/...`.
 
-## Few-Shot Classification
+In order to use these, we will call the script `aggregate_embeddings.py`, which merges all of them together into a single directory, creating a class-agnostic template to use for the next steps. Make sure to use the parameter `--dataset` to point to the correct dataset, as in the previous steps.
+
+## Generate Augmentations
+
+In order to generate augmentations, a connection to the HuggingFace API has to be set up.
+
+Run the following in your terminal:
+
+```bash
+pip install --upgrade huggingface_hub
+huggingface-cli login
+```
+
+You will be prompted for your HuggingFace account credentials, and for an access token that you may create for your account by following [this guide](https://huggingface.co/docs/huggingface_hub/quick-start#login).
+
+Afterwards, we can call the `generate_augmentations.py` script with the according parameters, for example:
+
+```bash
+--dataset=coco
+--out="output/coco/"
+--aug="real-guidance" #or "textual-inversion"
+--model-path="runwayml/stable-diffusion-v1-5"
+--embed-path="coco-tokens/coco-tokens-0-8.pt" #{dataset}-tokens-{seed}-{num_examples}
+--examples-per-class=1
+--num-synthetic=4
+--strength=0.5
+```
+
+## Train Classifiers
 
 Code for training image classification models using augmented images from DA-Fusion is located in `train_classifier.py`. This script accepts a number of arguments that control how the classifier is trained:
 
