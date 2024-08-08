@@ -6,7 +6,7 @@ from itertools import product
 from tqdm import trange
 
 
-DEFAULT_EMBED_PATH = "{dataset}-tokens/{dataset}-{seed}-{examples_per_class}.pt"
+DEFAULT_EMBED_PATH = "fine-tuned-aggregate/{dataset}/{dataset}-{seed}-{examples_per_class}.pt"
 
 
 if __name__ == "__main__":

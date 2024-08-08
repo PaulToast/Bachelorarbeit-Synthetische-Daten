@@ -169,3 +169,5 @@ testing/
 extracted/
 fine-tuned/
 fine-tuned-aggregate/
+real-guidance/
+textual-inversion-model/
