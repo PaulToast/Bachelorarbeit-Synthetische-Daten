@@ -2,7 +2,25 @@
 
 Diese Implementierung ist Teil einer Bachelorarbeit im Studiengang Medientechnik an der Hochschule für Angewandte Wissenschaften Hamburg.
 
-Für einen gewählten Datensatz soll:
+Das Ziel ist eine effiziente Kombination der [Supervised Contrastive Learning](https://arxiv.org/abs/2004.11362)-Methode mit [DA-Fusion](https://arxiv.org/abs/2302.07944), einer Methode zur synthetischen Datenaugmentation basierend auf Stable Diffusion. Mit der Kombination soll eine Bildklassifikation implementiert werden, welche eine verbesserte Generalisierungsfähigkeit und Robustheit gegenüber Out-of-Distribution-Daten aufweist.
 
-- [ ] mit [DA-Fusion](da-fusion/README.md) synthetische Augmentationen für die Klassen generiert werden
-- [ ] mit [Supervised Contrastive Learning](sup-contrast-fusion/README.md) unter Verwendung der synthetischen Daten latente Repräsentationen der Daten erlernt werden, die dann anschließend klassifiziert werden
+## Hintergrund
+
+...
+
+## Installation
+
+...[DA-Fusion](da-fusion/README.md)
+...[Supervised Contrastive Learning](sup-contrast-fusion/README.md)
+
+## Setup mit eigenen Daten
+
+...
+
+## Training
+
+...
+
+## Bildklassifikation
+
+...
