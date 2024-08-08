@@ -12,7 +12,7 @@ from PIL import Image
 from collections import defaultdict
 
 
-COCO_DIR = "projects/coco2017"
+COCO_DIR = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'training/coco2017'))
 
 TRAIN_IMAGE_DIR = os.path.join(COCO_DIR, "train2017")
 VAL_IMAGE_DIR = os.path.join(COCO_DIR, "val2017")

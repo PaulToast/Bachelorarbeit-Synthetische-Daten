@@ -162,8 +162,10 @@ cython_debug/
 #.idea/
 
 # Data
-projects/
+training/
+testing/
+
+# DA-Fusion
 extracted/
 fine-tuned/
-coco-tokens/
-output/
+fine-tuned-aggregate/

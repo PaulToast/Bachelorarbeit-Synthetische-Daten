@@ -11,7 +11,7 @@ from PIL import Image
 from collections import defaultdict
 
 
-PASCAL_DIR = "/projects/rsalakhugroup/datasets/pascal"
+PASCAL_DIR = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'training/pascal'))
 
 TRAIN_IMAGE_SET = os.path.join(
     PASCAL_DIR, "ImageSets/Segmentation/train.txt")
