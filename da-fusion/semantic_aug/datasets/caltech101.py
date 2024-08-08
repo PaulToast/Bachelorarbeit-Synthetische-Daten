@@ -13,7 +13,7 @@ from PIL import Image
 from collections import defaultdict
 
 
-DEFAULT_IMAGE_DIR = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'training/caltech101/caltech101/101_ObjectCategories'))
+DEFAULT_IMAGE_DIR = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_projects/caltech101/caltech101/101_ObjectCategories'))
 
 class CalTech101Dataset(FewShotDataset):
 

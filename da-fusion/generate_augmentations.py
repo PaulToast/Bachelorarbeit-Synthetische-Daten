@@ -41,7 +41,11 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Inference script")
     
-    parser.add_argument("--out", type=str, default="real-guidance/")
+    parser.add_argument(
+        "--out",
+        type=str,
+        default=os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_projects/{dataset}/aug/')),
+    )
 
     parser.add_argument("--model-path", type=str, default="CompVis/stable-diffusion-v1-4")
     parser.add_argument("--embed-path", type=str, default="erasure-tokens/pascal-tokens/pascal-0-8.pt")

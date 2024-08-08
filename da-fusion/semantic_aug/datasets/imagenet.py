@@ -9,7 +9,7 @@ from collections import defaultdict
 import numpy as np
 
 
-ILSVRC_DIR = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'training/imagenet'))
+ILSVRC_DIR = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_projects/imagenet'))
 
 LABEL_SYNSET = os.path.join(
     ILSVRC_DIR, "LOC_synset_mapping.txt")
