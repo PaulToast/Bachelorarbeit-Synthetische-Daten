@@ -1,3 +1,5 @@
+# From COCO
+
 from semantic_aug.few_shot_dataset import FewShotDataset
 from semantic_aug.generative_augmentation import GenerativeAugmentation
 from typing import Any, Tuple, Dict
@@ -7,100 +9,86 @@ import torchvision.transforms as transforms
 import torch
 import os
 
+#from pycocotools.coco import COCO
 from PIL import Image
 from collections import defaultdict
 
 
-PASCAL_DIR = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_projects/pascal'))
+MVIP_DIR = "/home/hofmpaul/Documents/Repositories/Bachelorarbeit-Synthetische-Daten/_projects/mvip"
 
-TRAIN_IMAGE_SET = os.path.join(PASCAL_DIR, "ImageSets/Segmentation/train.txt")
-VAL_IMAGE_SET = os.path.join(PASCAL_DIR, "ImageSets/Segmentation/val.txt")
+# projects/mvip/
+#   class1/
+#       train/
+#           0.png
+#           1.png
+#           ...
+#       val/
+#           ...
+#       meta.json
+#   ...
 
-DEFAULT_IMAGE_DIR = os.path.join(PASCAL_DIR, "JPEGImages")
-DEFAULT_LABEL_DIR = os.path.join(PASCAL_DIR, "SegmentationClass")
-DEFAULT_INSTANCE_DIR = os.path.join(PASCAL_DIR, "SegmentationObject")
 
+class MVIPDataset(FewShotDataset):
 
-class PASCALDataset(FewShotDataset):
-
-    class_names = ['airplane', 'bicycle', 'bird', 'boat', 'bottle', 
-        'bus', 'car', 'cat', 'chair', 'cow', 'dining table', 'dog', 
-        'horse', 'motorcycle', 'person', 'potted plant', 'sheep', 
-        'sofa', 'train', 'television']
+    # Generate list of class names from the directory
+    class_names = [f for f in os.listdir(MVIP_DIR) if os.path.isdir(os.path.join(MVIP_DIR, f))]
 
     num_classes: int = len(class_names)
 
-    def __init__(self, *args, split: str = "train", seed: int = 0, 
-                 train_image_set: str = TRAIN_IMAGE_SET, 
-                 val_image_set: str = VAL_IMAGE_SET, 
-                 image_dir: str = DEFAULT_IMAGE_DIR, 
-                 label_dir: str = DEFAULT_LABEL_DIR, 
-                 instance_dir: str = DEFAULT_INSTANCE_DIR, 
+    def __init__(self, *args, split: str = "train", seed: int = 0,
+                 image_dir: str = MVIP_DIR,
+                 #train_image_dir: str = TRAIN_IMAGE_DIR, 
+                 #val_image_dir: str = VAL_IMAGE_DIR, 
+                 #train_instances_file: str = DEFAULT_TRAIN_INSTANCES, 
+                 #val_instances_file: str = DEFAULT_VAL_INSTANCES, 
                  examples_per_class: int = None, 
                  generative_aug: GenerativeAugmentation = None, 
                  synthetic_probability: float = 0.5,
                  use_randaugment: bool = False,
                  image_size: Tuple[int] = (256, 256), **kwargs):
 
-        super(PASCALDataset, self).__init__(
+        super(MVIPDataset, self).__init__(
             *args, examples_per_class=examples_per_class,
             synthetic_probability=synthetic_probability, 
             generative_aug=generative_aug, **kwargs)
 
-        image_set = {"train": train_image_set, "val": val_image_set}[split]
-
-        with open(image_set, "r") as f:
-            image_set_lines = [x.strip() for x in f.readlines()]
-
+        # Add every image path to a class_to_images dict
         class_to_images = defaultdict(list)
-        class_to_annotations = defaultdict(list)
 
-        for image_id in image_set_lines:
+        for class_name in self.class_names:
+            path = os.path.join(image_dir, class_name, split)
+            images = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+            for image in images: 
+                class_to_images[class_name].append(os.path.join(path, image))
 
-            labels = os.path.join(label_dir, image_id + ".png")
-            instances = os.path.join(instance_dir, image_id + ".png")
-
-            labels = np.asarray(Image.open(labels))
-            instances = np.asarray(Image.open(instances))
-
-            instance_ids, pixel_loc, counts = np.unique(
-                instances, return_index=True, return_counts=True)
-
-            counts[0] = counts[-1] = 0  # remove background
-
-            argmax_index = counts.argmax()
-
-            mask = np.equal(instances, instance_ids[argmax_index])
-            class_name = self.class_names[
-                labels.flat[pixel_loc[argmax_index]] - 1]
-
-            class_to_images[class_name].append(
-                os.path.join(image_dir, image_id + ".jpg"))
-            class_to_annotations[class_name].append(dict(mask=mask))
-
+        # Randomly shuffle the order of images in each class by generating a sequence
+        # of ids for each class with a random seed
         rng = np.random.default_rng(seed)
+
         class_to_ids = {key: rng.permutation(
             len(class_to_images[key])) for key in self.class_names}
-
+        
         if examples_per_class is not None:
             class_to_ids = {key: ids[:examples_per_class] 
                             for key, ids in class_to_ids.items()}
+
+        ###
 
         self.class_to_images = {
             key: [class_to_images[key][i] for i in ids] 
             for key, ids in class_to_ids.items()}
 
-        self.class_to_annotations = {
+        """self.class_to_annotations = {
             key: [class_to_annotations[key][i] for i in ids] 
-            for key, ids in class_to_ids.items()}
+            for key, ids in class_to_ids.items()}"""
 
         self.all_images = sum([
             self.class_to_images[key] 
             for key in self.class_names], [])
 
-        self.all_annotations = sum([
+        """self.all_annotations = sum([
             self.class_to_annotations[key] 
-            for key in self.class_names], [])
+            for key in self.class_names], [])"""
 
         self.all_labels = [i for i, key in enumerate(
             self.class_names) for _ in self.class_to_images[key]]
@@ -141,15 +129,18 @@ class PASCALDataset(FewShotDataset):
         
         return len(self.all_images)
 
-    def get_image_by_idx(self, idx: int) -> Image.Image:
+    def get_image_by_idx(self, idx: int) -> torch.Tensor:
 
         return Image.open(self.all_images[idx]).convert('RGB')
 
-    def get_label_by_idx(self, idx: int) -> int:
+    def get_label_by_idx(self, idx: int) -> torch.Tensor:
 
         return self.all_labels[idx]
     
-    def get_metadata_by_idx(self, idx: int) -> dict:
+    def get_metadata_by_idx(self, idx: int) -> Dict:
+
+        annotation = self.all_annotations[idx]
 
         return dict(name=self.class_names[self.all_labels[idx]], 
-                    **self.all_annotations[idx])
+                    mask=self.cocoapi.annToMask(annotation),
+                    **annotation)
