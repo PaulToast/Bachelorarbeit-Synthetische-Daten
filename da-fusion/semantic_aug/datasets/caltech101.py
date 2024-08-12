@@ -54,6 +54,8 @@ class CalTech101Dataset(FewShotDataset):
 
         class_to_images = defaultdict(list)
 
+        # Go through all images and fill out the class_to_images dict with
+        # class_name & image_path pairs
         for image_path in glob.glob(os.path.join(image_dir, "*/*.jpg")):
             class_name = image_path.split("/")[-2].lower().replace("_", " ")
             class_to_images[class_name].append(image_path)
