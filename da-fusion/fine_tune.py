@@ -15,6 +15,7 @@ import torch.nn.functional as F
 import torch.utils.checkpoint
 from torch.utils.data import Dataset
 
+from semantic_aug.datasets.mvip import MVIPDataset
 from semantic_aug.datasets.coco import COCODataset
 from semantic_aug.datasets.spurge import SpurgeDataset
 from semantic_aug.datasets.imagenet import ImageNetDataset
@@ -42,6 +43,7 @@ from transformers import CLIPTextModel, CLIPTokenizer
 
 
 DATASETS = {
+    "mvip": MVIPDataset,
     "spurge": SpurgeDataset, 
     "coco": COCODataset, 
     "pascal": PASCALDataset,
@@ -304,7 +306,7 @@ def parse_args():
         "--dataset",
         type=str,
         default="coco", 
-        choices=["spurge", "imagenet", "coco", "pascal"],
+        choices=["spurge", "imagenet", "coco", "pascal", "mvip"],
     )
     parser.add_argument(
         "--unet-ckpt", type=str, default=None,

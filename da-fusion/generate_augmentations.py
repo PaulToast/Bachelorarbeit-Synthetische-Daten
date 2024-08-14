@@ -1,3 +1,4 @@
+from semantic_aug.datasets.mvip import MVIPDataset
 from semantic_aug.datasets.coco import COCODataset
 from semantic_aug.datasets.spurge import SpurgeDataset
 from semantic_aug.datasets.imagenet import ImageNetDataset
@@ -20,6 +21,7 @@ import random
 
 
 DATASETS = {
+    "mvip": MVIPDataset,
     "spurge": SpurgeDataset, 
     "coco": COCODataset, 
     "pascal": PASCALDataset,
@@ -41,16 +43,17 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Inference script")
     
+    parser.add_argument("--dataset", type=str, default="pascal")
+
     parser.add_argument(
         "--out",
         type=str,
-        default=os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_projects/{dataset}/aug/')),
+        default=os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_output/')),
     )
 
     parser.add_argument("--model-path", type=str, default="CompVis/stable-diffusion-v1-4")
     parser.add_argument("--embed-path", type=str, default="erasure-tokens/pascal-tokens/pascal-0-8.pt")
     
-    parser.add_argument("--dataset", type=str, default="pascal")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--examples-per-class", type=int, default=1)
     parser.add_argument("--num-synthetic", type=int, default=10)

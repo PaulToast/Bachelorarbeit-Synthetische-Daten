@@ -1,5 +1,3 @@
-# From COCO
-
 from semantic_aug.few_shot_dataset import FewShotDataset
 from semantic_aug.generative_augmentation import GenerativeAugmentation
 from typing import Any, Tuple, Dict
@@ -8,39 +6,38 @@ import numpy as np
 import torchvision.transforms as transforms
 import torch
 import os
+import json
 
-#from pycocotools.coco import COCO
 from PIL import Image
 from collections import defaultdict
 
-
-MVIP_DIR = "/home/hofmpaul/Documents/Repositories/Bachelorarbeit-Synthetische-Daten/_projects/mvip"
-
-# projects/mvip/
-#   class1/
-#       train/
-#           0.png
-#           1.png
-#           ...
-#       val/
-#           ...
-#       meta.json
-#   ...
+MVIP_DIR = "/mnt/HDD/MVIP/sets"
 
 
 class MVIPDataset(FewShotDataset):
 
-    # Generate list of class names from the directory
-    class_names = [f for f in os.listdir(MVIP_DIR) if os.path.isdir(os.path.join(MVIP_DIR, f))]
+    # Go through all classes & check the metadata
+    # If the class is of the super_class "CarComponent", add it to class_names
+    class_names = []
+
+    for class_name in [f for f in os.listdir(MVIP_DIR) if os.path.isdir(os.path.join(MVIP_DIR, f))]:
+        meta_file = open(os.path.join(MVIP_DIR, class_name, "meta.json"))
+        meta_data = json.load(meta_file)
+
+        if "CarComponent" in meta_data['super_class']:
+            class_names.append(class_name)
+
+        meta_file.close()
+
+        # Randomly select only 30 of the classes
+        np.random.shuffle(class_names)
+        del class_names[30:]
 
     num_classes: int = len(class_names)
+    print("num_classes: ", num_classes)
 
     def __init__(self, *args, split: str = "train", seed: int = 0,
                  image_dir: str = MVIP_DIR,
-                 #train_image_dir: str = TRAIN_IMAGE_DIR, 
-                 #val_image_dir: str = VAL_IMAGE_DIR, 
-                 #train_instances_file: str = DEFAULT_TRAIN_INSTANCES, 
-                 #val_instances_file: str = DEFAULT_VAL_INSTANCES, 
                  examples_per_class: int = None, 
                  generative_aug: GenerativeAugmentation = None, 
                  synthetic_probability: float = 0.5,
@@ -51,15 +48,27 @@ class MVIPDataset(FewShotDataset):
             *args, examples_per_class=examples_per_class,
             synthetic_probability=synthetic_probability, 
             generative_aug=generative_aug, **kwargs)
+        
+        split_dir = {
+            "train": "train_data",
+            "test": "test_data",
+            "val": "valid_data"
+        } 
 
         # Add every image path to a class_to_images dict
         class_to_images = defaultdict(list)
 
         for class_name in self.class_names:
-            path = os.path.join(image_dir, class_name, split)
-            images = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-            for image in images: 
-                class_to_images[class_name].append(os.path.join(path, image))
+            root = os.path.join(image_dir, class_name, split_dir[split])
+
+            # Go through every set + orientation + cam
+            # Select only the rgb images
+            for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
+                for orientation in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
+                    for cam in [f for f in os.listdir(os.path.join(root, set, orientation)) if os.path.isdir(os.path.join(root, set, orientation, f))]:
+                        for file in os.listdir(os.path.join(root, set, orientation, cam)):
+                            if file.endswith("rgb.png"):
+                                class_to_images[class_name].append(os.path.join(root, set, orientation, cam, file))
 
         # Randomly shuffle the order of images in each class by generating a sequence
         # of ids for each class with a random seed
@@ -72,7 +81,7 @@ class MVIPDataset(FewShotDataset):
             class_to_ids = {key: ids[:examples_per_class] 
                             for key, ids in class_to_ids.items()}
 
-        ###
+        ##############################################################################
 
         self.class_to_images = {
             key: [class_to_images[key][i] for i in ids] 
@@ -139,8 +148,8 @@ class MVIPDataset(FewShotDataset):
     
     def get_metadata_by_idx(self, idx: int) -> Dict:
 
-        annotation = self.all_annotations[idx]
+        #annotation = self.all_annotations[idx]
 
-        return dict(name=self.class_names[self.all_labels[idx]], 
-                    mask=self.cocoapi.annToMask(annotation),
-                    **annotation)
+        return dict(name=self.class_names[self.all_labels[idx]]) 
+                    #mask=self.cocoapi.annToMask(annotation),
+                    #**annotation)

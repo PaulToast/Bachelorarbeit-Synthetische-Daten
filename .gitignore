@@ -162,9 +162,9 @@ cython_debug/
 #.idea/
 
 # Data
-_projects/
+_datasets/
+_output/
 
-# DA-Fusion
 extracted/
 fine-tuned/
 fine-tuned-aggregate/

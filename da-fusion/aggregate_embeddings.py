@@ -20,7 +20,7 @@ if __name__ == "__main__":
     parser.add_argument("--input-path", type=str, default="./fine-tuned")
     
     parser.add_argument("--dataset", type=str, default="pascal", 
-                        choices=["spurge", "imagenet", "coco", "pascal"])
+                        choices=["spurge", "imagenet", "coco", "pascal", "mvip"])
 
     args = parser.parse_args()
 

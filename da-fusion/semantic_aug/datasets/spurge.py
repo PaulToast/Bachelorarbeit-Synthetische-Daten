@@ -11,7 +11,7 @@ import torchvision.transforms as transforms
 import torch
 
 
-DEFAULT_DATA_DIR = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_projects/spurge'))
+DEFAULT_DATA_DIR = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_datasets/spurge'))
 
 
 class SpurgeDataset(FewShotDataset):
