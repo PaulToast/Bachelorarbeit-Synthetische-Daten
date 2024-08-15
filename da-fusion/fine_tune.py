@@ -43,11 +43,11 @@ from transformers import CLIPTextModel, CLIPTokenizer
 
 
 DATASETS = {
-    "mvip": MVIPDataset,
-    "spurge": SpurgeDataset, 
     "coco": COCODataset, 
     "pascal": PASCALDataset,
-    "imagenet": ImageNetDataset
+    "imagenet": ImageNetDataset,
+    "spurge": SpurgeDataset,
+    "mvip": MVIPDataset
 }
 
 
@@ -88,16 +88,10 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
 
     parser.add_argument(
-        "--save_steps",
-        type=int,
-        default=500,
-        help="Save learned_embeds.bin every X updates steps.",
-    )
-    parser.add_argument(
-        "--only_save_embeds",
-        action="store_true",
-        default=False,
-        help="Save only the embeddings for the new concept.",
+        "--dataset",
+        type=str,
+        default="mvip", 
+        choices=DATASETS.keys(),
     )
     parser.add_argument(
         "--pretrained_model_name_or_path",
@@ -112,6 +106,45 @@ def parse_args():
         default=None,
         required=False,
         help="Revision of pretrained model identifier from huggingface.co/models.",
+    )
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        default=None,
+        help="The output directory where the model predictions and checkpoints will be written.",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="A seed for reproducible training.",
+    )
+    parser.add_argument(
+        "--resolution",
+        type=int,
+        default=512,
+        help=(
+            "The resolution for input images, all the images in the train/validation dataset will be"
+            "resized to this resolution"
+        ),
+    )
+    parser.add_argument(
+        "--num-trials", type=int, default=8, # help=""
+    )
+    parser.add_argument(
+        "--examples-per-class", nargs='+', type=int, default=[1, 2, 4, 8, 16], # help=""
+    )
+    parser.add_argument(
+        "--save_steps",
+        type=int,
+        default=500,
+        help="Save learned_embeds.bin every X updates steps.",
+    )
+    parser.add_argument(
+        "--only_save_embeds",
+        action="store_true",
+        default=False,
+        help="Save only the embeddings for the new concept.",
     )
     parser.add_argument(
         "--tokenizer_name",
@@ -129,27 +162,6 @@ def parse_args():
         type=int,
         default=100,
         help="How many times to repeat the training data.",
-    )
-    parser.add_argument(
-        "--output_dir",
-        type=str,
-        default=None,
-        help="The output directory where the model predictions and checkpoints will be written. If left to None will default to '_data/{dataset}/aug/'.",
-    )
-    parser.add_argument(
-        "--seed",
-        type=int,
-        default=None,
-        help="A seed for reproducible training.",
-    )
-    parser.add_argument(
-        "--resolution",
-        type=int,
-        default=512,
-        help=(
-            "The resolution for input images, all the images in the train/validation dataset will be"
-            "resized to this resolution"
-        ),
     )
     parser.add_argument(
         "--center_crop",
@@ -236,15 +248,6 @@ def parse_args():
         help="The name of the repository to keep in sync with the local `output_dir`.",
     )
     parser.add_argument(
-        "--logging_dir",
-        type=str,
-        default="logs",
-        help=(
-            "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
-            " *output_dir/runs/**CURRENT_DATETIME_HOSTNAME***."
-        ),
-    )
-    parser.add_argument(
         "--mixed_precision",
         type=str,
         default="no",
@@ -261,15 +264,6 @@ def parse_args():
         help=(
             "Whether or not to allow TF32 on Ampere GPUs. Can be used to speed up training. For more information, see"
             " https://pytorch.org/docs/stable/notes/cuda.html#tensorfloat-32-tf32-on-ampere-devices"
-        ),
-    )
-    parser.add_argument(
-        "--report_to",
-        type=str,
-        default="tensorboard",
-        help=(
-            'The integration to report the results and logs to. Supported platforms are `"tensorboard"`'
-            ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
         ),
     )
     parser.add_argument(
@@ -297,24 +291,30 @@ def parse_args():
         "--enable_xformers_memory_efficient_attention", action="store_true", help="Whether or not to use xformers.",
     )
     parser.add_argument(
-        "--num-trials", type=int, default=8, # help=""
-    )
-    parser.add_argument(
-        "--examples-per-class", nargs='+', type=int, default=[1, 2, 4, 8, 16], # help=""
-    )
-    parser.add_argument(
-        "--dataset",
-        type=str,
-        default="mvip", 
-        choices=["spurge", "imagenet", "coco", "pascal", "mvip"],
-    )
-    parser.add_argument(
         "--unet-ckpt", type=str, default=None,
     )
     parser.add_argument(
         "--erase-concepts",
         action="store_true", 
         help="erase text inversion concepts first",
+    )
+    parser.add_argument(
+        "--logging_dir",
+        type=str,
+        default="logs",
+        help=(
+            "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
+            " *output_dir/runs/**CURRENT_DATETIME_HOSTNAME***."
+        ),
+    )
+    parser.add_argument(
+        "--report_to",
+        type=str,
+        default="tensorboard",
+        help=(
+            'The integration to report the results and logs to. Supported platforms are `"tensorboard"`'
+            ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
+        ),
     )
 
     args = parser.parse_args()

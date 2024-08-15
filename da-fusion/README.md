@@ -1,8 +1,6 @@
 # Effective Data Augmentation With Diffusion Models
 
-Modified version of the [original DA-Fusion repository](https://github.com/brandontrabucco/da-fusion).
-
-[DA-Fusion Website](btrabuc.co/da-fusion)     |     [Paper](https://openreview.net/forum?id=ZWzUA9zeAg)
+Modified version of the [original DA-Fusion repository](https://github.com/brandontrabucco/da-fusion) ( [Website](btrabuc.co/da-fusion) | [Paper](https://openreview.net/forum?id=ZWzUA9zeAg) )
 
 ## Installation
 
@@ -14,7 +12,7 @@ conda activate da-fusion
 pip install diffusers["torch"] transformers pycocotools pandas matplotlib seaborn scipy
 ```
 
-Run `conda list` to check if the correct GPU/CUDA-versions of the packages `pytorch`, `torchvision`, etc. were installed. If not, set the conda channel configuration manually in the `/home/username/.condarc` file, setting `channel_priority: strict`:
+Run `conda list` to check if the correct GPU/CUDA-versions of the packages `pytorch`, `torchvision`, etc. were installed. If not, set the conda channel configuration manually in the `/home/username/.condarc` file, declaring `channel_priority: strict`:
 
 ```
 channel_priority: strict
@@ -33,11 +31,13 @@ pip install -e da-fusion
 
 ## Setting up benchmark & custom datasets
 
-Datasets should be placed into the directory `da-fusion/projects/`.
+Datasets should be placed into the directory `da-fusion/_data/{dataset}`. This is also where the trained weights & image augmentations will be saved for each dataset.
 
-First we benchmark DA-Fusion on a classification task derived from COCO (2017).
+To benchmark DA-Fusion, we use a classification task derived from COCO (2017).
 
-To setup COCO, first download the [2017 Training Images](http://images.cocodataset.org/zips/train2017.zip), the [2017 Validation Images](http://images.cocodataset.org/zips/val2017.zip), and the [2017 Train/Val Annotations](http://images.cocodataset.org/annotations/annotations_trainval2017.zip). These files should be unzipped into the following directory structure:
+Download the [2017 Training Images](http://images.cocodataset.org/zips/train2017.zip), the [2017 Validation Images](http://images.cocodataset.org/zips/val2017.zip), and the [2017 Train/Val Annotations](http://images.cocodataset.org/annotations/annotations_trainval2017.zip).
+
+These files should be unzipped into the top-level folder `_data/` with the following directory structure:
 
 ```
 coco2017/
@@ -46,40 +46,29 @@ coco2017/
     annotations/
 ```
 
-`COCO_DIR` located at `semantic_aug/datasets/coco.py` (Line 15) should be updated to point to the location of `coco2017` on your system.
-
-To set up custom datasets, add them to the same `projects` directory and implement a subclass of `semantic_aug/few_shot_dataset.py` - you can take `semantic_aug/datasets/coco.py` as an example.
+To set up custom datasets, add them to the same `_data` directory and implement a subclass of `semantic_aug/few_shot_dataset.py` (since every dataset may have a different structure and form - you can take `semantic_aug/datasets/coco.py` as an example.)
 
 ## Fine-Tuning Tokens
 
 We perform [Textual Inversion](https://arxiv.org/abs/2208.01618) to adapt Stable Diffusion to the classes present in our few-shot datasets. The implementation in `fine_tune.py` is adapted from the [Diffusers](https://github.com/huggingface/diffusers/blob/main/examples/textual_inversion/textual_inversion.py) example.
 
-Execute the `fine_tune.py` script with the according parameters, for example:
+Here is an example for executing the `fine_tune.py` script on the COCO dataset:
 
 ```bash
---dataset=coco
---pretrained_model_name_or_path="runwayml/stable-diffusion-v1-5"
---resolution=512
---train_batch_size=4
---lr_warmup_steps=0
---gradient_accumulation_steps=1
---max_train_steps=1000
---learning_rate=5.0e-04
---scale_lr
---lr_scheduler="constant"
---mixed_precision=fp16
---revision=fp16
---gradient_checkpointing
---only_save_embeds
---num-trials 8
---examples-per-class 1 2 4 8 16 
+python fine_tune.py --dataset=coco \
+--pretrained_model_name_or_path="CompVis/stable-diffusion-v1-4" \
+--resolution=512 --train_batch_size=4 --lr_warmup_steps=0 \
+--gradient_accumulation_steps=1 --max_train_steps=1000 \
+--learning_rate=5.0e-04 --scale_lr --lr_scheduler="constant" \
+--mixed_precision=fp16 --revision=fp16 --gradient_checkpointing \
+--only_save_embeds --num-trials 8 --examples-per-class 1 2 4 8 16 
 ```
 
 ## Aggregate Embeddings
 
-After the previous step, we should be able to find the learned class tokens in the directory `fine-tuned/...`.
+After the previous step, we should be able to find the learned class tokens in the directory `_data/{dataset}/sd-fine-tuned/`.
 
-In order to use these, we will call the script `aggregate_embeddings.py`, which merges all of them together into a single directory, creating a class-agnostic template to use for the next steps. Make sure to use the parameter `--dataset` to point to the correct dataset, as in the previous steps.
+In order to use them, we will call the script `aggregate_embeddings.py`, which merges all of them together into a single directory, creating a class-agnostic template to use for the next steps. Make sure to use the parameter `--dataset` to point to the correct dataset, as in the previous steps.
 
 ## Generate Augmentations
 
@@ -97,30 +86,6 @@ You will be prompted for your HuggingFace account credentials, and for an access
 Afterwards, we can call the `generate_augmentations.py` script with the according parameters, for example:
 
 ```bash
---dataset=coco
---out="output/coco/"
---aug="real-guidance" #or "textual-inversion"
---model-path="runwayml/stable-diffusion-v1-5"
---embed-path="coco-tokens/coco-tokens-0-8.pt" #{dataset}-tokens-{seed}-{num_examples}
---examples-per-class=1
---num-synthetic=4
---strength=0.5
+python generate_augmentations.py --dataset=coco \
+--examples-per-class=1 --num-synthetic=4 --strength=0.5
 ```
-
-## Train Classifiers
-
-Code for training image classification models using augmented images from DA-Fusion is located in `train_classifier.py`. This script accepts a number of arguments that control how the classifier is trained:
-
-```bash
-python train_classifier.py --logdir pascal-baselines/textual-inversion-0.5 \
---synthetic-dir "aug/textual-inversion-0.5/{dataset}-{seed}-{examples_per_class}" \
---dataset pascal --prompt "a photo of a {name}" \
---aug textual-inversion --guidance-scale 7.5 \
---strength 0.5 --mask 0 --inverted 0 \
---num-synthetic 10 --synthetic-probability 0.5 \
---num-trials 1 --examples-per-class 4
-```
-
-This example will train a classifier on the PASCAL VOC task, with 4 images per class, using the prompt `"a photo of a ClassX"` where the special token `ClassX` is fine-tuned (from scratch) with textual inversion. Slurm scripts that reproduce the paper are located in `scripts/textual_inversion`. Results are logged to `.csv` files based on the script argument `--logdir`. 
-
-We used a [custom plotting script](https://github.com/brandontrabucco/da-fusion/blob/main/plot.py) to generate the figures in the main paper.

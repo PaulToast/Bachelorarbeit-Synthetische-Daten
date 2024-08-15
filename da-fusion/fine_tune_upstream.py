@@ -63,6 +63,7 @@ from semantic_aug.datasets.imagenet import ImageNetDataset
 from semantic_aug.datasets.pascal import PASCALDataset
 from semantic_aug.datasets.caltech101 import CalTech101Dataset
 from semantic_aug.datasets.flowers102 import Flowers102Dataset
+from semantic_aug.datasets.mvip import MVIPDataset
 
 
 DATASETS = {
@@ -71,7 +72,8 @@ DATASETS = {
     "pascal": PASCALDataset,
     "imagenet": ImageNetDataset,
     "caltech": CalTech101Dataset,
-    "flowers": Flowers102Dataset
+    "flowers": Flowers102Dataset,
+    "mvip": MVIPDataset
 }
 
 
@@ -94,7 +96,6 @@ else:
         "lanczos": PIL.Image.LANCZOS,
         "nearest": PIL.Image.NEAREST,
     }
-# ------------------------------------------------------------------------------
 
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
@@ -190,27 +191,17 @@ def save_progress(text_encoder, placeholder_token_ids, accelerator, args, save_p
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
+    
     parser.add_argument(
-        "--save_steps",
-        type=int,
-        default=500,
-        help="Save learned_embeds.bin every X updates steps.",
-    )
-    parser.add_argument(
-        "--save_as_full_pipeline",
-        action="store_true",
-        help="Save the complete stable diffusion pipeline.",
-    )
-    parser.add_argument(
-        "--num_vectors",
-        type=int,
-        default=1,
-        help="How many textual inversion vectors shall be used to learn the concept.",
+        "--dataset",
+        type=str,
+        default="mvip",
+        choices=DATASETS.keys(),
     )
     parser.add_argument(
         "--pretrained_model_name_or_path",
         type=str,
-        default=None,
+        default="CompVis/stable-diffusion-v1-4",
         required=True,
         help="Path to pretrained model or model identifier from huggingface.co/models.",
     )
@@ -220,6 +211,12 @@ def parse_args():
         default=None,
         required=False,
         help="Revision of pretrained model identifier from huggingface.co/models.",
+    )
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        default=None,
+        help="The output directory where the model predictions and checkpoints will be written.",
     )
     parser.add_argument(
         "--tokenizer_name",
@@ -241,24 +238,6 @@ def parse_args():
         help="A token to use as initializer word.",
     )
     parser.add_argument(
-        "--learnable_property",
-        type=str,
-        default="object",
-        help="Choose between 'object' and 'style'",
-    )
-    parser.add_argument(
-        "--repeats",
-        type=int,
-        default=100,
-        help="How many times to repeat the training data.",
-    )
-    parser.add_argument(
-        "--output_dir",
-        type=str,
-        default="text-inversion-model",
-        help="The output directory where the model predictions and checkpoints will be written.",
-    )
-    parser.add_argument(
         "--seed",
         type=int,
         default=None,
@@ -274,9 +253,15 @@ def parse_args():
         ),
     )
     parser.add_argument(
-        "--center_crop",
-        action="store_true",
-        help="Whether to center crop images before resizing to resolution.",
+        "--num_trials",
+        type=int,
+        default=8,
+    )
+    parser.add_argument(
+        "--examples_per_class",
+        nargs='+',
+        type=int,
+        default=[1, 2, 4, 8, 16],
     )
     parser.add_argument(
         "--train_batch_size",
@@ -294,6 +279,40 @@ def parse_args():
         type=int,
         default=5000,
         help="Total number of training steps to perform.  If provided, overrides num_train_epochs.",
+    )
+    parser.add_argument(
+        "--save_steps",
+        type=int,
+        default=500,
+        help="Save learned_embeds.bin every X updates steps.",
+    )
+    parser.add_argument(
+        "--save_as_full_pipeline",
+        action="store_true",
+        help="Save the complete stable diffusion pipeline.",
+    )
+    parser.add_argument(
+        "--num_vectors",
+        type=int,
+        default=1,
+        help="How many textual inversion vectors shall be used to learn the concept.",
+    )
+    parser.add_argument(
+        "--learnable_property",
+        type=str,
+        default="object",
+        help="Choose between 'object' and 'style'",
+    )
+    parser.add_argument(
+        "--repeats",
+        type=int,
+        default=100,
+        help="How many times to repeat the training data.",
+    )
+    parser.add_argument(
+        "--center_crop",
+        action="store_true",
+        help="Whether to center crop images before resizing to resolution.",
     )
     parser.add_argument(
         "--gradient_accumulation_steps",
@@ -357,15 +376,6 @@ def parse_args():
         help="The name of the repository to keep in sync with the local `output_dir`.",
     )
     parser.add_argument(
-        "--logging_dir",
-        type=str,
-        default="logs",
-        help=(
-            "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
-            " *output_dir/runs/**CURRENT_DATETIME_HOSTNAME***."
-        ),
-    )
-    parser.add_argument(
         "--mixed_precision",
         type=str,
         default="no",
@@ -382,15 +392,6 @@ def parse_args():
         help=(
             "Whether or not to allow TF32 on Ampere GPUs. Can be used to speed up training. For more information, see"
             " https://pytorch.org/docs/stable/notes/cuda.html#tensorfloat-32-tf32-on-ampere-devices"
-        ),
-    )
-    parser.add_argument(
-        "--report_to",
-        type=str,
-        default="tensorboard",
-        help=(
-            'The integration to report the results and logs to. Supported platforms are `"tensorboard"`'
-            ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
         ),
     )
     parser.add_argument(
@@ -425,7 +426,12 @@ def parse_args():
             " and logging the images."
         ),
     )
-    parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
+    parser.add_argument(
+        "--local_rank",
+        type=int,
+        default=-1,
+        help="For distributed training: local_rank",
+    )
     parser.add_argument(
         "--checkpointing_steps",
         type=int,
@@ -451,16 +457,44 @@ def parse_args():
         ),
     )
     parser.add_argument(
-        "--enable_xformers_memory_efficient_attention", action="store_true", help="Whether or not to use xformers."
+        "--enable_xformers_memory_efficient_attention",
+        action="store_true",
+        help="Whether or not to use xformers.",
     )
-    parser.add_argument("--num-trials", type=int, default=8)
-    parser.add_argument("--examples-per-class", nargs='+', type=int, default=[1, 2, 4, 8, 16])
-    parser.add_argument("--dataset", type=str, default="coco", choices=DATASETS.keys())
-    parser.add_argument("--unet-ckpt", type=str, default=None)
-    parser.add_argument("--erase-concepts", action="store_true", 
-                        help="erase text inversion concepts first")
+    parser.add_argument(
+        "--unet-ckpt",
+        type=str,
+        default=None,
+    )
+    parser.add_argument(
+        "--erase-concepts",
+        action="store_true", 
+        help="erase text inversion concepts first",
+    )
+    parser.add_argument(
+        "--logging_dir",
+        type=str,
+        default="logs",
+        help=(
+            "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
+            " *output_dir/runs/**CURRENT_DATETIME_HOSTNAME***."
+        ),
+    )
+    parser.add_argument(
+        "--report_to",
+        type=str,
+        default="tensorboard",
+        help=(
+            'The integration to report the results and logs to. Supported platforms are `"tensorboard"`'
+            ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
+        ),
+    )
 
     args = parser.parse_args()
+
+    if args.output_dir == None:
+        args.output_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_data', args.dataset))
+
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
         args.local_rank = env_local_rank
@@ -1073,14 +1107,14 @@ if __name__ == "__main__":
         args.train_data_dir = os.path.join(
             output_dir, "extracted", dirname)
         args.output_dir = os.path.join(
-            output_dir, "fine-tuned", dirname)
+            output_dir, "sd-fine-tuned", dirname)
 
         word_name = class_name.replace(" ", "")
 
-        if args.erase_concepts: args.unet_ckpt = (
+        """if args.erase_concepts: args.unet_ckpt = (
             "/projects/rsalakhugroup/btrabucc/esd-models/" + 
             f"compvis-word_{word_name}-method_full-sg_3-ng_1-iter_1000-lr_1e-05/" + 
-            f"diffusers-word_{word_name}-method_full-sg_3-ng_1-iter_1000-lr_1e-05.pt")
+            f"diffusers-word_{word_name}-method_full-sg_3-ng_1-iter_1000-lr_1e-05.pt")"""
 
         main(args)
 
