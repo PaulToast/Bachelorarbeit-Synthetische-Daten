@@ -48,7 +48,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--out",
         type=str,
-        default=os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_output/')),
+        default=None,
+        help="If left to None will default to '_data/{dataset}/aug/'."
     )
 
     parser.add_argument("--model-path", type=str, default="CompVis/stable-diffusion-v1-4")
@@ -79,6 +80,9 @@ if __name__ == "__main__":
     parser.add_argument("--erasure-ckpt-path", type=str, default=None)
 
     args = parser.parse_args()
+
+    if args.out == None:
+        args.out = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_data', args.dataset, 'aug'))
 
     os.makedirs(args.out, exist_ok=True)
 

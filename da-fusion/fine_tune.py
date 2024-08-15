@@ -102,7 +102,7 @@ def parse_args():
     parser.add_argument(
         "--pretrained_model_name_or_path",
         type=str,
-        default=None,
+        default="CompVis/stable-diffusion-v1-4",
         required=True,
         help="Path to pretrained model or model identifier from huggingface.co/models.",
     )
@@ -133,8 +133,8 @@ def parse_args():
     parser.add_argument(
         "--output_dir",
         type=str,
-        default="./",
-        help="The output directory where the model predictions and checkpoints will be written.",
+        default=None,
+        help="The output directory where the model predictions and checkpoints will be written. If left to None will default to '_data/{dataset}/aug/'.",
     )
     parser.add_argument(
         "--seed",
@@ -297,15 +297,15 @@ def parse_args():
         "--enable_xformers_memory_efficient_attention", action="store_true", help="Whether or not to use xformers.",
     )
     parser.add_argument(
-        "--num-trials", type=int, default=8,
+        "--num-trials", type=int, default=8, # help=""
     )
     parser.add_argument(
-        "--examples-per-class", nargs='+', type=int, default=[1, 2, 4, 8, 16],
+        "--examples-per-class", nargs='+', type=int, default=[1, 2, 4, 8, 16], # help=""
     )
     parser.add_argument(
         "--dataset",
         type=str,
-        default="coco", 
+        default="mvip", 
         choices=["spurge", "imagenet", "coco", "pascal", "mvip"],
     )
     parser.add_argument(
@@ -318,6 +318,10 @@ def parse_args():
     )
 
     args = parser.parse_args()
+
+    if args.output_dir == None:
+        args.output_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_data', args.dataset))
+    
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
         args.local_rank = env_local_rank
@@ -489,6 +493,10 @@ def main(args):
         project_dir=logging_dir, # PREVIOUSLY: logging_dir=logging_dir
     )
 
+    # ???
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+
     # Make one log on every process with the configuration for debugging.
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -610,7 +618,7 @@ def main(args):
         eps=args.adam_epsilon,
     )
 
-    # Dataset and DataLoaders creation:
+    # Dataset and DataLoaders creation
     train_dataset = TextualInversionDataset(
         data_root=args.train_data_dir,
         tokenizer=tokenizer,
@@ -844,14 +852,14 @@ if __name__ == "__main__":
             args.train_data_dir = os.path.join(
                 output_dir, "extracted", dirname)
             args.output_dir = os.path.join(
-                output_dir, "fine-tuned", dirname)
+                output_dir, "sd-fine-tuned", dirname)
 
             word_name = class_name.replace(" ", "")
 
-            if args.erase_concepts: args.unet_ckpt = (
+            """if args.erase_concepts: args.unet_ckpt = (
                 "/projects/rsalakhugroup/btrabucc/esd-models/" + 
                 f"compvis-word_{word_name}-method_full-sg_3-ng_1-iter_1000-lr_1e-05/" + 
-                f"diffusers-word_{word_name}-method_full-sg_3-ng_1-iter_1000-lr_1e-05.pt")
+                f"diffusers-word_{word_name}-method_full-sg_3-ng_1-iter_1000-lr_1e-05.pt")"""
 
             main(args)
 
