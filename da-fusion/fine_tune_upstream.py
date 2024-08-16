@@ -36,6 +36,8 @@ from accelerate.logging import get_logger
 from accelerate.utils import ProjectConfiguration, set_seed
 from huggingface_hub import create_repo, upload_folder
 
+from datetime import datetime
+
 # TODO: remove and import from diffusers.utils when the new version of diffusers is released
 from packaging import version
 from PIL import Image
@@ -199,6 +201,18 @@ def parse_args():
         choices=DATASETS.keys(),
     )
     parser.add_argument(
+        "--experiment_name",
+        type=str,
+        default=datetime.utcnow().strftime('%Y%m%d%H%M'),
+        help="Will default to current datetime, excluding seconds: 'YYYYmmddHHMM'"
+    )
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        default=None,
+        help="Will default to '_experiments/{dataset}-{experiment_name}/'",
+    )
+    parser.add_argument(
         "--pretrained_model_name_or_path",
         type=str,
         default="CompVis/stable-diffusion-v1-4",
@@ -211,12 +225,6 @@ def parse_args():
         default=None,
         required=False,
         help="Revision of pretrained model identifier from huggingface.co/models.",
-    )
-    parser.add_argument(
-        "--output_dir",
-        type=str,
-        default=None,
-        help="The output directory where the model predictions and checkpoints will be written.",
     )
     parser.add_argument(
         "--tokenizer_name",
@@ -486,7 +494,7 @@ def parse_args():
         default="logs",
         help=(
             "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
-            " *output_dir/runs/**CURRENT_DATETIME_HOSTNAME***."
+            " '_experiments/{dataset}-{experiment_name}/logs/'."
         ),
     )
     parser.add_argument(
@@ -502,7 +510,7 @@ def parse_args():
     args = parser.parse_args()
 
     if args.output_dir == None:
-        args.output_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_data', args.dataset))
+        args.output_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_experiments', f"{args.dataset}-{args.experiment_name}"))
 
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
@@ -1101,7 +1109,7 @@ if __name__ == "__main__":
             if metadata["name"] == class_name:
 
                 name = metadata["name"].replace(" ", "_")
-                path = f"{args.dataset}-{seed}-{examples_per_class}"
+                path = f"seed={seed}_ex={examples_per_class}"
 
                 path = os.path.join(output_dir, "extracted", path, name, f"{idx}.png")
                 os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -1120,7 +1128,7 @@ if __name__ == "__main__":
         args.train_data_dir = os.path.join(
             output_dir, "extracted", dirname)
         args.output_dir = os.path.join(
-            output_dir, "sd-fine-tuned", dirname)
+            output_dir, "fine-tuned", dirname)
 
         word_name = class_name.replace(" ", "")
 

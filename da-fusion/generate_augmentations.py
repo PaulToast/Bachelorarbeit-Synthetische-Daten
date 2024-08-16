@@ -21,11 +21,11 @@ import random
 
 
 DATASETS = {
-    "mvip": MVIPDataset,
     "spurge": SpurgeDataset, 
     "coco": COCODataset, 
     "pascal": PASCALDataset,
-    "imagenet": ImageNetDataset
+    "imagenet": ImageNetDataset,
+    "mvip": MVIPDataset
 }
 
 COMPOSE = {
@@ -43,28 +43,45 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Inference script")
     
-    parser.add_argument("--dataset", type=str, default="pascal")
-
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default="mvip", 
+        choices=DATASETS.keys(),
+    )
+    parser.add_argument(
+        "--experiment_name",
+        type=str,
+        required=True,
+    )
     parser.add_argument(
         "--out",
         type=str,
         default=None,
-        help="If left to None will default to '_data/{dataset}/aug/'."
+        help="Will default to '_experiments/{dataset}-{experiment_name}/aug/'."
     )
-
-    parser.add_argument("--model-path", type=str, default="CompVis/stable-diffusion-v1-4")
-    parser.add_argument("--embed-path", type=str, default="erasure-tokens/pascal-tokens/pascal-0-8.pt")
+    parser.add_argument(
+        "--model_path",
+        type=str,
+        default="CompVis/stable-diffusion-v1-4",
+    )
+    parser.add_argument(
+        "--embed_path",
+        type=str,
+        default=None,
+        help="Will default to '_experiments/{dataset}-{experiment_name}/fine-tuned-merged/{dataset}-0-8.pt'"
+    )
     
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--examples-per-class", type=int, default=1)
-    parser.add_argument("--num-synthetic", type=int, default=10)
+    parser.add_argument("--examples_per_class", type=int, default=1)
+    parser.add_argument("--num_synthetic", type=int, default=10)
 
     parser.add_argument("--prompt", type=str, default="a photo of a {name}")
     
     parser.add_argument("--aug", nargs="+", type=str, default=["real-guidance"], 
                         choices=["real-guidance", "textual-inversion"])
 
-    parser.add_argument("--guidance-scale", nargs="+", type=float, default=[7.5])
+    parser.add_argument("--guidance_scale", nargs="+", type=float, default=[7.5])
     parser.add_argument("--strength", nargs="+", type=float, default=[0.5])
 
     parser.add_argument("--mask", nargs="+", type=int, default=[0], choices=[0, 1])
@@ -75,14 +92,20 @@ if __name__ == "__main__":
     parser.add_argument("--compose", type=str, default="parallel", 
                         choices=["parallel", "sequential"])
 
-    parser.add_argument("--class-name", type=str, default=None)
+    parser.add_argument("--class_name", type=str, default=None)
     
-    parser.add_argument("--erasure-ckpt-path", type=str, default=None)
+    parser.add_argument("--erasure_ckpt_path", type=str, default=None)
 
     args = parser.parse_args()
 
+    if args.embed_path == None:
+        args.embed_path = os.path.abspath(
+            os.path.join(os.path.dirname( __file__ ), '..', '_experiments', f"{args.dataset}-{args.experiment_name}/fine-tuned-merged/seed=0_ex=16.pt")
+        )
     if args.out == None:
-        args.out = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_data', args.dataset, 'aug'))
+        args.out = os.path.abspath(
+            os.path.join(os.path.dirname( __file__ ), '..', '_experiments', args.dataset, 'aug')
+        )
 
     os.makedirs(args.out, exist_ok=True)
 

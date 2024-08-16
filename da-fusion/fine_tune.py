@@ -34,6 +34,8 @@ from diffusers.utils import check_min_version
 from diffusers.utils.import_utils import is_xformers_available
 from huggingface_hub import HfFolder, Repository, whoami
 
+from datetime import datetime
+
 # TODO: remove and import from diffusers.utils when the new version of diffusers is released
 from packaging import version
 from PIL import Image
@@ -94,6 +96,18 @@ def parse_args():
         choices=DATASETS.keys(),
     )
     parser.add_argument(
+        "--experiment_name",
+        type=str,
+        default=datetime.utcnow().strftime('%Y%m%d%H%M'),
+        help="Will default to current datetime, excluding seconds: 'YYYYmmddHHMM'"
+    )
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        default=None,
+        help="Will default to '_experiments/{dataset}-{experiment_name}/'",
+    )
+    parser.add_argument(
         "--pretrained_model_name_or_path",
         type=str,
         default="CompVis/stable-diffusion-v1-4",
@@ -106,12 +120,6 @@ def parse_args():
         default=None,
         required=False,
         help="Revision of pretrained model identifier from huggingface.co/models.",
-    )
-    parser.add_argument(
-        "--output_dir",
-        type=str,
-        default=None,
-        help="The output directory where the model predictions and checkpoints will be written.",
     )
     parser.add_argument(
         "--seed",
@@ -129,10 +137,10 @@ def parse_args():
         ),
     )
     parser.add_argument(
-        "--num_trials", type=int, default=8, # help=""
+        "--num_trials", type=int, default=8,
     )
     parser.add_argument(
-        "--examples_per_class", nargs='+', type=int, default=[1, 2, 4, 8, 16], # help=""
+        "--examples_per_class", nargs='+', type=int, default=[1, 2, 4, 8, 16],
     )
     parser.add_argument(
         "--save_steps",
@@ -304,7 +312,7 @@ def parse_args():
         default="logs",
         help=(
             "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
-            " *output_dir/runs/**CURRENT_DATETIME_HOSTNAME***."
+            " '_experiments/{dataset}-{experiment_name}/logs/'."
         ),
     )
     parser.add_argument(
@@ -320,8 +328,8 @@ def parse_args():
     args = parser.parse_args()
 
     if args.output_dir == None:
-        args.output_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_data', args.dataset))
-    
+        args.output_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_experiments', f"{args.dataset}-{args.experiment_name}"))
+   
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
         args.local_rank = env_local_rank
@@ -484,7 +492,8 @@ def get_full_repo_name(model_id: str, organization: Optional[str] = None, token:
 # The main function when executing the fine_tune.py script, starting the training process
 def main(args):
 
-    logging_dir = os.path.join(args.output_dir, args.logging_dir)
+    output_dir = args.output_dir
+    logging_dir = os.path.join(output_dir, args.logging_dir)
 
     accelerator = Accelerator(
         gradient_accumulation_steps=args.gradient_accumulation_steps,
@@ -517,7 +526,7 @@ def main(args):
     if args.seed is not None:
         set_seed(args.seed)
 
-    # Handle the repository creation
+    """# Handle the repository creation
     if accelerator.is_main_process:
         if args.push_to_hub:
             if args.hub_model_id is None:
@@ -532,7 +541,7 @@ def main(args):
                 if "epoch_*" not in gitignore:
                     gitignore.write("epoch_*\n")
         elif args.output_dir is not None:
-            os.makedirs(args.output_dir, exist_ok=True)
+            os.makedirs(args.output_dir, exist_ok=True)"""
 
     # Load tokenizer
     if args.tokenizer_name:
@@ -693,12 +702,12 @@ def main(args):
             path = os.path.basename(args.resume_from_checkpoint)
         else:
             # Get the most recent checkpoint
-            dirs = os.listdir(args.output_dir)
+            dirs = os.listdir(output_dir)
             dirs = [d for d in dirs if d.startswith("checkpoint")]
             dirs = sorted(dirs, key=lambda x: int(x.split("-")[1]))
             path = dirs[-1]
         accelerator.print(f"Resuming from checkpoint {path}")
-        accelerator.load_state(os.path.join(args.output_dir, path))
+        accelerator.load_state(os.path.join(output_dir, path))
         global_step = int(path.split("-")[1])
 
         resume_global_step = global_step * args.gradient_accumulation_steps
@@ -772,7 +781,7 @@ def main(args):
                 progress_bar.update(1)
                 global_step += 1
                 if global_step % args.save_steps == 0:
-                    save_path = os.path.join(args.output_dir, f"learned_embeds-steps-{global_step}.bin")
+                    save_path = os.path.join(output_dir, f"learned_embeds-steps-{global_step}.bin")
                     save_progress(text_encoder, placeholder_token_id, accelerator, args, save_path)
 
             logs = {"loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
@@ -786,7 +795,7 @@ def main(args):
 
     if accelerator.is_main_process:
         # Save the newly trained embeddings
-        save_path = os.path.join(args.output_dir, "learned_embeds.bin")
+        save_path = os.path.join(output_dir, "learned_embeds.bin")
         save_progress(text_encoder, placeholder_token_id, 
                       accelerator, args, save_path)
 
@@ -840,7 +849,7 @@ if __name__ == "__main__":
         for class_name in train_dataset.class_names:
 
             formatted_name = class_name.replace(" ", "_")
-            dirname = f"{args.dataset}-{seed}-{examples_per_class}/{formatted_name}"
+            dirname = f"seed={seed}_ex={examples_per_class}/{formatted_name}"
 
             args = parse_args()
             
@@ -852,7 +861,7 @@ if __name__ == "__main__":
             args.train_data_dir = os.path.join(
                 output_dir, "extracted", dirname)
             args.output_dir = os.path.join(
-                output_dir, "sd-fine-tuned", dirname)
+                output_dir, "fine-tuned", dirname)
 
             word_name = class_name.replace(" ", "")
 
