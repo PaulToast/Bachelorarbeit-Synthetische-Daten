@@ -664,6 +664,10 @@ def main(args):
         if not is_wandb_available():
             raise ImportError("Make sure to install wandb if you want to use it for logging during training.")
 
+    # ???
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+    
     # Make one log on every process with the configuration for debugging.
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
