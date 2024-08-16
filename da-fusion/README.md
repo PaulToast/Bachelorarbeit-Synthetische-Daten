@@ -52,16 +52,29 @@ To set up custom datasets, add them to the same `_data` directory and implement 
 
 We perform [Textual Inversion](https://arxiv.org/abs/2208.01618) to adapt Stable Diffusion to the classes present in our few-shot datasets. The implementation in `fine_tune.py` is adapted from the [Diffusers](https://github.com/huggingface/diffusers/blob/main/examples/textual_inversion/textual_inversion.py) example.
 
-Here is an example for executing the `fine_tune.py` script on the COCO dataset:
+Here is an example for executing the `fine_tune.py` script on the MVIP dataset:
 
 ```bash
-python fine_tune.py --dataset=coco \
+python fine_tune.py --dataset=mvip \
 --pretrained_model_name_or_path="CompVis/stable-diffusion-v1-4" \
 --resolution=512 --train_batch_size=4 --lr_warmup_steps=0 \
 --gradient_accumulation_steps=1 --max_train_steps=1000 \
 --learning_rate=5.0e-04 --scale_lr --lr_scheduler="constant" \
 --mixed_precision=fp16 --revision=fp16 --gradient_checkpointing \
---only_save_embeds --num-trials 8 --examples-per-class 1 2 4 8 16 
+--only_save_embeds --num_trials 8 --examples_per_class 1 2 4 8 16
+```
+
+Here for the same dataset, but with the `fine_tune_upstream.py` script:
+
+```bash
+python fine_tune_upstream.py --dataset=mvip \
+--pretrained_model_name_or_path="CompVis/stable-diffusion-v1-4" \
+--initializer_token="component" --validation_prompt="a photo of a {name}" \
+--resolution=512 --train_batch_size=4 --lr_warmup_steps=0 \
+--gradient_accumulation_steps=1 --max_train_steps=1000 \
+--learning_rate=5.0e-04 --scale_lr --lr_scheduler="constant" \
+--mixed_precision=fp16 --revision=fp16 --gradient_checkpointing \
+--num_trials 8 --examples_per_class 1 2 4 8 16
 ```
 
 ## Aggregate Embeddings

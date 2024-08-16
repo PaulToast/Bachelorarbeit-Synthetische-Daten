@@ -4,12 +4,15 @@ from semantic_aug.datasets.imagenet import ImageNetDataset
 from semantic_aug.datasets.pascal import PASCALDataset
 from semantic_aug.datasets.caltech101 import CalTech101Dataset
 from semantic_aug.datasets.flowers102 import Flowers102Dataset
+from semantic_aug.datasets.mvip import MVIPDataset
+
 from semantic_aug.augmentations.compose import ComposeParallel
 from semantic_aug.augmentations.compose import ComposeSequential
 from semantic_aug.augmentations.real_guidance import RealGuidance
 from semantic_aug.augmentations.textual_inversion import TextualInversion
 from semantic_aug.augmentations.textual_inversion_upstream \
     import TextualInversion as MultiTokenTextualInversion
+
 from torch.utils.data import DataLoader
 from torchvision.models import resnet50, ResNet50_Weights
 from transformers import AutoImageProcessor, DeiTModel
@@ -49,7 +52,8 @@ DATASETS = {
     "pascal": PASCALDataset,
     "imagenet": ImageNetDataset,
     "caltech": CalTech101Dataset,
-    "flowers": Flowers102Dataset
+    "flowers": Flowers102Dataset,
+    "mvip": MVIPDataset
 }
 
 COMPOSERS = {
@@ -66,7 +70,7 @@ AUGMENTATIONS = {
 
 def run_experiment(examples_per_class: int = 0, 
                    seed: int = 0, 
-                   dataset: str = "spurge", 
+                   dataset: str = "mvip", 
                    num_synthetic: int = 100, 
                    iterations_per_epoch: int = 200, 
                    num_epochs: int = 50, 

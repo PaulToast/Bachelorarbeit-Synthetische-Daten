@@ -129,10 +129,10 @@ def parse_args():
         ),
     )
     parser.add_argument(
-        "--num-trials", type=int, default=8, # help=""
+        "--num_trials", type=int, default=8, # help=""
     )
     parser.add_argument(
-        "--examples-per-class", nargs='+', type=int, default=[1, 2, 4, 8, 16], # help=""
+        "--examples_per_class", nargs='+', type=int, default=[1, 2, 4, 8, 16], # help=""
     )
     parser.add_argument(
         "--save_steps",
