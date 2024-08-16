@@ -61,7 +61,7 @@ python fine_tune_upstream.py --dataset=mvip \
 --num_vectors=4 --resolution=512 --train_batch_size=8 --lr_warmup_steps=0 \
 --gradient_accumulation_steps=1 --max_train_steps=1000 \
 --learning_rate=5.0e-04 --scale_lr --lr_scheduler="constant" \
---mixed_precision=fp16" --revision=fp16 --gradient_checkpointing \
+--mixed_precision=fp16 --revision=fp16 --gradient_checkpointing \
 --num_trials=1 --examples_per_class=16
 ```
 
