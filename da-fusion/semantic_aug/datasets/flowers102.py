@@ -14,7 +14,7 @@ from PIL import Image
 from collections import defaultdict
 
 
-DEFAULT_IMAGE_DIR = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_datasets/flowers102'))
+DEFAULT_IMAGE_DIR = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_data/flowers102'))
 
 
 class Flowers102Dataset(FewShotDataset):
