@@ -69,7 +69,7 @@ if __name__ == "__main__":
         "--embed_path",
         type=str,
         default=None,
-        help="Will default to '_experiments/{dataset}-{experiment_name}/fine-tuned-merged/{dataset}-0-8.pt'"
+        help="Will default to '_experiments/{dataset}-{experiment_name}/fine-tuned-merged/{dataset}-0-16.pt'"
     )
     
     parser.add_argument("--seed", type=int, default=0)

@@ -31,13 +31,11 @@ pip install -e da-fusion
 
 ## Setting up benchmark & custom datasets
 
-Datasets should be placed into the directory `da-fusion/_data/{dataset}`. This is also where the trained weights & image augmentations will be saved for each dataset.
-
 To benchmark DA-Fusion, we use a classification task derived from COCO (2017).
 
 Download the [2017 Training Images](http://images.cocodataset.org/zips/train2017.zip), the [2017 Validation Images](http://images.cocodataset.org/zips/val2017.zip), and the [2017 Train/Val Annotations](http://images.cocodataset.org/annotations/annotations_trainval2017.zip).
 
-These files should be unzipped into the top-level folder `_data/` with the following directory structure:
+These files should be unzipped into the top-level folder `_datasets/` with the following directory structure:
 
 ```
 coco2017/
@@ -46,7 +44,7 @@ coco2017/
     annotations/
 ```
 
-To set up custom datasets, add them to the same `_data` directory and implement a subclass of `semantic_aug/few_shot_dataset.py` (since every dataset may have a different structure and form - you can take `semantic_aug/datasets/coco.py` as an example.)
+To set up custom datasets, add them to the same `_datasets` directory and implement a subclass of `semantic_aug/few_shot_dataset.py` (since every dataset may have a different structure and form - you can take `semantic_aug/datasets/coco.py` as an example.)
 
 ## Fine-Tuning Tokens
 
@@ -55,7 +53,7 @@ We perform [Textual Inversion](https://arxiv.org/abs/2208.01618) to adapt Stable
 The `fine_tune_upstream.py` script seems to be an updated version of the script with a couple of modifications and more parameters. Here is an example for executing the script on the MVIP dataset, as it was used for the thesis:
 
 ```bash
-python fine_tune_upstream.py --dataset=mvip \
+python fine_tune_upstream.py --dataset=mvip --experiment_name="test-01" \
 --pretrained_model_name_or_path="CompVis/stable-diffusion-v1-4" \
 --initializer_token="component" --validation_prompt="a photo of a {name}" \
 --num_vectors=4 --resolution=512 --train_batch_size=8 --lr_warmup_steps=0 \
@@ -65,11 +63,18 @@ python fine_tune_upstream.py --dataset=mvip \
 --num_trials=1 --examples_per_class=16
 ```
 
+The trained token weights will be saved under `_experiments/{dataset}-{experiment_name}/fine-tuned`.
+
 ## Aggregate Embeddings
 
-After the previous step, we should be able to find the learned class tokens in the directory `_data/{dataset}/sd-fine-tuned/`.
+Before generating augmentations, we call the script `aggregate_embeddings.py`, which merges all of the learned tokens together into a single directory, creating a class-agnostic template to use for the next steps:
 
-In order to use them, we will call the script `aggregate_embeddings.py`, which merges all of them together into a single directory, creating a class-agnostic template to use for the next steps. Make sure to use the parameter `--dataset` to point to the correct dataset, as in the previous steps.
+```bash
+python aggregate_embeddings.py --dataset=mvip --experiment_name="test-01" \
+--num_trials=1 --examples_per_class=16
+```
+
+The results will be saved under `_experiments/{dataset}-{experiment_name}/fine-tuned-merged`.
 
 ## Generate Augmentations
 
@@ -87,6 +92,16 @@ You will be prompted for your HuggingFace account credentials, and for an access
 Afterwards, we can call the `generate_augmentations.py` script with the according parameters, for example:
 
 ```bash
-python generate_augmentations.py --dataset=coco \
+python generate_augmentations.py --dataset=mvip -experiment_name="test-01" \
+--model_path="CompVis/stable-diffusion-v1-4" \
 --examples-per-class=1 --num-synthetic=4 --strength=0.5
 ```
+
+The images will be saved under `_experiments/{dataset}-{experiment_name}/aug`
+
+There are several ways to configure the augmentation:
+
+- `--prompt`: A custom prompt can be specified; Will default to "a photo of a {name}".
+- `--aug`: The method for generating the augmentations, either "real-guidance" or "textual-inversion"
+- `--guidance_scale`: Represents how much importance is given to your prompt when generating images. Lower values will give less attention to the prompt, but generate more freely. Will default to 7.5
+- ...
