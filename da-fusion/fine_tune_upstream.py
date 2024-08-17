@@ -639,7 +639,7 @@ class TextualInversionDataset(Dataset):
         if not image.mode == "RGB":
             image = image.convert("RGB")
 
-        placeholder_string = self.placeholder_token #f"{self.placeholder_token} component" # ORIGINALLY: self.placeholder_token
+        placeholder_string = f"{self.placeholder_token} part" # ORIGINALLY: self.placeholder_token
         text = random.choice(self.templates).format(placeholder_string)
 
         example["input_ids"] = self.tokenizer(
