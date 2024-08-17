@@ -92,9 +92,9 @@ You will be prompted for your HuggingFace account credentials, and for an access
 Afterwards, we can call the `generate_augmentations.py` script with the according parameters, for example:
 
 ```bash
-python generate_augmentations.py --dataset=mvip -experiment_name="test-01" \
+python generate_augmentations.py --dataset=mvip --experiment_name="test-01" \
 --model_path="CompVis/stable-diffusion-v1-4" \
---examples-per-class=1 --num-synthetic=4 --strength=0.5
+--examples_per_class=1 --num_synthetic=4 --strength=0.5
 ```
 
 The images will be saved under `_experiments/{dataset}-{experiment_name}/aug`

@@ -133,13 +133,13 @@ These are textual inversion adaption weights for {base_model}. You can find some
     with open(os.path.join(repo_folder, "README.md"), "w") as f:
         f.write(yaml + model_card)
 
-
+# For generating validation images during training for logging
 def log_validation(text_encoder, tokenizer, unet, vae, args, accelerator, weight_dtype, epoch):
     logger.info(
         f"Running validation... \n Generating {args.num_validation_images} images with prompt:"
         f" {args.validation_prompt}."
     )
-    # create pipeline (note: unet and vae are loaded again in float32)
+    # Create pipeline (note: unet and vae are loaded again in float32)
     pipeline = DiffusionPipeline.from_pretrained(
         args.pretrained_model_name_or_path,
         text_encoder=accelerator.unwrap_model(text_encoder),
@@ -154,12 +154,13 @@ def log_validation(text_encoder, tokenizer, unet, vae, args, accelerator, weight
     pipeline = pipeline.to(accelerator.device)
     pipeline.set_progress_bar_config(disable=True)
 
-    # run inference
+    # Run inference
     generator = None if args.seed is None else torch.Generator(device=accelerator.device).manual_seed(args.seed)
     images = []
+    formatted_prompt = args.validation_prompt.replace("*", args.placeholder_token)
     for _ in range(args.num_validation_images):
         with torch.autocast("cuda"):
-            image = pipeline(args.validation_prompt, num_inference_steps=25, generator=generator).images[0]
+            image = pipeline(formatted_prompt, num_inference_steps=25, generator=generator).images[0]
         images.append(image)
 
     for tracker in accelerator.trackers:
@@ -170,7 +171,7 @@ def log_validation(text_encoder, tokenizer, unet, vae, args, accelerator, weight
             tracker.log(
                 {
                     "validation": [
-                        wandb.Image(image, caption=f"{i}: {args.validation_prompt}") for i, image in enumerate(images)
+                        wandb.Image(image, caption=f"{i}: {formatted_prompt}") for i, image in enumerate(images)
                     ]
                 }
             )
@@ -233,17 +234,22 @@ def parse_args():
         help="Pretrained tokenizer name or path if not the same as model_name",
     )
     parser.add_argument(
-        "--placeholder_token",
-        type=str,
-        default=None,
-        help="A token to use as a placeholder for the concept.",
-    )
-    parser.add_argument(
         "--initializer_token",
         type=str,
         default=None,
-        required=True,
-        help="A token to use as initializer word.",
+        help=(
+            "A token to use as initializer word.",
+            " Will default to class name."
+        )
+    )
+    parser.add_argument(
+        "--placeholder_token",
+        type=str,
+        default=None,
+        help=(
+            "A token to use as a placeholder for the concept.",
+            " Will default to class name."
+        )
     )
     parser.add_argument(
         "--seed",
@@ -415,7 +421,7 @@ def parse_args():
         "--validation_prompt",
         type=str,
         default=None,
-        help="A prompt that is used during validation to verify that the model is learning.",
+        help="A prompt that is used during validation to verify that the model is learning. '*' as placeholder for concept token.",
     )
     parser.add_argument(
         "--num_validation_images",
@@ -500,7 +506,7 @@ def parse_args():
     parser.add_argument(
         "--report_to",
         type=str,
-        default="tensorboard",
+        default="wandb",
         help=(
             'The integration to report the results and logs to. Supported platforms are `"tensorboard"`'
             ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
@@ -521,14 +527,14 @@ def parse_args():
 
 imagenet_templates_small = [
     "a photo of a {}",
-    "a rendering of a {}",
+    #"a rendering of a {}",
     "a cropped photo of the {}",
     "the photo of a {}",
-    "a photo of a clean {}",
-    "a photo of a dirty {}",
-    "a dark photo of the {}",
+    #"a photo of a clean {}",
+    #"a photo of a dirty {}",
+    #"a dark photo of the {}",
     "a photo of my {}",
-    "a photo of the cool {}",
+    #"a photo of the cool {}",
     "a close-up photo of a {}",
     "a bright photo of the {}",
     "a cropped photo of a {}",
@@ -536,17 +542,17 @@ imagenet_templates_small = [
     "a good photo of the {}",
     "a photo of one {}",
     "a close-up photo of the {}",
-    "a rendition of the {}",
-    "a photo of the clean {}",
-    "a rendition of a {}",
-    "a photo of a nice {}",
+    #"a rendition of the {}",
+    #"a photo of the clean {}",
+    #"a rendition of a {}",
+    #"a photo of a nice {}",
     "a good photo of a {}",
-    "a photo of the nice {}",
-    "a photo of the small {}",
-    "a photo of the weird {}",
-    "a photo of the large {}",
-    "a photo of a cool {}",
-    "a photo of a small {}",
+    #"a photo of the nice {}",
+    #"a photo of the small {}",
+    #"a photo of the weird {}",
+    #"a photo of the large {}",
+    #"a photo of a cool {}",
+    #"a photo of a small {}",
 ]
 
 imagenet_style_templates_small = [
@@ -622,7 +628,7 @@ class TextualInversionDataset(Dataset):
         if not image.mode == "RGB":
             image = image.convert("RGB")
 
-        placeholder_string = self.placeholder_token
+        placeholder_string = self.placeholder_token #f"{self.placeholder_token} component" # ORIGINALLY: self.placeholder_token
         text = random.choice(self.templates).format(placeholder_string)
 
         example["input_ids"] = self.tokenizer(
@@ -657,7 +663,7 @@ class TextualInversionDataset(Dataset):
         example["pixel_values"] = torch.from_numpy(image).permute(2, 0, 1)
         return example
 
-
+# Called for every class, num_trials, examples_per_class
 def main(args):
     logging_dir = os.path.join(args.output_dir, args.logging_dir)
     accelerator_project_config = ProjectConfiguration(project_dir=args.output_dir, logging_dir=logging_dir)
@@ -724,13 +730,17 @@ def main(args):
         unet.load_state_dict(torch.load(args.unet_ckpt))
         print(f"Loaded UNET from {args.unet_ckpt}")
 
+    # Set initializer token to class name, if not passed as argument
+    if args.initializer_token == None:
+        args.initializer_token = args.placeholder_token
+    
     # Add the placeholder token in tokenizer
     placeholder_tokens = [args.placeholder_token]
 
     if args.num_vectors < 1:
         raise ValueError(f"--num_vectors has to be larger or equal to 1, but is {args.num_vectors}")
 
-    # add dummy tokens for multi-vector
+    # Add dummy tokens for multi-vector
     additional_tokens = []
     for i in range(1, args.num_vectors):
         additional_tokens.append(f"{args.placeholder_token}_{i}")
@@ -745,7 +755,6 @@ def main(args):
 
     # Convert the initializer_token, placeholder_token to ids
     token_ids = tokenizer.encode(args.initializer_token, add_special_tokens=False)
-    # Check if initializer_token is a single token or a sequence of tokens
     if len(token_ids) > 1:
         raise ValueError("The initializer token must be a single token.")
 
@@ -1022,6 +1031,7 @@ def main(args):
 
             if global_step >= args.max_train_steps:
                 break
+    
     # Create the pipeline using the trained modules and save it.
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
@@ -1039,6 +1049,7 @@ def main(args):
                 tokenizer=tokenizer,
             )
             pipeline.save_pretrained(args.output_dir)
+        
         # Save the newly trained embeddings
         save_path = os.path.join(args.output_dir, "learned_embeds.bin")
         save_progress(text_encoder, placeholder_token_ids, accelerator, args, save_path)
@@ -1117,7 +1128,7 @@ if __name__ == "__main__":
                 image.save(path)
 
         formatted_name = class_name.replace(" ", "_")
-        dirname = f"{args.dataset}-{seed}-{examples_per_class}/{formatted_name}"
+        dirname = f"seed={seed}_ex={examples_per_class}/{formatted_name}"
 
         args = parse_args()
         

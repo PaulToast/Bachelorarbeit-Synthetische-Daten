@@ -164,3 +164,4 @@ cython_debug/
 # All imported & generated data
 _datasets/
 _experiments/
+wandb/

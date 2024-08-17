@@ -34,7 +34,6 @@ class MVIPDataset(FewShotDataset):
         del class_names[20:]
 
     num_classes: int = len(class_names)
-    print("num_classes: ", num_classes)
 
     def __init__(self, *args, split: str = "train", seed: int = 0,
                  image_dir: str = MVIP_DIR,

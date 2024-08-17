@@ -104,7 +104,7 @@ if __name__ == "__main__":
         )
     if args.out == None:
         args.out = os.path.abspath(
-            os.path.join(os.path.dirname( __file__ ), '..', '_experiments', args.dataset, 'aug')
+            os.path.join(os.path.dirname( __file__ ), '..', '_experiments', f"{args.dataset}-{args.experiment_name}", 'aug')
         )
 
     os.makedirs(args.out, exist_ok=True)
