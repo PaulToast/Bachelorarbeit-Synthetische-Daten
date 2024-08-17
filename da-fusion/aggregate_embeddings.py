@@ -6,19 +6,10 @@ from itertools import product
 from tqdm import trange
 
 
-DEFAULT_EMBED_PATH = "fine-tuned-merged/seed={seed}_ex={examples_per_class}.pt"
-
-
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Merge token files")
 
-    parser.add_argument(
-        "--dataset",
-        type=str,
-        default="mvip", 
-        choices=["spurge", "imagenet", "coco", "pascal", "mvip"],
-    )
     parser.add_argument(
         "--experiment_name",
         type=str,
@@ -39,10 +30,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     input_path = os.path.abspath(
-        os.path.join(os.path.dirname( __file__ ), '..', '_experiments', f"{args.dataset}-{args.experiment_name}", "fine-tuned")
+        os.path.join(os.path.dirname( __file__ ), '..', '_experiments', f"{args.experiment_name}", "fine-tuned")
     )
     output_path = os.path.abspath(
-        os.path.join(os.path.dirname( __file__ ), '..', '_experiments', f"{args.dataset}-{args.experiment_name}", DEFAULT_EMBED_PATH)
+        os.path.join(os.path.dirname( __file__ ), '..', '_experiments', f"{args.experiment_name}", "fine-tuned-merged/seed={seed}_ex={examples_per_class}.pt")
     )
 
     for seed, examples_per_class in product(

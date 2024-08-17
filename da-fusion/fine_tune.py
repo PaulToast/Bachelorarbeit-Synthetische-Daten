@@ -98,14 +98,14 @@ def parse_args():
     parser.add_argument(
         "--experiment_name",
         type=str,
-        default=datetime.utcnow().strftime('%Y%m%d%H%M'),
-        help="Will default to current datetime, excluding seconds: 'YYYYmmddHHMM'"
+        default=None,
+        help="Will default to {dataset}-{datetime} ('YYYYmmddHHMM')."
     )
     parser.add_argument(
         "--output_dir",
         type=str,
         default=None,
-        help="Will default to '_experiments/{dataset}-{experiment_name}/'",
+        help="Will default to '_experiments/{experiment_name}/'",
     )
     parser.add_argument(
         "--pretrained_model_name_or_path",
@@ -312,7 +312,7 @@ def parse_args():
         default="logs",
         help=(
             "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
-            " '_experiments/{dataset}-{experiment_name}/logs/'."
+            " '_experiments/{experiment_name}/logs/'."
         ),
     )
     parser.add_argument(
@@ -327,8 +327,10 @@ def parse_args():
 
     args = parser.parse_args()
 
+    if args.experiment_name == None:
+        args.experiment_name = f"{args.dataset}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
     if args.output_dir == None:
-        args.output_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_experiments', f"{args.dataset}-{args.experiment_name}"))
+        args.output_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_experiments', args.experiment_name))
    
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
@@ -489,7 +491,6 @@ def get_full_repo_name(model_id: str, organization: Optional[str] = None, token:
         return f"{organization}/{model_id}"
 
 
-# The main function when executing the fine_tune.py script, starting the training process
 def main(args):
 
     output_dir = args.output_dir

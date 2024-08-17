@@ -13,6 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 
+#region setup
+
 import argparse
 import logging
 import math
@@ -105,6 +107,8 @@ check_min_version("0.20.0.dev0")
 
 logger = get_logger(__name__)
 
+#endregion
+
 
 def save_model_card(repo_id: str, images=None, base_model=str, repo_folder=None):
     img_str = ""
@@ -133,12 +137,17 @@ These are textual inversion adaption weights for {base_model}. You can find some
     with open(os.path.join(repo_folder, "README.md"), "w") as f:
         f.write(yaml + model_card)
 
-# For generating validation images during training for logging
+
 def log_validation(text_encoder, tokenizer, unet, vae, args, accelerator, weight_dtype, epoch):
+    
+    # Replace "*" in prompt with placeholder_token (class name)
+    formatted_prompt = args.validation_prompt.replace("*", args.placeholder_token)
+    
     logger.info(
         f"Running validation... \n Generating {args.num_validation_images} images with prompt:"
-        f" {args.validation_prompt}."
+        f" {formatted_prompt}."
     )
+
     # Create pipeline (note: unet and vae are loaded again in float32)
     pipeline = DiffusionPipeline.from_pretrained(
         args.pretrained_model_name_or_path,
@@ -157,7 +166,6 @@ def log_validation(text_encoder, tokenizer, unet, vae, args, accelerator, weight
     # Run inference
     generator = None if args.seed is None else torch.Generator(device=accelerator.device).manual_seed(args.seed)
     images = []
-    formatted_prompt = args.validation_prompt.replace("*", args.placeholder_token)
     for _ in range(args.num_validation_images):
         with torch.autocast("cuda"):
             image = pipeline(formatted_prompt, num_inference_steps=25, generator=generator).images[0]
@@ -204,14 +212,14 @@ def parse_args():
     parser.add_argument(
         "--experiment_name",
         type=str,
-        default=datetime.utcnow().strftime('%Y%m%d%H%M'),
-        help="Will default to current datetime, excluding seconds: 'YYYYmmddHHMM'"
+        default=None,
+        help="Will default to {dataset}-{datetime} ('YYYYmmddHHMM')."
     )
     parser.add_argument(
         "--output_dir",
         type=str,
         default=None,
-        help="Will default to '_experiments/{dataset}-{experiment_name}/'",
+        help="Will default to '_experiments/{experiment_name}/'",
     )
     parser.add_argument(
         "--pretrained_model_name_or_path",
@@ -500,7 +508,7 @@ def parse_args():
         default="logs",
         help=(
             "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
-            " '_experiments/{dataset}-{experiment_name}/logs/'."
+            " '_experiments/{experiment_name}/logs/'."
         ),
     )
     parser.add_argument(
@@ -515,8 +523,10 @@ def parse_args():
 
     args = parser.parse_args()
 
+    if args.experiment_name == None:
+        args.experiment_name = f"{args.dataset}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
     if args.output_dir == None:
-        args.output_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_experiments', f"{args.dataset}-{args.experiment_name}"))
+        args.output_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_experiments', args.experiment_name))
 
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
@@ -577,7 +587,8 @@ imagenet_style_templates_small = [
     "a large painting in the style of {}",
 ]
 
-
+# Defines how to handle and preprocess the chosen dataset for training.
+# (loads images, applies transformations, and generates text prompts with placeholder token)
 class TextualInversionDataset(Dataset):
     def __init__(
         self,
@@ -663,7 +674,7 @@ class TextualInversionDataset(Dataset):
         example["pixel_values"] = torch.from_numpy(image).permute(2, 0, 1)
         return example
 
-# Called for every class, num_trials, examples_per_class
+
 def main(args):
     logging_dir = os.path.join(args.output_dir, args.logging_dir)
     accelerator_project_config = ProjectConfiguration(project_dir=args.output_dir, logging_dir=logging_dir)
