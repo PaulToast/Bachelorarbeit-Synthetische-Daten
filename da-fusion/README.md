@@ -53,11 +53,11 @@ We perform [Textual Inversion](https://arxiv.org/abs/2208.01618) to adapt Stable
 The `fine_tune_upstream.py` script seems to be an updated version of the script with a couple of modifications and more parameters. Here is an example for executing the script on the MVIP dataset, as it was used for the thesis:
 
 ```bash
-python fine_tune_upstream.py --dataset=mvip --experiment_name="test-01" \
+python fine_tune_upstream.py --dataset=mvip \
 --pretrained_model_name_or_path="CompVis/stable-diffusion-v1-4" \
---initializer_token="component" --validation_prompt="a photo of a {name}" \
---num_vectors=4 --resolution=512 --train_batch_size=8 --lr_warmup_steps=0 \
---gradient_accumulation_steps=1 --max_train_steps=1000 \
+--initializer_token="part" --validation_prompt="a photo of a *" \
+--mask=True --num_vectors=4 --resolution=512 --train_batch_size=12 \
+--lr_warmup_steps=0 --gradient_accumulation_steps=1 --max_train_steps=1500 \
 --learning_rate=5.0e-04 --scale_lr --lr_scheduler="constant" \
 --mixed_precision=fp16 --revision=fp16 --gradient_checkpointing \
 --num_trials=1 --examples_per_class=16
@@ -70,7 +70,7 @@ The trained token weights will be saved under `_experiments/{dataset}-{experimen
 Before generating augmentations, we call the script `aggregate_embeddings.py`, which merges all of the learned tokens together into a single directory, creating a class-agnostic template to use for the next steps:
 
 ```bash
-python aggregate_embeddings.py --experiment_name="test-01" \
+python aggregate_embeddings.py --experiment_name="mvip-01" \
 --num_trials=1 --examples_per_class=16
 ```
 

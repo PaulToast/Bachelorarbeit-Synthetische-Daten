@@ -35,6 +35,7 @@ from diffusers.utils.import_utils import is_xformers_available
 from huggingface_hub import HfFolder, Repository, whoami
 
 from datetime import datetime
+from scipy.ndimage import maximum_filter
 
 # TODO: remove and import from diffusers.utils when the new version of diffusers is released
 from packaging import version
@@ -120,6 +121,11 @@ def parse_args():
         default=None,
         required=False,
         help="Revision of pretrained model identifier from huggingface.co/models.",
+    )
+    parser.add_argument(
+        "--mask",
+        type=bool,
+        default=False,
     )
     parser.add_argument(
         "--seed",
@@ -838,6 +844,17 @@ if __name__ == "__main__":
 
             image = train_dataset.get_image_by_idx(idx)
             metadata = train_dataset.get_metadata_by_idx(idx)
+
+            # Apply mask
+            if args.mask:
+                mask = Image.fromarray((
+                    np.where(metadata["mask"], 255, 0)
+                ).astype(np.uint8))
+
+                mask = Image.fromarray(
+                    maximum_filter(np.array(mask), size=16))
+                
+                image = Image.composite(image, mask, mask)
 
             name = metadata["name"].replace(" ", "_")
             path = f"{args.dataset}-{seed}-{examples_per_class}"
