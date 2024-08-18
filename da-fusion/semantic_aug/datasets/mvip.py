@@ -149,12 +149,14 @@ class MVIPDataset(FewShotDataset):
 
     def get_image_by_idx(self, idx: int) -> torch.Tensor:
 
+        """
         # Apply the mask before returning the image
         image = Image.open(self.all_images[idx]).convert('RGB')
         mask = Image.open(self.all_masks[idx]).convert('RGB')
-        masked_image = Image.composite(image, mask, mask)
 
-        return masked_image
+        return Image.composite(image, mask, mask)
+        """
+        return Image.open(self.all_images[idx]).convert('RGB')
 
     def get_label_by_idx(self, idx: int) -> torch.Tensor:
 
@@ -164,6 +166,8 @@ class MVIPDataset(FewShotDataset):
 
         #annotation = self.all_annotations[idx]
 
-        return dict(name=self.class_names[self.all_labels[idx]]) 
-                    #mask=self.cocoapi.annToMask(annotation),
-                    #**annotation)
+        return dict(
+            name=self.class_names[self.all_labels[idx]],
+            mask=np.array(Image.open(self.all_masks[idx]).convert('L')) #mask=self.cocoapi.annToMask(annotation),
+            #**annotation)
+        )

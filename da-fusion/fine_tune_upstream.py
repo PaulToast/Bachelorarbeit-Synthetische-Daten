@@ -13,8 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 
-#region setup
-
 import argparse
 import logging
 import math
@@ -39,6 +37,7 @@ from accelerate.utils import ProjectConfiguration, set_seed
 from huggingface_hub import create_repo, upload_folder
 
 from datetime import datetime
+from scipy.ndimage import maximum_filter
 
 # TODO: remove and import from diffusers.utils when the new version of diffusers is released
 from packaging import version
@@ -106,8 +105,6 @@ else:
 check_min_version("0.20.0.dev0")
 
 logger = get_logger(__name__)
-
-#endregion
 
 
 def save_model_card(repo_id: str, images=None, base_model=str, repo_folder=None):
@@ -258,6 +255,11 @@ def parse_args():
             "A token to use as a placeholder for the concept.",
             " Will default to class name."
         )
+    )
+    parser.add_argument(
+        "--mask",
+        type=bool,
+        default=False,
     )
     parser.add_argument(
         "--seed",
@@ -639,7 +641,7 @@ class TextualInversionDataset(Dataset):
         if not image.mode == "RGB":
             image = image.convert("RGB")
 
-        placeholder_string = f"{self.placeholder_token} in a workshop" # ORIGINALLY: self.placeholder_token
+        placeholder_string = self.placeholder_token #f"{self.placeholder_token} in a workshop" # ORIGINALLY: self.placeholder_token
         text = random.choice(self.templates).format(placeholder_string)
 
         example["input_ids"] = self.tokenizer(
@@ -1128,6 +1130,17 @@ if __name__ == "__main__":
 
             image = train_dataset.get_image_by_idx(idx)
             metadata = train_dataset.get_metadata_by_idx(idx)
+
+            # Apply mask
+            if args.mask:
+                mask = Image.fromarray((
+                    np.where(metadata["mask"], 255, 0)
+                ).astype(np.uint8))
+
+                mask = Image.fromarray(
+                    maximum_filter(np.array(mask), size=16))
+                
+                image = Image.composite(image, mask, mask)
 
             if metadata["name"] == class_name:
 
