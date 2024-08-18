@@ -639,7 +639,7 @@ class TextualInversionDataset(Dataset):
         if not image.mode == "RGB":
             image = image.convert("RGB")
 
-        placeholder_string = f"{self.placeholder_token} part" # ORIGINALLY: self.placeholder_token
+        placeholder_string = f"{self.placeholder_token} in a workshop" # ORIGINALLY: self.placeholder_token
         text = random.choice(self.templates).format(placeholder_string)
 
         example["input_ids"] = self.tokenizer(
@@ -900,11 +900,12 @@ def main(args):
     total_batch_size = args.train_batch_size * accelerator.num_processes * args.gradient_accumulation_steps
 
     logger.info("***** Running training *****")
+    logger.info(f"  Placeholder token = {args.placeholder_token}")
     logger.info(f"  Num examples = {len(train_dataset)}")
-    logger.info(f"  Num Epochs = {args.num_train_epochs}")
+    logger.info(f"  Num epochs = {args.num_train_epochs}")
     logger.info(f"  Instantaneous batch size per device = {args.train_batch_size}")
     logger.info(f"  Total train batch size (w. parallel, distributed & accumulation) = {total_batch_size}")
-    logger.info(f"  Gradient Accumulation steps = {args.gradient_accumulation_steps}")
+    logger.info(f"  Gradient accumulation steps = {args.gradient_accumulation_steps}")
     logger.info(f"  Total optimization steps = {args.max_train_steps}")
     global_step = 0
     first_epoch = 0
@@ -1118,7 +1119,7 @@ if __name__ == "__main__":
     for seed, examples_per_class, class_name in options:
 
         os.makedirs(os.path.join(output_dir, "extracted"), exist_ok=True)
-
+        
         train_dataset = DATASETS[
             args.dataset](split="train", seed=seed, 
                           examples_per_class=examples_per_class)
@@ -1131,6 +1132,7 @@ if __name__ == "__main__":
             if metadata["name"] == class_name:
 
                 name = metadata["name"].replace(" ", "_")
+
                 path = f"seed={seed}_ex={examples_per_class}"
 
                 path = os.path.join(output_dir, "extracted", path, name, f"{idx}.png")
@@ -1139,13 +1141,20 @@ if __name__ == "__main__":
                 image.save(path)
 
         formatted_name = class_name.replace(" ", "_")
+        
         dirname = f"seed={seed}_ex={examples_per_class}/{formatted_name}"
 
         args = parse_args()
         
         args.seed = seed
 
-        args.placeholder_token = f"<{formatted_name}>"
+        # For the MVIP dataset, use the placeholder token "<car_part_{class_index}>"
+        # Otherwise, use "<{class_name}>"
+        if args.dataset == "mvip":
+            class_index = class_names.index(class_name)
+            args.placeholder_token = f"<car_part_{class_index}>"
+        else:
+            args.placeholder_token = f"<{formatted_name}>"
 
         args.train_data_dir = os.path.join(
             output_dir, "extracted", dirname)

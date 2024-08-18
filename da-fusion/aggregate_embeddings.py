@@ -47,7 +47,6 @@ if __name__ == "__main__":
             merged_dict.update(torch.load(file))
 
         target_path = output_path.format(
-            dataset=args.dataset,
             seed=seed, 
             examples_per_class=examples_per_class)
 

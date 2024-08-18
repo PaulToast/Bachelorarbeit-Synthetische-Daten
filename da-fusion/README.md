@@ -70,7 +70,7 @@ The trained token weights will be saved under `_experiments/{dataset}-{experimen
 Before generating augmentations, we call the script `aggregate_embeddings.py`, which merges all of the learned tokens together into a single directory, creating a class-agnostic template to use for the next steps:
 
 ```bash
-python aggregate_embeddings.py --dataset=mvip --experiment_name="test-01" \
+python aggregate_embeddings.py --experiment_name="test-01" \
 --num_trials=1 --examples_per_class=16
 ```
 
