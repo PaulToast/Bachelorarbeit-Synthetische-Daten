@@ -54,8 +54,9 @@ class MVIPDataset(FewShotDataset):
             "val": "valid_data"
         } 
 
-        # Add every image path to a class_to_images dict
+        # Add every image & mask path to a class_to_images dict
         class_to_images = defaultdict(list)
+        class_to_masks = defaultdict(list)
 
         for class_name in self.class_names:
             root = os.path.join(image_dir, class_name, split_dir[split])
@@ -68,9 +69,11 @@ class MVIPDataset(FewShotDataset):
                         for file in os.listdir(os.path.join(root, set, orientation, cam)):
                             if file.endswith("rgb.png"):
                                 class_to_images[class_name].append(os.path.join(root, set, orientation, cam, file))
+                            if file.endswith("rgb_mask_gen.png"):
+                                class_to_masks[class_name].append(os.path.join(root, set, orientation, cam, file))
 
-        # Randomly shuffle the order of images in each class by generating a sequence
-        # of ids for each class with a random seed
+        # Generate a sequence of ids for each class, in random order,
+        # effectively shuffling the order of images
         rng = np.random.default_rng(seed)
 
         class_to_ids = {key: rng.permutation(
@@ -82,8 +85,12 @@ class MVIPDataset(FewShotDataset):
 
         ##############################################################################
 
+        # Replicate class_to_images & class_to_masks, but in the random order from class_to_ids
         self.class_to_images = {
             key: [class_to_images[key][i] for i in ids] 
+            for key, ids in class_to_ids.items()}
+        self.class_to_masks = {
+            key: [class_to_masks[key][i] for i in ids] 
             for key, ids in class_to_ids.items()}
 
         """self.class_to_annotations = {
@@ -92,6 +99,9 @@ class MVIPDataset(FewShotDataset):
 
         self.all_images = sum([
             self.class_to_images[key] 
+            for key in self.class_names], [])
+        self.all_masks = sum([
+            self.class_to_masks[key] 
             for key in self.class_names], [])
 
         """self.all_annotations = sum([
@@ -139,7 +149,12 @@ class MVIPDataset(FewShotDataset):
 
     def get_image_by_idx(self, idx: int) -> torch.Tensor:
 
-        return Image.open(self.all_images[idx]).convert('RGB')
+        # Apply the mask before returning the image
+        image = Image.open(self.all_images[idx]).convert('RGB')
+        mask = Image.open(self.all_masks[idx]).convert('RGB')
+        masked_image = Image.composite(image, mask, mask)
+
+        return masked_image
 
     def get_label_by_idx(self, idx: int) -> torch.Tensor:
 
