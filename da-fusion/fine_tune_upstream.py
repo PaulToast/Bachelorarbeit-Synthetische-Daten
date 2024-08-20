@@ -542,29 +542,48 @@ imagenet_templates_small = [
     #"a rendering of a {}",
     "a cropped photo of the {}",
     "the photo of a {}",
-    #"a photo of a clean {}",
-    #"a photo of a dirty {}",
+    "a photo of a clean {}",
+    "a photo of a dirty {}",
+    "a photo of a used {}",
+    "a photo of a {} in used condition",
     #"a dark photo of the {}",
-    "a photo of my {}",
+    #"a photo of my {}",
     #"a photo of the cool {}",
-    "a close-up photo of a {}",
-    "a bright photo of the {}",
+    #"a close-up photo of a {}",
+    #"a bright photo of the {}",
     "a cropped photo of a {}",
     "a photo of the {}",
-    "a good photo of the {}",
-    "a photo of one {}",
-    "a close-up photo of the {}",
+    #"a good photo of the {}",
+    #"a photo of one {}",
+    #"a close-up photo of the {}",
     #"a rendition of the {}",
     #"a photo of the clean {}",
     #"a rendition of a {}",
     #"a photo of a nice {}",
-    "a good photo of a {}",
+    #"a good photo of a {}",
+    "a low quality photo of a {}",
+    "a blurry photo of a {}",
     #"a photo of the nice {}",
     #"a photo of the small {}",
     #"a photo of the weird {}",
     #"a photo of the large {}",
     #"a photo of a cool {}",
     #"a photo of a small {}",
+]
+
+mvip_templates = [
+    "a detailed photo of a {} on a steel table",
+    "a photo of a {} in used condition on a table",
+    "photo of a {} on a lab table",
+    "a photo of a dirty {} on a workshop table",
+    "a photo of a used {} on a steel table",
+    "a dark photo of the {} on a steel table",
+    "a low quality photo of a used {} on a steel table",
+    "a blurry photo of a {} on a steel table",
+    "a bright photo of the {} on a workshop table",
+    "a photo of the {} on a scale",
+    "a photo of an old {} on a steel table",
+    "a photo of a broken {} on a lab table",
 ]
 
 imagenet_style_templates_small = [
@@ -628,7 +647,13 @@ class TextualInversionDataset(Dataset):
             "lanczos": PIL_INTERPOLATION["lanczos"],
         }[interpolation]
 
-        self.templates = imagenet_style_templates_small if learnable_property == "style" else imagenet_templates_small
+        if learnable_property == "style":
+            self.templates = imagenet_style_templates_small
+        elif args.dataset == "mvip":
+            self.templates = imagenet_templates_small #mvip_templates
+        else:
+            self.templates = imagenet_templates_small
+        
         self.flip_transform = transforms.RandomHorizontalFlip(p=self.flip_p)
 
     def __len__(self):
@@ -896,7 +921,7 @@ def main(args):
     # We need to initialize the trackers we use, and also store our configuration.
     # The trackers initializes automatically on the main process.
     if accelerator.is_main_process:
-        accelerator.init_trackers("textual_inversion", config=vars(args))
+        accelerator.init_trackers(args.experiment_name, config=vars(args)) # "textual_inversion"
 
     # Train!
     total_batch_size = args.train_batch_size * accelerator.num_processes * args.gradient_accumulation_steps
@@ -946,6 +971,10 @@ def main(args):
     for epoch in range(first_epoch, args.num_train_epochs):
         text_encoder.train()
         for step, batch in enumerate(train_dataloader):
+            # Generate first validation images before starting the training
+            if global_step == 0:
+                log_validation(text_encoder, tokenizer, unet, vae, args, accelerator, weight_dtype, epoch)
+            
             # Skip steps until we reach the resumed step
             if args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
                 if step % args.gradient_accumulation_steps == 0:
@@ -1131,16 +1160,22 @@ if __name__ == "__main__":
             image = train_dataset.get_image_by_idx(idx)
             metadata = train_dataset.get_metadata_by_idx(idx)
 
-            # Apply mask
+            # Use mask to augment background
             if args.mask:
+                method = random.choice(["none", "noise", "black"])
+
                 mask = Image.fromarray((
                     np.where(metadata["mask"], 255, 0)
                 ).astype(np.uint8))
 
                 mask = Image.fromarray(
                     maximum_filter(np.array(mask), size=16))
-                
-                image = Image.composite(image, mask, mask)
+
+                if method == "noise":
+                    noise = Image.effect_noise(image.size, 25).convert("RGB")
+                    image = Image.composite(image, noise, mask)
+                elif method == "black":
+                    image = Image.composite(image, mask, mask)
 
             if metadata["name"] == class_name:
 

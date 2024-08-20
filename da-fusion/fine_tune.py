@@ -124,8 +124,10 @@ def parse_args():
     )
     parser.add_argument(
         "--mask",
-        type=bool,
-        default=False,
+        nargs="+",
+        type=int,
+        default=[0],
+        choices=[0, 1]
     )
     parser.add_argument(
         "--seed",
@@ -854,7 +856,7 @@ if __name__ == "__main__":
                 mask = Image.fromarray(
                     maximum_filter(np.array(mask), size=16))
                 
-                image = Image.composite(image, mask, mask)
+                image = Image.composite(image, mask.convert("RGB"), mask)
 
             name = metadata["name"].replace(" ", "_")
             path = f"{args.dataset}-{seed}-{examples_per_class}"
