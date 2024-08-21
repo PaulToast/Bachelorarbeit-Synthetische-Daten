@@ -261,8 +261,9 @@ def parse_args():
     )
     parser.add_argument(
         "--mask",
-        type=bool,
-        default=False,
+        type=str,
+        default=None,
+        choices=["noise", "crop"],
     )
     parser.add_argument(
         "--seed",
@@ -1163,35 +1164,29 @@ if __name__ == "__main__":
             image = train_dataset.get_image_by_idx(idx)
             metadata = train_dataset.get_metadata_by_idx(idx)
 
-            # Use mask to crop image & augment background
-            if args.mask:
-                method = random.choice(["none", "noise", "black"])
-
+            if args.mask is not None:
+                # Create mask from metadata
                 mask = Image.fromarray((
                     np.where(metadata["mask"], 255, 0)
                 ).astype(np.uint8))
-
                 mask = Image.fromarray(
                     maximum_filter(np.array(mask), size=16))
 
-                if method == "noise":
+                if args.mask == "noise":
                     noise = Image.effect_noise(image.size, 25).convert("RGB")
                     image = Image.composite(image, noise, mask)
-                elif method == "black":
-                    image = Image.composite(image, mask, mask)
+                elif args.mask == "crop":
+                    mask_box = mask.getbbox()
+                    padding = 10
 
-                # Crop the image to the mask
-                mask_box = mask.getbbox()
-                padding = 10
+                    mask_box = (
+                        mask_box[0] - padding,
+                        mask_box[1] - padding,
+                        mask_box[2] + padding,
+                        mask_box[3] + padding
+                    )
 
-                mask_box = (
-                    mask_box[0] - padding,
-                    mask_box[1] - padding,
-                    mask_box[2] + padding,
-                    mask_box[3] + padding
-                )
-
-                image = image.crop(mask_box)
+                    image = image.crop(mask_box)
 
             if metadata["name"] == class_name:
 
