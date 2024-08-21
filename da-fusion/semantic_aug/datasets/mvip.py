@@ -30,7 +30,6 @@ class MVIPDataset(FewShotDataset):
         meta_file.close()
 
         # Select only 20 of the classes
-        #np.random.shuffle(class_names)
         del class_names[20:]
 
     num_classes: int = len(class_names)
@@ -93,20 +92,12 @@ class MVIPDataset(FewShotDataset):
             key: [class_to_masks[key][i] for i in ids] 
             for key, ids in class_to_ids.items()}
 
-        """self.class_to_annotations = {
-            key: [class_to_annotations[key][i] for i in ids] 
-            for key, ids in class_to_ids.items()}"""
-
         self.all_images = sum([
             self.class_to_images[key] 
             for key in self.class_names], [])
         self.all_masks = sum([
             self.class_to_masks[key] 
             for key in self.class_names], [])
-
-        """self.all_annotations = sum([
-            self.class_to_annotations[key] 
-            for key in self.class_names], [])"""
 
         self.all_labels = [i for i, key in enumerate(
             self.class_names) for _ in self.class_to_images[key]]
@@ -149,13 +140,6 @@ class MVIPDataset(FewShotDataset):
 
     def get_image_by_idx(self, idx: int) -> torch.Tensor:
 
-        """
-        # Apply the mask before returning the image
-        image = Image.open(self.all_images[idx]).convert('RGB')
-        mask = Image.open(self.all_masks[idx]).convert('RGB')
-
-        return Image.composite(image, mask, mask)
-        """
         return Image.open(self.all_images[idx]).convert('RGB')
 
     def get_label_by_idx(self, idx: int) -> torch.Tensor:
@@ -164,10 +148,7 @@ class MVIPDataset(FewShotDataset):
     
     def get_metadata_by_idx(self, idx: int) -> Dict:
 
-        #annotation = self.all_annotations[idx]
-
         return dict(
             name=self.class_names[self.all_labels[idx]],
-            mask=np.array(Image.open(self.all_masks[idx]).convert('L')) #mask=self.cocoapi.annToMask(annotation),
-            #**annotation)
+            mask=np.array(Image.open(self.all_masks[idx]).convert('L'))
         )
