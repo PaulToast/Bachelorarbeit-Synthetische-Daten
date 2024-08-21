@@ -42,6 +42,7 @@ from scipy.ndimage import maximum_filter
 # TODO: remove and import from diffusers.utils when the new version of diffusers is released
 from packaging import version
 from PIL import Image
+from PIL import ImageChops
 from torch.utils.data import Dataset
 from torchvision import transforms
 from tqdm.auto import tqdm
@@ -1162,7 +1163,7 @@ if __name__ == "__main__":
             image = train_dataset.get_image_by_idx(idx)
             metadata = train_dataset.get_metadata_by_idx(idx)
 
-            # Use mask to augment background
+            # Use mask to crop image & augment background
             if args.mask:
                 method = random.choice(["none", "noise", "black"])
 
@@ -1178,6 +1179,19 @@ if __name__ == "__main__":
                     image = Image.composite(image, noise, mask)
                 elif method == "black":
                     image = Image.composite(image, mask, mask)
+
+                # Crop the image to the mask
+                mask_box = mask.getbbox()
+                padding = 10
+
+                mask_box = (
+                    mask_box[0] - padding,
+                    mask_box[1] - padding,
+                    mask_box[2] + padding,
+                    mask_box[3] + padding
+                )
+
+                image = image.crop(mask_box)
 
             if metadata["name"] == class_name:
 
