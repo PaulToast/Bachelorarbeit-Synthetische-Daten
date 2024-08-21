@@ -1,12 +1,15 @@
-from semantic_aug.datasets.mvip import MVIPDataset
 from semantic_aug.datasets.coco import COCODataset
 from semantic_aug.datasets.spurge import SpurgeDataset
 from semantic_aug.datasets.imagenet import ImageNetDataset
 from semantic_aug.datasets.pascal import PASCALDataset
+from semantic_aug.datasets.mvip import MVIPDataset
+from semantic_aug.datasets.mvip_mini import MVIPMiniDataset
+
 from semantic_aug.augmentations.compose import ComposeParallel
 from semantic_aug.augmentations.compose import ComposeSequential
 from semantic_aug.augmentations.real_guidance import RealGuidance
 from semantic_aug.augmentations.textual_inversion import TextualInversion
+
 from diffusers import StableDiffusionPipeline
 from itertools import product
 from torch import autocast
@@ -25,7 +28,8 @@ DATASETS = {
     "coco": COCODataset, 
     "pascal": PASCALDataset,
     "imagenet": ImageNetDataset,
-    "mvip": MVIPDataset
+    "mvip": MVIPDataset,
+    "mvip-mini": MVIPMiniDataset
 }
 
 COMPOSE = {
@@ -37,6 +41,16 @@ AUGMENT = {
     "real-guidance": RealGuidance,
     "textual-inversion": TextualInversion
 }
+
+PROMPTS = [
+    "a photo of a used {name}",
+    "a photo of a dirty {name}",
+    "a photo of a rusty {name}",
+    "a photo of a broken {name}",
+    "a photo of a old {name}",
+    "a photo of a clean {name}",
+    "a photo of a brand new {name}",
+]
 
 
 if __name__ == "__main__":
@@ -151,8 +165,13 @@ if __name__ == "__main__":
         if args.class_name is not None: 
             if metadata["name"] != args.class_name: continue
 
+        if args.dataset == "mvip" or "mvip-mini":
+            prompt = random.choice(PROMPTS)
+        else:
+            prompt = None
+
         image, label = aug(
-            image, label, metadata)
+            image, label, metadata, prompt)
 
         name = metadata['name'].replace(" ", "_")
 

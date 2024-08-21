@@ -67,6 +67,7 @@ from semantic_aug.datasets.pascal import PASCALDataset
 from semantic_aug.datasets.caltech101 import CalTech101Dataset
 from semantic_aug.datasets.flowers102 import Flowers102Dataset
 from semantic_aug.datasets.mvip import MVIPDataset
+from semantic_aug.datasets.mvip_mini import MVIPMiniDataset
 
 
 DATASETS = {
@@ -76,7 +77,8 @@ DATASETS = {
     "imagenet": ImageNetDataset,
     "caltech": CalTech101Dataset,
     "flowers": Flowers102Dataset,
-    "mvip": MVIPDataset
+    "mvip": MVIPDataset,
+    "mvip-mini": MVIPMiniDataset
 }
 
 

@@ -62,10 +62,13 @@ class RealGuidance(GenerativeAugmentation):
         self.erasure_word_name = None
 
     def forward(self, image: Image.Image, label: int, 
-                metadata: dict) -> Tuple[Image.Image, int]:
+                metadata: dict, prompt: str=None) -> Tuple[Image.Image, int]:
 
         canvas = image.resize((512, 512), Image.BILINEAR)
-        prompt = self.prompt.format(name=metadata.get("name", ""))
+        if prompt is None:
+            prompt = self.prompt.format(name=metadata.get("name", ""))
+        else:
+            prompt = prompt.format(name=metadata.get("name", ""))
 
         if self.mask: assert "mask" in metadata, \
             "mask=True but no mask present in metadata"
@@ -97,7 +100,7 @@ class RealGuidance(GenerativeAugmentation):
         if self.mask:  # use focal object mask
 
             mask_image = Image.fromarray((
-                np.where(metadata["mask"], 255, 0)
+                np.where(metadata["mask"]>10, 255, 0)
             ).astype(np.uint8)).resize((512, 512), Image.NEAREST)
 
             mask_image = Image.fromarray(

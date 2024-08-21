@@ -25,12 +25,12 @@ class ComposeSequential(GenerativeAugmentation):
             else [1.0 for _ in augs]
 
     def forward(self, image: Image.Image, label: int, 
-                metadata: dict) -> Tuple[Image.Image, int]:
+                metadata: dict, prompt: str=None) -> Tuple[Image.Image, int]:
 
         for aug, p in zip(self.augs, self.probs):
 
             if np.random.uniform() < p:
-                image, label = aug(image, label, metadata)
+                image, label = aug(image, label, metadata, prompt)
 
         return image, label
 
@@ -47,10 +47,10 @@ class ComposeParallel(GenerativeAugmentation):
             else [1.0 / len(augs) for _ in augs]
 
     def forward(self, image: Image.Image, label: int, 
-                metadata: dict) -> Tuple[Image.Image, int]:
+                metadata: dict, prompt: str=None) -> Tuple[Image.Image, int]:
 
         idx = np.random.choice(len(self.probs), p=self.probs)
 
-        image, label = self.augs[idx](image, label, metadata)
+        image, label = self.augs[idx](image, label, metadata, prompt)
 
         return image, label
