@@ -29,8 +29,8 @@ class MVIPDataset(FewShotDataset):
 
         meta_file.close()
 
-        # Randomly select only 20 of the classes
-        np.random.shuffle(class_names)
+        # Select only 20 of the classes
+        #np.random.shuffle(class_names)
         del class_names[20:]
 
     num_classes: int = len(class_names)
