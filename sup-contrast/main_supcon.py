@@ -5,6 +5,7 @@ import sys
 import argparse
 import time
 import math
+import numpy as np
 
 import tensorboard_logger as tb_logger
 import torch
@@ -17,171 +18,286 @@ from util import set_optimizer, save_model
 from networks.resnet_big import SupConResNet
 from losses import SupConLoss
 
+from torch.utils.data import Dataset
+from PIL import Image
+
 try:
     import apex
     from apex import amp, optimizers
 except ImportError:
     pass
 
+from diffusers.utils import check_min_version, is_wandb_available
+if is_wandb_available():
+    import wandb
 
-def parse_option():
-    parser = argparse.ArgumentParser('argument for training')
+PIL_INTERPOLATION = {
+    "linear": Image.Resampling.BILINEAR,
+    "bilinear": Image.Resampling.BILINEAR,
+    "bicubic": Image.Resampling.BICUBIC,
+    "lanczos": Image.Resampling.LANCZOS,
+    "nearest": Image.Resampling.NEAREST,
+}
 
-    parser.add_argument('--print_freq', type=int, default=10,
-                        help='print frequency')
-    parser.add_argument('--save_freq', type=int, default=50,
-                        help='save frequency')
-    parser.add_argument('--batch_size', type=int, default=256,
-                        help='batch_size')
-    parser.add_argument('--num_workers', type=int, default=16,
-                        help='num of workers to use')
-    parser.add_argument('--epochs', type=int, default=1000,
-                        help='number of training epochs')
+"""
+TODO
+- take --experiment_name
+- use the extracted folder
+- dataset=mvip with same class
+- logging with wandb
+"""
 
-    # optimization
-    parser.add_argument('--learning_rate', type=float, default=0.05,
-                        help='learning rate')
-    parser.add_argument('--lr_decay_epochs', type=str, default='700,800,900',
-                        help='where to decay lr, can be a list')
-    parser.add_argument('--lr_decay_rate', type=float, default=0.1,
-                        help='decay rate for learning rate')
-    parser.add_argument('--weight_decay', type=float, default=1e-4,
-                        help='weight decay')
-    parser.add_argument('--momentum', type=float, default=0.9,
-                        help='momentum')
+class MVIPDataset(Dataset):
+    def __init__(
+        self,
+        transform,
+        size=512,
+        repeats=100,
+        interpolation="bicubic",
+        flip_p=0.5,
+        set="train",
+    ):
+        self.data_root = '/mnt/HDD/MVIP/sets'
 
-    # model dataset
+        self.flip_transform = transform
+        self.size = size
+        self.flip_p = flip_p
+
+        self.image_paths = self.get_image_paths()
+
+        self.num_images = len(self.image_paths)
+        self._length = self.num_images
+
+        if set == "train":
+            self.split = "train_data"
+            self._length = self.num_images * repeats
+
+        self.interpolation = {
+            "linear": PIL_INTERPOLATION["linear"],
+            "bilinear": PIL_INTERPOLATION["bilinear"],
+            "bicubic": PIL_INTERPOLATION["bicubic"],
+            "lanczos": PIL_INTERPOLATION["lanczos"],
+        }[interpolation]
+        
+        self.flip_transform = transforms.RandomHorizontalFlip(p=self.flip_p)
+
+    def __len__(self):
+        return self._length
+
+    def __getitem__(self, i):
+        example = {}
+
+        # Label
+        example["labels"] = torch.tensor([int(self.image_paths[i % self.num_images].split("/")[-6])])
+
+        # Image
+        image = Image.open(self.image_paths[i % self.num_images])
+
+        if not image.mode == "RGB":
+            image = image.convert("RGB")
+
+        example["pixel_values"] = self.transform(image)
+
+        return example
+    
+    def get_image_paths(self): # /mnt/HDD/MVIP/sets/class_name/train_data/0/0/cam0/0_rgb.png
+        paths = []
+
+        for class_name in [f for f in os.listdir(self.data_root) if os.path.isdir(os.path.join(self.data_root, f))]:
+            root = os.path.join(self.data_root, class_name, self.split)
+
+            for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
+                for orientation in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
+                    for cam in [f for f in os.listdir(os.path.join(root, set, orientation)) if os.path.isdir(os.path.join(root, set, orientation, f))]:
+                        for file in os.listdir(os.path.join(root, set, orientation, cam)):
+                            if file.endswith("rgb.png"):
+                                paths.append(os.path.join(root, set, orientation, cam, file))
+
+# Extracts the MVIP images to '_experiments/{experiment_name}/extracted/' following the torchvision ImageFolder convention.
+def extract_mvip(args):
+    root_dir = '/mnt/HDD/MVIP/sets'
+    output_dir = os.path.abspath(os.path.join(
+        os.path.dirname( __file__ ), '..', '_experiments', args.experiment_name, 'extracted')
+    )
+    os.makedirs(output_dir, exist_ok=True)
+
+    for class_name in [f for f in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir, f))]:
+        root = os.path.join(root_dir, class_name, "train_data")
+
+        os.makedirs(os.path.join(output_dir, class_name), exist_ok=True)
+
+        image_index = 0
+        for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
+            for orientation in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
+                for cam in [f for f in os.listdir(os.path.join(root, set, orientation)) if os.path.isdir(os.path.join(root, set, orientation, f))]:
+                    for file in os.listdir(os.path.join(root, set, orientation, cam)):
+                        if file.endswith("rgb.png"):
+                            image = Image.open(os.path.join(root, set, orientation, cam, file))
+                            image.save(image, os.path.join(output_dir, class_name, f"{image_index}.png"))
+                            image_index += 1
+    
+    # Calculate mean and std of the dataset
+    mean = torch.zeros(3)
+    std = torch.zeros(3)
+    dataset = datasets.ImageFolder(root=args.data_folder, transform=transforms.ToTensor())
+
+    for image, _ in dataset:
+        mean += torch.mean(image, dim=(1, 2))
+        std += torch.std(image, dim=(1, 2))
+
+    mean /= len(dataset)
+    std /= len(dataset)
+
+    mean = tuple(mean.tolist())
+    std = tuple(std.tolist())
+
+
+def parse_args():
+    parser = argparse.ArgumentParser('Arguments for training')
+
+    # Model & Dataset
     parser.add_argument('--model', type=str, default='resnet50')
-    parser.add_argument('--dataset', type=str, default='cifar10',
-                        choices=['cifar10', 'cifar100', 'path'], help='dataset')
-    parser.add_argument('--mean', type=str, help='mean of dataset in path in form of str tuple')
-    parser.add_argument('--std', type=str, help='std of dataset in path in form of str tuple')
-    parser.add_argument('--data_folder', type=str, default=None, help='path to custom dataset')
-    parser.add_argument('--size', type=int, default=32, help='parameter for RandomResizedCrop')
 
-    # method
-    parser.add_argument('--method', type=str, default='SupCon',
-                        choices=['SupCon', 'SimCLR'], help='choose method')
+    parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100', 'mvip'])
+    parser.add_argument('--data_folder', type=str, default=None)
+    parser.add_argument('--experiment_name', type=str, default=None)
 
-    # temperature
-    parser.add_argument('--temp', type=float, default=0.07,
-                        help='temperature for loss function')
+    parser.add_argument( '--batch_size', type=int, default=256)
+    parser.add_argument( '--num_workers', type=int, default=16)
+    parser.add_argument('--epochs', type=int, default=1000)
 
-    # other setting
-    parser.add_argument('--cosine', action='store_true',
-                        help='using cosine annealing')
-    parser.add_argument('--syncBN', action='store_true',
-                        help='using synchronized batch normalization')
-    parser.add_argument('--warm', action='store_true',
-                        help='warm-up for large batch training')
-    parser.add_argument('--trial', type=str, default='0',
-                        help='id for recording multiple runs')
+    parser.add_argument('--size', type=int, default=32, help='Parameter for RandomResizedCrop.')
 
-    opt = parser.parse_args()
+    parser.add_argument('--print_freq', type=int, default=10,help='print frequency')
+    parser.add_argument('--save_freq', type=int, default=50, help='save frequency')
 
-    # check if dataset is path that passed required arguments
-    if opt.dataset == 'path':
-        assert opt.data_folder is not None \
-            and opt.mean is not None \
-            and opt.std is not None
+    # Optimization
+    parser.add_argument('--learning_rate', type=float, default=0.05)
+    parser.add_argument('--lr_decay_epochs', type=str, default='700,800,900', help='When to decay lr, as string seperated by ","')
+    parser.add_argument('--lr_decay_rate', type=float, default=0.1)
+    parser.add_argument('--weight_decay', type=float, default=1e-4)
+    parser.add_argument('--momentum', type=float, default=0.9)
 
-    # set the path according to the environment
-    if opt.data_folder is None:
-        opt.data_folder = './datasets/'
-    opt.model_path = './save/SupCon/{}_models'.format(opt.dataset)
-    opt.tb_path = './save/SupCon/{}_tensorboard'.format(opt.dataset)
+    # Method
+    parser.add_argument('--method', type=str, default='SupCon', choices=['SupCon', 'SimCLR'])
 
-    iterations = opt.lr_decay_epochs.split(',')
-    opt.lr_decay_epochs = list([])
+    # Temperature
+    parser.add_argument('--temp', type=float, default=0.07, help='Temperature for loss function.')
+
+    # Other settings
+    parser.add_argument('--cosine', action='store_true', help='Using cosine annealing.')
+    parser.add_argument('--syncBN', action='store_true', help='Using synchronized batch normalization.')
+    parser.add_argument('--warm', action='store_true', help='Warm-up for large batch training.')
+    parser.add_argument('--trial', type=str, default='0', help='id for recording multiple runs.')
+
+    args = parser.parse_args()
+
+    # Set specific arguments for dataset=mvip
+    if args.dataset == 'mvip':
+        assert args.experiment_name is not None, "--experiment_name is required for dataset=mvip."
+
+        args.model_path = os.path.abspath(os.path.join(
+            os.path.dirname( __file__ ), '..', '_experiments', args.experiment_name, 'SupCon/models'
+        ))
+
+        args.tb_path = os.path.abspath(os.path.join(
+            os.path.dirname( __file__ ), '..', '_experiments', args.experiment_name, 'SupCon/logs'
+        ))
+    else:
+        args.model_path = './save/SupCon/{}_models'.format(args.dataset)
+        args.tb_path = './save/SupCon/{}_tensorboard'.format(args.dataset)
+
+    # Set learning rate decay epochs from string argument
+    iterations = args.lr_decay_epochs.split(',')
+    args.lr_decay_epochs = list([])
     for it in iterations:
-        opt.lr_decay_epochs.append(int(it))
+        args.lr_decay_epochs.append(int(it))
 
-    opt.model_name = '{}_{}_{}_lr_{}_decay_{}_bsz_{}_temp_{}_trial_{}'.\
-        format(opt.method, opt.dataset, opt.model, opt.learning_rate,
-               opt.weight_decay, opt.batch_size, opt.temp, opt.trial)
+    # Set model name for output
+    args.model_name = '{}_{}_{}_lr={}_decay={}_bs={}_temp={}_trial={}'.\
+        format(args.method, args.dataset, args.model, args.learning_rate,
+               args.weight_decay, args.batch_size, args.temp, args.trial)
 
-    if opt.cosine:
-        opt.model_name = '{}_cosine'.format(opt.model_name)
+    if args.cosine:
+        args.model_name = '{}_cosine'.format(args.model_name)
 
-    # warm-up for large-batch training,
-    if opt.batch_size > 256:
-        opt.warm = True
-    if opt.warm:
-        opt.model_name = '{}_warm'.format(opt.model_name)
-        opt.warmup_from = 0.01
-        opt.warm_epochs = 10
-        if opt.cosine:
-            eta_min = opt.learning_rate * (opt.lr_decay_rate ** 3)
-            opt.warmup_to = eta_min + (opt.learning_rate - eta_min) * (
-                    1 + math.cos(math.pi * opt.warm_epochs / opt.epochs)) / 2
+    # Warm-up for large-batch training,
+    if args.batch_size > 256:
+        args.warm = True
+    if args.warm:
+        args.model_name = '{}_warm'.format(args.model_name)
+        args.warmup_from = 0.01
+        args.warm_epochs = 10
+        if args.cosine:
+            eta_min = args.learning_rate * (args.lr_decay_rate ** 3)
+            args.warmup_to = eta_min + (args.learning_rate - eta_min) * (
+                    1 + math.cos(math.pi * args.warm_epochs / args.epochs)) / 2
         else:
-            opt.warmup_to = opt.learning_rate
+            args.warmup_to = args.learning_rate
 
-    opt.tb_folder = os.path.join(opt.tb_path, opt.model_name)
-    if not os.path.isdir(opt.tb_folder):
-        os.makedirs(opt.tb_folder)
+    args.tb_folder = os.path.join(args.tb_path, args.model_name)
+    if not os.path.isdir(args.tb_folder):
+        os.makedirs(args.tb_folder)
 
-    opt.save_folder = os.path.join(opt.model_path, opt.model_name)
-    if not os.path.isdir(opt.save_folder):
-        os.makedirs(opt.save_folder)
+    args.save_folder = os.path.join(args.model_path, args.model_name)
+    if not os.path.isdir(args.save_folder):
+        os.makedirs(args.save_folder)
 
-    return opt
+    return args
 
 
-def set_loader(opt):
-    # construct data loader
-    if opt.dataset == 'cifar10':
+# Construct data loader
+def set_loader(args):
+    if args.dataset == 'cifar10':
         mean = (0.4914, 0.4822, 0.4465)
         std = (0.2023, 0.1994, 0.2010)
-    elif opt.dataset == 'cifar100':
+    elif args.dataset == 'cifar100':
         mean = (0.5071, 0.4867, 0.4408)
         std = (0.2675, 0.2565, 0.2761)
-    elif opt.dataset == 'path':
-        mean = eval(opt.mean)
-        std = eval(opt.std)
+    elif args.dataset == 'mvip':
+        mean = (0.5, 0.5, 0.5)
+        std = (0.5, 0.5, 0.5)
     else:
-        raise ValueError('dataset not supported: {}'.format(opt.dataset))
-    normalize = transforms.Normalize(mean=mean, std=std)
-
+        raise ValueError('dataset not supported: {}'.format(args.dataset))
+    
     train_transform = transforms.Compose([
-        transforms.RandomResizedCrop(size=opt.size, scale=(0.2, 1.)),
+        transforms.RandomResizedCrop(size=args.size, scale=(0.2, 1.)),
         transforms.RandomHorizontalFlip(),
-        transforms.RandomApply([
-            transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)
-        ], p=0.8),
+        transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
         transforms.RandomGrayscale(p=0.2),
         transforms.ToTensor(),
-        normalize,
+        transforms.Normalize(mean=mean, std=std),
     ])
 
-    if opt.dataset == 'cifar10':
-        train_dataset = datasets.CIFAR10(root=opt.data_folder,
+    if args.dataset == 'cifar10':
+        train_dataset = datasets.CIFAR10(root=args.data_folder,
                                          transform=TwoCropTransform(train_transform),
                                          download=True)
-    elif opt.dataset == 'cifar100':
-        train_dataset = datasets.CIFAR100(root=opt.data_folder,
+    elif args.dataset == 'cifar100':
+        train_dataset = datasets.CIFAR100(root=args.data_folder,
                                           transform=TwoCropTransform(train_transform),
                                           download=True)
-    elif opt.dataset == 'path':
-        train_dataset = datasets.ImageFolder(root=opt.data_folder,
-                                            transform=TwoCropTransform(train_transform))
+    elif args.dataset == 'mvip':
+        train_dataset = MVIPDataset(size=args.size,
+                                    transform=TwoCropTransform(train_transform),
+                                    set="train")
     else:
-        raise ValueError(opt.dataset)
+        raise ValueError(args.dataset)
 
     train_sampler = None
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=opt.batch_size, shuffle=(train_sampler is None),
-        num_workers=opt.num_workers, pin_memory=True, sampler=train_sampler)
+        train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
+        num_workers=args.num_workers, pin_memory=True, sampler=train_sampler)
 
     return train_loader
 
 
-def set_model(opt):
-    model = SupConResNet(name=opt.model)
-    criterion = SupConLoss(temperature=opt.temp)
+def set_model(args):
+    model = SupConResNet(name=args.model)
+    criterion = SupConLoss(temperature=args.temp)
 
-    # enable synchronized Batch Normalization
-    if opt.syncBN:
+    # Enable synchronized batch normalization
+    if args.syncBN:
         model = apex.parallel.convert_syncbn_model(model)
 
     if torch.cuda.is_available():
@@ -194,8 +310,8 @@ def set_model(opt):
     return model, criterion
 
 
-def train(train_loader, model, criterion, optimizer, epoch, opt):
-    """one epoch training"""
+def train(train_loader, model, criterion, optimizer, epoch, args):
+    """One epoch training"""
     model.train()
 
     batch_time = AverageMeter()
@@ -212,22 +328,22 @@ def train(train_loader, model, criterion, optimizer, epoch, opt):
             labels = labels.cuda(non_blocking=True)
         bsz = labels.shape[0]
 
-        # warm-up learning rate
-        warmup_learning_rate(opt, epoch, idx, len(train_loader), optimizer)
+        # Warm-up learning rate
+        warmup_learning_rate(args, epoch, idx, len(train_loader), optimizer)
 
-        # compute loss
+        # Compute loss
         features = model(images)
         f1, f2 = torch.split(features, [bsz, bsz], dim=0)
         features = torch.cat([f1.unsqueeze(1), f2.unsqueeze(1)], dim=1)
-        if opt.method == 'SupCon':
+        if args.method == 'SupCon':
             loss = criterion(features, labels)
-        elif opt.method == 'SimCLR':
+        elif args.method == 'SimCLR':
             loss = criterion(features)
         else:
-            raise ValueError('contrastive method not supported: {}'.
-                             format(opt.method))
+            raise ValueError('Contrastive method not supported: {}'.
+                             format(args.method))
 
-        # update metric
+        # Update metric
         losses.update(loss.item(), bsz)
 
         # SGD
@@ -235,12 +351,12 @@ def train(train_loader, model, criterion, optimizer, epoch, opt):
         loss.backward()
         optimizer.step()
 
-        # measure elapsed time
+        # Measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()
 
-        # print info
-        if (idx + 1) % opt.print_freq == 0:
+        # Print info
+        if (idx + 1) % args.print_freq == 0:
             print('Train: [{0}][{1}/{2}]\t'
                   'BT {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                   'DT {data_time.val:.3f} ({data_time.avg:.3f})\t'
@@ -253,43 +369,57 @@ def train(train_loader, model, criterion, optimizer, epoch, opt):
 
 
 def main():
-    opt = parse_option()
+    args = parse_args()
 
-    # build data loader
-    train_loader = set_loader(opt)
+    # Build data loader
+    train_loader = set_loader(args)
 
-    # build model and criterion
-    model, criterion = set_model(opt)
+    # Build model and criterion
+    model, criterion = set_model(args)
 
-    # build optimizer
-    optimizer = set_optimizer(opt, model)
+    # Build optimizer
+    optimizer = set_optimizer(args, model)
 
-    # tensorboard
-    logger = tb_logger.Logger(logdir=opt.tb_folder, flush_secs=2)
+    # Init W&B logging
+    run = wandb.init(
+        project='SupCon',
+        config={
+            "dataset" : args.dataset,
+            "model_name": args.model_name,
+            "batch_size" : args.batch_size,
+            "learning_rate" : args.learning_rate,
+            "epochs" : args.epochs,
+            "weight_decay" : args.weight_decay,
+            "temperature" : args.temp,
+            "cosine" : args.cosine,
+        },
+    )
 
-    # training routine
-    for epoch in range(1, opt.epochs + 1):
-        adjust_learning_rate(opt, optimizer, epoch)
+    # Training routine
+    for epoch in range(1, args.epochs + 1):
+        adjust_learning_rate(args, optimizer, epoch)
 
-        # train for one epoch
+        # Train for one epoch
         time1 = time.time()
-        loss = train(train_loader, model, criterion, optimizer, epoch, opt)
+        loss = train(train_loader, model, criterion, optimizer, epoch, args)
         time2 = time.time()
         print('epoch {}, total time {:.2f}'.format(epoch, time2 - time1))
 
-        # tensorboard logger
-        logger.log_value('loss', loss, epoch)
-        logger.log_value('learning_rate', optimizer.param_groups[0]['lr'], epoch)
+        # W&B logger
+        wandb.log({
+            "loss": loss,
+            "learning_rate": optimizer.param_groups[0]['lr'],
+        })
 
-        if epoch % opt.save_freq == 0:
+        if epoch % args.save_freq == 0:
             save_file = os.path.join(
-                opt.save_folder, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
-            save_model(model, optimizer, opt, epoch, save_file)
+                args.save_folder, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
+            save_model(model, optimizer, args, epoch, save_file)
 
-    # save the last model
+    # Save the last model
     save_file = os.path.join(
-        opt.save_folder, 'last.pth')
-    save_model(model, optimizer, opt, opt.epochs, save_file)
+        args.save_folder, 'last.pth')
+    save_model(model, optimizer, args, args.epochs, save_file)
 
 
 if __name__ == '__main__':

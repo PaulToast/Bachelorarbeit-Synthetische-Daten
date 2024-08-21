@@ -12,25 +12,27 @@ from PIL import Image
 from collections import defaultdict
 
 MVIP_DIR = "/mnt/HDD/MVIP/sets"
+SUPER_CLASS = "CarComponent"
+NUM_CLASSES = 20
 
 
 class MVIPDataset(FewShotDataset):
 
     # Go through all classes & check the metadata
-    # If the class is of the super_class "CarComponent", add it to class_names
+    # If the class is of the selected super_class, add it to class_names
     class_names = []
 
     for class_name in [f for f in os.listdir(MVIP_DIR) if os.path.isdir(os.path.join(MVIP_DIR, f))]:
         meta_file = open(os.path.join(MVIP_DIR, class_name, "meta.json"))
         meta_data = json.load(meta_file)
 
-        if "CarComponent" in meta_data['super_class']:
+        if SUPER_CLASS in meta_data['super_class']:
             class_names.append(class_name)
 
         meta_file.close()
 
-        # Select only 20 of the classes
-        del class_names[20:]
+        # Select only a certain number of the classes
+        del class_names[NUM_CLASSES:]
 
     num_classes: int = len(class_names)
 
