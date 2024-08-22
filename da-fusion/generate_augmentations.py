@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--mask", nargs="+", type=int, default=[0], choices=[0, 1])
     parser.add_argument("--inverted", nargs="+", type=int, default=[0], choices=[0, 1])
-    parser.add_argument("--mask_crop", nargs="+", type=int, default=[0], choices=[0, 1])
+    parser.add_argument("--mask_crop", action="store_true")
     
     parser.add_argument("--probs", nargs="+", type=float, default=None)
     
