@@ -22,6 +22,8 @@ import argparse
 import numpy as np
 import random
 
+from scipy.ndimage import maximum_filter
+
 
 DATASETS = {
     "spurge": SpurgeDataset, 
@@ -161,6 +163,25 @@ if __name__ == "__main__":
         label = train_dataset.get_label_by_idx(idx)
 
         metadata = train_dataset.get_metadata_by_idx(idx)
+
+        if args.mask is not None:
+            mask = Image.fromarray((
+                np.where(metadata["mask"], 255, 0)
+            ).astype(np.uint8))
+            mask = Image.fromarray(
+                maximum_filter(np.array(mask), size=16))
+
+            mask_box = mask.getbbox()
+            padding = 10
+
+            mask_box = (
+                mask_box[0] - padding,
+                mask_box[1] - padding,
+                mask_box[2] + padding,
+                mask_box[3] + padding
+            )
+
+            image = image.crop(mask_box)
 
         if args.class_name is not None: 
             if metadata["name"] != args.class_name: continue
