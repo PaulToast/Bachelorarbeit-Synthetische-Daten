@@ -60,7 +60,8 @@ class MVIPDataset(Dataset):
             self.transform = transform
         else:
             self.transform = transforms.Compose([
-                transforms.Resize(512, Image.Resampling.BICUBIC),
+                transforms.RandomResizedCrop(512, scale=(0.2, 1.)),
+                #transforms.Resize(512, Image.Resampling.BICUBIC),
                 transforms.RandomHorizontalFlip(p=0.5),
                 transforms.ToTensor(),
             ])
@@ -129,7 +130,7 @@ def parse_args():
     parser.add_argument('--num_workers', type=int, default=16)
     parser.add_argument('--epochs', type=int, default=1000)
 
-    parser.add_argument('--size', type=int, default=32, help='Parameter for RandomResizedCrop.')
+    parser.add_argument('--size', type=int, default=512, help='Parameter for RandomResizedCrop.')
 
     parser.add_argument('--save_freq', type=int, default=50,)
     parser.add_argument('--print_freq', type=int, default=10,)
@@ -211,10 +212,12 @@ def parse_args():
 
 # Construct data loader
 def set_loader(args):
+    print("Preparing dataloader...")
     if args.dataset == 'mvip':
         train_dataset = MVIPDataset(split="train")
 
         mean, std = train_dataset.get_mean_std()
+        print("Mean: {}, Std: {}".format(mean, std))
 
         train_transform = transforms.Compose([
             transforms.RandomResizedCrop(size=args.size, scale=(0.2, 1.)),
@@ -249,6 +252,8 @@ def set_loader(args):
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
         num_workers=args.num_workers, pin_memory=True, sampler=train_sampler)
+    
+    print("Dataloader ready.")
 
     return train_loader
 
