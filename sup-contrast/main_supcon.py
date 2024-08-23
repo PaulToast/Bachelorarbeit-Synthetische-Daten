@@ -128,21 +128,21 @@ class MVIPDataset(Dataset):
 def parse_args():
     parser = argparse.ArgumentParser('Arguments for training')
 
-    # Model & Dataset
-    parser.add_argument('--model', type=str, default='resnet50')
-
+    # Dataset
     parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100', 'mvip'])
-    parser.add_argument('--data_folder', type=str, default=None)
+    parser.add_argument('--data_dir', type=str, default=None)
     parser.add_argument('--experiment_name', type=str, default=None)
 
-    parser.add_argument( '--batch_size', type=int, default=256)
-    parser.add_argument( '--num_workers', type=int, default=16)
+    # Model
+    parser.add_argument('--model', type=str, default='resnet50')
+    parser.add_argument('--batch_size', type=int, default=256)
+    parser.add_argument('--num_workers', type=int, default=16)
     parser.add_argument('--epochs', type=int, default=1000)
 
     parser.add_argument('--size', type=int, default=32, help='Parameter for RandomResizedCrop.')
 
-    parser.add_argument('--print_freq', type=int, default=10,help='print frequency')
-    parser.add_argument('--save_freq', type=int, default=50, help='save frequency')
+    parser.add_argument('--save_freq', type=int, default=50,)
+    parser.add_argument('--print_freq', type=int, default=10,)
 
     # Optimization
     parser.add_argument('--learning_rate', type=float, default=0.05)
@@ -169,16 +169,16 @@ def parse_args():
     if args.dataset == 'mvip':
         assert args.experiment_name is not None, "--experiment_name is required for dataset=mvip."
 
-        args.model_path = os.path.abspath(os.path.join(
+        args.save_dir = os.path.abspath(os.path.join(
             os.path.dirname( __file__ ), '..', '_experiments', args.experiment_name, 'SupCon/models'
         ))
 
-        args.tb_path = os.path.abspath(os.path.join(
+        args.logging_dir = os.path.abspath(os.path.join(
             os.path.dirname( __file__ ), '..', '_experiments', args.experiment_name, 'SupCon/logs'
         ))
     else:
-        args.model_path = './save/SupCon/{}_models'.format(args.dataset)
-        args.tb_path = './save/SupCon/{}_tensorboard'.format(args.dataset)
+        args.save_dir = './save/SupCon/{}_models'.format(args.dataset)
+        args.logging_dir = './save/SupCon/{}_tensorboard'.format(args.dataset)
 
     # Set learning rate decay epochs from string argument
     iterations = args.lr_decay_epochs.split(',')
@@ -208,13 +208,13 @@ def parse_args():
         else:
             args.warmup_to = args.learning_rate
 
-    args.tb_folder = os.path.join(args.tb_path, args.model_name)
-    if not os.path.isdir(args.tb_folder):
-        os.makedirs(args.tb_folder)
+    args.logging_dir = os.path.join(args.logging_dir, args.model_name)
+    if not os.path.isdir(args.logging_dir):
+        os.makedirs(args.logging_dir)
 
-    args.save_folder = os.path.join(args.model_path, args.model_name)
-    if not os.path.isdir(args.save_folder):
-        os.makedirs(args.save_folder)
+    args.save_dir = os.path.join(args.save_dir, args.model_name)
+    if not os.path.isdir(args.save_dir):
+        os.makedirs(args.save_dir)
 
     return args
 
@@ -251,7 +251,7 @@ def set_loader(args):
             transforms.Normalize(mean=mean_std[args.dataset][0], std=mean_std[args.dataset][1]),
         ])
 
-        train_dataset = datasets.CIFAR10(root=args.data_folder,
+        train_dataset = datasets.CIFAR10(root=args.data_dir,
                                          transform=TwoCropTransform(train_transform),
                                          download=True)
 
@@ -289,9 +289,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
     data_time = AverageMeter()
     losses = AverageMeter()
 
-    end = time.time()
+    start_time = time.time()
     for idx, (images, labels) in enumerate(train_loader):
-        data_time.update(time.time() - end)
+        data_time.update(time.time() - start_time)
 
         images = torch.cat([images[0], images[1]], dim=0)
         if torch.cuda.is_available():
@@ -323,8 +323,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
         optimizer.step()
 
         # Measure elapsed time
-        batch_time.update(time.time() - end)
-        end = time.time()
+        batch_time.update(time.time() - start_time)
 
         # Print info
         if (idx + 1) % args.print_freq == 0:
@@ -371,10 +370,10 @@ def main():
         adjust_learning_rate(args, optimizer, epoch)
 
         # Train for one epoch
-        time1 = time.time()
+        start_time = time.time()
         loss = train(train_loader, model, criterion, optimizer, epoch, args)
-        time2 = time.time()
-        print('epoch {}, total time {:.2f}'.format(epoch, time2 - time1))
+        end_time = time.time()
+        print('epoch {}, total time {:.2f}'.format(epoch, end_time - start_time))
 
         # W&B logger
         wandb.log({
@@ -384,12 +383,12 @@ def main():
 
         if epoch % args.save_freq == 0:
             save_file = os.path.join(
-                args.save_folder, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
+                args.save_dir, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
             save_model(model, optimizer, args, epoch, save_file)
 
     # Save the last model
     save_file = os.path.join(
-        args.save_folder, 'last.pth')
+        args.save_dir, 'last.pth')
     save_model(model, optimizer, args, args.epochs, save_file)
 
 
