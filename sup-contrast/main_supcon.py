@@ -334,8 +334,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
             raise ValueError('Contrastive method not supported: {}'.
                              format(args.method))
 
-        # Update metric
+        # Update metric & log
         losses.update(loss.item(), bsz)
+        wandb.log({"loss": loss.item()})
 
         # SGD
         optimizer.zero_grad()
@@ -395,11 +396,11 @@ def main():
         end_time = time.time()
         print('epoch {}, total time {:.2f}'.format(epoch, end_time - start_time))
 
-        # W&B logger
+        """# Log average epoch loss
         wandb.log({
             "loss": loss,
             "learning_rate": optimizer.param_groups[0]['lr'],
-        })
+        })"""
 
         if epoch % args.save_freq == 0:
             save_file = os.path.join(
