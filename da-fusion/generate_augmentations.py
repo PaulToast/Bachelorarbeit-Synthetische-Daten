@@ -102,6 +102,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--mask", nargs="+", type=int, default=[0], choices=[0, 1])
     parser.add_argument("--inverted", nargs="+", type=int, default=[0], choices=[0, 1])
+    parser.add_argument("--mask_crop", action="store_true")
     
     parser.add_argument("--probs", nargs="+", type=float, default=None)
     
@@ -164,15 +165,17 @@ if __name__ == "__main__":
 
         metadata = train_dataset.get_metadata_by_idx(idx)
 
-        if args.mask is not None:
+        if args.mask_crop:
+            # Get mask from metadata
             mask = Image.fromarray((
                 np.where(metadata["mask"], 255, 0)
             ).astype(np.uint8))
             mask = Image.fromarray(
                 maximum_filter(np.array(mask), size=16))
 
+            # Get bounding box for crop from masked area
             mask_box = mask.getbbox()
-            padding = 10
+            padding = 20
 
             mask_box = (
                 mask_box[0] - padding,
@@ -181,7 +184,12 @@ if __name__ == "__main__":
                 mask_box[3] + padding
             )
 
+            # Crop image
             image = image.crop(mask_box)
+
+            # Also update the mask to fit the now cropped image
+            mask = mask.crop(mask_box)
+            metadata["mask"] = np.array(mask)
 
         if args.class_name is not None: 
             if metadata["name"] != args.class_name: continue
