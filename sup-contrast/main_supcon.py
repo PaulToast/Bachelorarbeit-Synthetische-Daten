@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import os
 import sys
+import json
 import argparse
 import time
 import math
@@ -48,10 +49,24 @@ class MVIPDataset(Dataset):
         }
         self.split = split_dir[split]
 
+        # Limit dataset to 20 classes from the "CarComponent" super class
+        self.class_names = []
+
+        for class_name in [f for f in os.listdir(self.data_root) if os.path.isdir(os.path.join(self.data_root, f))]:
+            meta_file = open(os.path.join(self.data_root, class_name, "meta.json"))
+            meta_data = json.load(meta_file)
+
+            if "CarComponent" in meta_data['super_class']:
+                self.class_names.append(class_name)
+
+            meta_file.close()
+
+            del self.class_names[20:]
+
         self.image_paths = self.get_image_paths()
         self.num_images = len(self.image_paths)
 
-        if set == "train":
+        if split == "train":
             self._length = self.num_images * repeats
         else:
             self._length = self.num_images
@@ -61,7 +76,6 @@ class MVIPDataset(Dataset):
         else:
             self.transform = transforms.Compose([
                 transforms.RandomResizedCrop(512, scale=(0.2, 1.)),
-                #transforms.Resize(512, Image.Resampling.BICUBIC),
                 transforms.RandomHorizontalFlip(p=0.5),
                 transforms.ToTensor(),
             ])
@@ -85,10 +99,10 @@ class MVIPDataset(Dataset):
 
         return example
     
-    def get_image_paths(self): # /mnt/HDD/MVIP/sets/class_name/train_data/0/0/cam0/0_rgb.png
+    def get_image_paths(self): # Example: "/mnt/HDD/MVIP/sets/class_name/train_data/0/0/cam0/0_rgb.png"
         paths = []
 
-        for class_name in [f for f in os.listdir(self.data_root) if os.path.isdir(os.path.join(self.data_root, f))]:
+        for class_name in self.class_names:
             root = os.path.join(self.data_root, class_name, self.split)
 
             for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
