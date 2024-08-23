@@ -7,7 +7,7 @@ import time
 import math
 import numpy as np
 
-import tensorboard_logger as tb_logger
+#import tensorboard_logger as tb_logger
 import torch
 import torch.backends.cudnn as cudnn
 from torchvision import transforms, datasets
@@ -21,61 +21,49 @@ from losses import SupConLoss
 from torch.utils.data import Dataset
 from PIL import Image
 
-try:
+"""try:
     import apex
     from apex import amp, optimizers
 except ImportError:
-    pass
+    pass"""
 
 from diffusers.utils import check_min_version, is_wandb_available
 if is_wandb_available():
     import wandb
 
-PIL_INTERPOLATION = {
-    "linear": Image.Resampling.BILINEAR,
-    "bilinear": Image.Resampling.BILINEAR,
-    "bicubic": Image.Resampling.BICUBIC,
-    "lanczos": Image.Resampling.LANCZOS,
-    "nearest": Image.Resampling.NEAREST,
-}
-
-"""
-TODO
-- take --experiment_name
-- use the extracted folder
-- dataset=mvip with same class
-- logging with wandb
-"""
 
 class MVIPDataset(Dataset):
     def __init__(
         self,
-        transform,
-        size=512,
+        transform=None,
         repeats=100,
-        interpolation="bicubic",
-        flip_p=0.5,
-        set="train",
+        split="train",
     ):
         self.data_root = '/mnt/HDD/MVIP/sets'
 
-        self.image_paths = self.get_image_paths()
+        split_dir = {
+            "train": "train_data",
+            "val": "valid_data",
+            "test": "test_data",
+        }
+        self.split = split_dir[split]
 
+        self.image_paths = self.get_image_paths()
         self.num_images = len(self.image_paths)
-        self._length = self.num_images
 
         if set == "train":
-            self.split = "train_data"
             self._length = self.num_images * repeats
+        else:
+            self._length = self.num_images
 
-        self.transform = transform
-
-        self.interpolation = {
-            "linear": PIL_INTERPOLATION["linear"],
-            "bilinear": PIL_INTERPOLATION["bilinear"],
-            "bicubic": PIL_INTERPOLATION["bicubic"],
-            "lanczos": PIL_INTERPOLATION["lanczos"],
-        }[interpolation]
+        if transform is not None:
+            self.transform = transform
+        else:
+            self.transform = transforms.Compose([
+                transforms.Resize(512, Image.Resampling.BICUBIC),
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.ToTensor(),
+            ])
 
     def __len__(self):
         return self._length
@@ -108,6 +96,8 @@ class MVIPDataset(Dataset):
                         for file in os.listdir(os.path.join(root, set, orientation, cam)):
                             if file.endswith("rgb.png"):
                                 paths.append(os.path.join(root, set, orientation, cam, file))
+        
+        return paths
     
     def get_mean_std(self):
         mean = torch.zeros(3)
@@ -222,7 +212,7 @@ def parse_args():
 # Construct data loader
 def set_loader(args):
     if args.dataset == 'mvip':
-        train_dataset = MVIPDataset(size=args.size, set="train")
+        train_dataset = MVIPDataset(split="train")
 
         mean, std = train_dataset.get_mean_std()
 
@@ -267,9 +257,9 @@ def set_model(args):
     model = SupConResNet(name=args.model)
     criterion = SupConLoss(temperature=args.temp)
 
-    # Enable synchronized batch normalization
+    """# Enable synchronized batch normalization
     if args.syncBN:
-        model = apex.parallel.convert_syncbn_model(model)
+        model = apex.parallel.convert_syncbn_model(model)"""
 
     if torch.cuda.is_available():
         if torch.cuda.device_count() > 1:
