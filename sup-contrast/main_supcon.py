@@ -59,10 +59,6 @@ class MVIPDataset(Dataset):
     ):
         self.data_root = '/mnt/HDD/MVIP/sets'
 
-        self.flip_transform = transform
-        self.size = size
-        self.flip_p = flip_p
-
         self.image_paths = self.get_image_paths()
 
         self.num_images = len(self.image_paths)
@@ -72,14 +68,14 @@ class MVIPDataset(Dataset):
             self.split = "train_data"
             self._length = self.num_images * repeats
 
+        self.transform = transform
+
         self.interpolation = {
             "linear": PIL_INTERPOLATION["linear"],
             "bilinear": PIL_INTERPOLATION["bilinear"],
             "bicubic": PIL_INTERPOLATION["bicubic"],
             "lanczos": PIL_INTERPOLATION["lanczos"],
         }[interpolation]
-        
-        self.flip_transform = transforms.RandomHorizontalFlip(p=self.flip_p)
 
     def __len__(self):
         return self._length
@@ -112,44 +108,21 @@ class MVIPDataset(Dataset):
                         for file in os.listdir(os.path.join(root, set, orientation, cam)):
                             if file.endswith("rgb.png"):
                                 paths.append(os.path.join(root, set, orientation, cam, file))
-
-# Extracts the MVIP images to '_experiments/{experiment_name}/extracted/' following the torchvision ImageFolder convention.
-def extract_mvip(args):
-    root_dir = '/mnt/HDD/MVIP/sets'
-    output_dir = os.path.abspath(os.path.join(
-        os.path.dirname( __file__ ), '..', '_experiments', args.experiment_name, 'extracted')
-    )
-    os.makedirs(output_dir, exist_ok=True)
-
-    for class_name in [f for f in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir, f))]:
-        root = os.path.join(root_dir, class_name, "train_data")
-
-        os.makedirs(os.path.join(output_dir, class_name), exist_ok=True)
-
-        image_index = 0
-        for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
-            for orientation in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
-                for cam in [f for f in os.listdir(os.path.join(root, set, orientation)) if os.path.isdir(os.path.join(root, set, orientation, f))]:
-                    for file in os.listdir(os.path.join(root, set, orientation, cam)):
-                        if file.endswith("rgb.png"):
-                            image = Image.open(os.path.join(root, set, orientation, cam, file))
-                            image.save(image, os.path.join(output_dir, class_name, f"{image_index}.png"))
-                            image_index += 1
     
-    # Calculate mean and std of the dataset
-    mean = torch.zeros(3)
-    std = torch.zeros(3)
-    dataset = datasets.ImageFolder(root=args.data_folder, transform=transforms.ToTensor())
+    def get_mean_std(self):
+        mean = torch.zeros(3)
+        std = torch.zeros(3)
 
-    for image, _ in dataset:
-        mean += torch.mean(image, dim=(1, 2))
-        std += torch.std(image, dim=(1, 2))
+        for image in self.image_paths:
+            image = Image.open(image)
+            image = self.transform(image)
+            mean += torch.mean(image, dim=(1, 2))
+            std += torch.std(image, dim=(1, 2))
 
-    mean /= len(dataset)
-    std /= len(dataset)
+        mean /= len(self.image_paths)
+        std /= len(self.image_paths)
 
-    mean = tuple(mean.tolist())
-    std = tuple(std.tolist())
+        return mean, std
 
 
 def parse_args():
@@ -248,41 +221,39 @@ def parse_args():
 
 # Construct data loader
 def set_loader(args):
-    if args.dataset == 'cifar10':
-        mean = (0.4914, 0.4822, 0.4465)
-        std = (0.2023, 0.1994, 0.2010)
-    elif args.dataset == 'cifar100':
-        mean = (0.5071, 0.4867, 0.4408)
-        std = (0.2675, 0.2565, 0.2761)
-    elif args.dataset == 'mvip':
-        mean = (0.5, 0.5, 0.5)
-        std = (0.5, 0.5, 0.5)
-    else:
-        raise ValueError('dataset not supported: {}'.format(args.dataset))
-    
-    train_transform = transforms.Compose([
-        transforms.RandomResizedCrop(size=args.size, scale=(0.2, 1.)),
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
-        transforms.RandomGrayscale(p=0.2),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=mean, std=std),
-    ])
+    if args.dataset == 'mvip':
+        train_dataset = MVIPDataset(size=args.size, set="train")
 
-    if args.dataset == 'cifar10':
+        mean, std = train_dataset.get_mean_std()
+
+        train_transform = transforms.Compose([
+            transforms.RandomResizedCrop(size=args.size, scale=(0.2, 1.)),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
+            transforms.RandomGrayscale(p=0.2),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=mean, std=std),
+        ])
+
+        train_dataset.transform = train_transform
+    else:
+        mean_std = {
+            'cifar10': ([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+            'cifar100': ([0.5071, 0.4867, 0.4408], [0.2675, 0.2565, 0.2761]),
+        }
+
+        train_transform = transforms.Compose([
+            transforms.RandomResizedCrop(size=args.size, scale=(0.2, 1.)),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
+            transforms.RandomGrayscale(p=0.2),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=mean_std[args.dataset][0], std=mean_std[args.dataset][1]),
+        ])
+
         train_dataset = datasets.CIFAR10(root=args.data_folder,
                                          transform=TwoCropTransform(train_transform),
                                          download=True)
-    elif args.dataset == 'cifar100':
-        train_dataset = datasets.CIFAR100(root=args.data_folder,
-                                          transform=TwoCropTransform(train_transform),
-                                          download=True)
-    elif args.dataset == 'mvip':
-        train_dataset = MVIPDataset(size=args.size,
-                                    transform=TwoCropTransform(train_transform),
-                                    set="train")
-    else:
-        raise ValueError(args.dataset)
 
     train_sampler = None
     train_loader = torch.utils.data.DataLoader(
