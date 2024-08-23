@@ -63,8 +63,13 @@ class MVIPDataset(Dataset):
 
             del self.class_names[20:]
 
-        self.image_paths = self.get_image_paths()
-        self.num_images = len(self.image_paths)
+        self.class_to_idx = {self.class_names[i]: i for i in range(len(self.class_names))}
+
+        self.all_images = self.get_all_image_paths()
+        self.num_images = len(self.all_images)
+
+        # Example: "/mnt/HDD/MVIP/sets/ >CLASS_NAME< /train_data/0/0/cam0/0_rgb.png"
+        self.all_labels = [self.class_to_idx[self.all_images[i].split("/")[-6]] for i in range(self.num_images)]
 
         if split == "train":
             self._length = self.num_images * repeats
@@ -83,23 +88,19 @@ class MVIPDataset(Dataset):
     def __len__(self):
         return self._length
 
-    def __getitem__(self, i):
-        example = {}
-
+    def __getitem__(self, idx):
         # Label
-        example["labels"] = torch.tensor([int(self.image_paths[i % self.num_images].split("/")[-6])])
+        label = self.all_labels[idx % self.num_images]
 
         # Image
-        image = Image.open(self.image_paths[i % self.num_images])
+        image = Image.open(self.all_images[idx % self.num_images])
 
         if not image.mode == "RGB":
             image = image.convert("RGB")
 
-        example["pixel_values"] = self.transform(image)
-
-        return example
+        return self.transform(image), label
     
-    def get_image_paths(self): # Example: "/mnt/HDD/MVIP/sets/class_name/train_data/0/0/cam0/0_rgb.png"
+    def get_all_image_paths(self): # Example: "/mnt/HDD/MVIP/sets/class_name/train_data/0/0/cam0/0_rgb.png"
         paths = []
 
         for class_name in self.class_names:
@@ -118,14 +119,14 @@ class MVIPDataset(Dataset):
         mean = torch.zeros(3)
         std = torch.zeros(3)
 
-        for image in self.image_paths:
+        for image in self.all_images:
             image = Image.open(image)
             image = self.transform(image)
             mean += torch.mean(image, dim=(1, 2))
             std += torch.std(image, dim=(1, 2))
 
-        mean /= len(self.image_paths)
-        std /= len(self.image_paths)
+        mean /= len(self.all_images)
+        std /= len(self.all_images)
 
         return mean, std
 
