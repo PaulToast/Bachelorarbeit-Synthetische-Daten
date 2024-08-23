@@ -227,7 +227,8 @@ def parse_args():
 # Construct data loader
 def set_loader(args):
     print("Preparing dataloader...")
-    if args.dataset == 'mvip':
+
+    """if args.dataset == 'mvip':
         train_dataset = MVIPDataset(split="train")
 
         mean, std = train_dataset.get_mean_std()
@@ -242,25 +243,34 @@ def set_loader(args):
             transforms.Normalize(mean=mean, std=std),
         ])
 
-        train_dataset.transform = train_transform
-    else:
-        mean_std = {
-            'cifar10': ([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
-            'cifar100': ([0.5071, 0.4867, 0.4408], [0.2675, 0.2565, 0.2761]),
-        }
+        train_dataset.transform = train_transform"""
+    
+    mean_std = {
+        'cifar10': ([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+        'cifar100': ([0.5071, 0.4867, 0.4408], [0.2675, 0.2565, 0.2761]),
+        'mvip': ([0.4213, 0.4252, 0.4242], [0.1955, 0.1923, 0.1912]),
+    }
 
-        train_transform = transforms.Compose([
-            transforms.RandomResizedCrop(size=args.size, scale=(0.2, 1.)),
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
-            transforms.RandomGrayscale(p=0.2),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=mean_std[args.dataset][0], std=mean_std[args.dataset][1]),
-        ])
+    train_transform = transforms.Compose([
+        transforms.RandomResizedCrop(size=args.size, scale=(0.2, 1.)),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
+        transforms.RandomGrayscale(p=0.2),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=mean_std[args.dataset][0], std=mean_std[args.dataset][1]),
+    ])
 
+    if args.dataset == "cifar10":
         train_dataset = datasets.CIFAR10(root=args.data_dir,
-                                         transform=TwoCropTransform(train_transform),
-                                         download=True)
+                                        transform=TwoCropTransform(train_transform),
+                                        download=True)
+    elif args.dataset == "cifar100":
+        train_dataset = datasets.CIFAR100(root=args.data_dir,
+                                        transform=TwoCropTransform(train_transform),
+                                        download=True)
+    elif args.dataset == "mvip":
+        train_dataset = MVIPDataset(split="train",
+                                    transform=TwoCropTransform(train_transform))
 
     train_sampler = None
     train_loader = torch.utils.data.DataLoader(
