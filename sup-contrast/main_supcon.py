@@ -21,6 +21,7 @@ from losses import SupConLoss
 
 from torch.utils.data import Dataset
 from PIL import Image
+from scipy.ndimage import maximum_filter
 
 """try:
     import apex
@@ -37,7 +38,7 @@ class MVIPDataset(Dataset):
     def __init__(
         self,
         transform=None,
-        repeats=100,
+        repeats=1, # da-fusion: 100
         split="train",
     ):
         self.data_root = '/mnt/HDD/MVIP/sets'
@@ -65,7 +66,7 @@ class MVIPDataset(Dataset):
 
         self.class_to_idx = {self.class_names[i]: i for i in range(len(self.class_names))}
 
-        self.all_images = self.get_all_image_paths()
+        self.all_images, self.all_masks = self.get_all_image_paths()
         self.num_images = len(self.all_images)
 
         # Example: "/mnt/HDD/MVIP/sets/ >CLASS_NAME< /train_data/0/0/cam0/0_rgb.png"
@@ -80,7 +81,8 @@ class MVIPDataset(Dataset):
             self.transform = transform
         else:
             self.transform = transforms.Compose([
-                transforms.RandomResizedCrop(512, scale=(0.2, 1.)),
+                transforms.Resize(512),
+                transforms.RandomResizedCrop(256, scale=(0.2, 1.)),
                 transforms.RandomHorizontalFlip(p=0.5),
                 transforms.ToTensor(),
             ])
@@ -89,19 +91,34 @@ class MVIPDataset(Dataset):
         return self._length
 
     def __getitem__(self, idx):
-        # Label
+        # Get label
         label = self.all_labels[idx % self.num_images]
 
-        # Image
+        # Get image
         image = Image.open(self.all_images[idx % self.num_images])
 
         if not image.mode == "RGB":
             image = image.convert("RGB")
 
+        # Crop image with mask
+        mask = np.array(Image.open(self.all_masks[idx % self.num_images]).convert('L'))
+        mask = Image.fromarray(maximum_filter(mask, size=16))
+        mask_box = mask.getbbox()
+        padding = 10
+        mask_box = (
+            mask_box[0] - padding,
+            mask_box[1] - padding,
+            mask_box[2] + padding,
+            mask_box[3] + padding
+        )
+
+        image = image.crop(mask_box)
+
         return self.transform(image), label
     
     def get_all_image_paths(self): # Example: "/mnt/HDD/MVIP/sets/class_name/train_data/0/0/cam0/0_rgb.png"
-        paths = []
+        images = []
+        masks = []
 
         for class_name in self.class_names:
             root = os.path.join(self.data_root, class_name, self.split)
@@ -111,9 +128,11 @@ class MVIPDataset(Dataset):
                     for cam in [f for f in os.listdir(os.path.join(root, set, orientation)) if os.path.isdir(os.path.join(root, set, orientation, f))]:
                         for file in os.listdir(os.path.join(root, set, orientation, cam)):
                             if file.endswith("rgb.png"):
-                                paths.append(os.path.join(root, set, orientation, cam, file))
+                                images.append(os.path.join(root, set, orientation, cam, file))
+                            elif file.endswith("rgb_mask_gen.png"):
+                                masks.append(os.path.join(root, set, orientation, cam, file))
         
-        return paths
+        return images, masks
     
     def get_mean_std(self):
         mean = torch.zeros(3)
@@ -134,40 +153,39 @@ class MVIPDataset(Dataset):
 def parse_args():
     parser = argparse.ArgumentParser('Arguments for training')
 
-    # Dataset
+    # Dataset & model
     parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100', 'mvip'])
     parser.add_argument('--data_dir', type=str, default=None)
+
     parser.add_argument('--experiment_name', type=str, default=None)
 
-    # Model
     parser.add_argument('--model', type=str, default='resnet50')
-    parser.add_argument('--batch_size', type=int, default=256)
+    parser.add_argument('--trial', type=str, default='0', help='id for recording multiple runs.')
+
+    # Training parameters
+    parser.add_argument('--method', type=str, default='SupCon', choices=['SupCon', 'SimCLR'])
+
+    parser.add_argument('--size', type=int, default=512, help='Size for RandomResizedCrop.')
+
+    parser.add_argument('--batch_size', type=int, default=12)
     parser.add_argument('--num_workers', type=int, default=16)
     parser.add_argument('--epochs', type=int, default=1000)
 
-    parser.add_argument('--size', type=int, default=512, help='Parameter for RandomResizedCrop.')
-
-    parser.add_argument('--save_freq', type=int, default=50,)
-    parser.add_argument('--print_freq', type=int, default=10,)
-
-    # Optimization
-    parser.add_argument('--learning_rate', type=float, default=0.05)
+    parser.add_argument('--lr', type=float, default=0.05)
+    parser.add_argument('--lr_warmup', action='store_true', help='Learning rate warm-up for large batch training.')
     parser.add_argument('--lr_decay_epochs', type=str, default='700,800,900', help='When to decay lr, as string seperated by ","')
     parser.add_argument('--lr_decay_rate', type=float, default=0.1)
+    parser.add_argument('--lr_cosine', action='store_true', help='Using cosine annealing.')
+
     parser.add_argument('--weight_decay', type=float, default=1e-4)
     parser.add_argument('--momentum', type=float, default=0.9)
-
-    # Method
-    parser.add_argument('--method', type=str, default='SupCon', choices=['SupCon', 'SimCLR'])
-
-    # Temperature
     parser.add_argument('--temp', type=float, default=0.07, help='Temperature for loss function.')
 
-    # Other settings
-    parser.add_argument('--cosine', action='store_true', help='Using cosine annealing.')
-    parser.add_argument('--syncBN', action='store_true', help='Using synchronized batch normalization.')
-    parser.add_argument('--warm', action='store_true', help='Warm-up for large batch training.')
-    parser.add_argument('--trial', type=str, default='0', help='id for recording multiple runs.')
+    #parser.add_argument('--syncBN', action='store_true', help='Using synchronized batch normalization.')
+
+    # Output & logging
+    parser.add_argument('--save_freq', type=int, default=50,)
+    parser.add_argument('--print_freq', type=int, default=10,)
 
     args = parser.parse_args()
 
@@ -194,25 +212,25 @@ def parse_args():
 
     # Set model name for output
     args.model_name = '{}_{}_{}_lr={}_decay={}_bs={}_temp={}_trial={}'.\
-        format(args.method, args.dataset, args.model, args.learning_rate,
+        format(args.method, args.dataset, args.model, args.lr,
                args.weight_decay, args.batch_size, args.temp, args.trial)
 
-    if args.cosine:
+    if args.lr_cosine:
         args.model_name = '{}_cosine'.format(args.model_name)
 
-    # Warm-up for large-batch training,
+    # Learning rate warm-up for large-batch training
     if args.batch_size > 256:
-        args.warm = True
-    if args.warm:
+        args.lr_warmup = True
+    if args.lr_warmup:
         args.model_name = '{}_warm'.format(args.model_name)
-        args.warmup_from = 0.01
-        args.warm_epochs = 10
-        if args.cosine:
-            eta_min = args.learning_rate * (args.lr_decay_rate ** 3)
-            args.warmup_to = eta_min + (args.learning_rate - eta_min) * (
-                    1 + math.cos(math.pi * args.warm_epochs / args.epochs)) / 2
+        args.lr_warmup_from = 0.01
+        args.lr_warmup_epochs = 10
+        if args.lr_cosine:
+            eta_min = args.lr * (args.lr_decay_rate ** 3)
+            args.lr_warmup_to = eta_min + (args.lr - eta_min) * (
+                    1 + math.cos(math.pi * args.lr_warm_epochs / args.epochs)) / 2
         else:
-            args.warmup_to = args.learning_rate
+            args.lr_warmup_to = args.lr
 
     args.logging_dir = os.path.join(args.logging_dir, args.model_name)
     if not os.path.isdir(args.logging_dir):
@@ -228,23 +246,6 @@ def parse_args():
 # Construct data loader
 def set_loader(args):
     print("Preparing dataloader...")
-
-    """if args.dataset == 'mvip':
-        train_dataset = MVIPDataset(split="train")
-
-        mean, std = train_dataset.get_mean_std()
-        print("Mean: {}, Std: {}".format(mean, std))
-
-        train_transform = transforms.Compose([
-            transforms.RandomResizedCrop(size=args.size, scale=(0.2, 1.)),
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
-            transforms.RandomGrayscale(p=0.2),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=mean, std=std),
-        ])
-
-        train_dataset.transform = train_transform"""
     
     mean_std = {
         'cifar10': ([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
@@ -253,6 +254,7 @@ def set_loader(args):
     }
 
     train_transform = transforms.Compose([
+        transforms.Resize(512),
         transforms.RandomResizedCrop(size=args.size, scale=(0.2, 1.)),
         transforms.RandomHorizontalFlip(),
         transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
@@ -336,7 +338,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
         # Update metric & log
         losses.update(loss.item(), bsz)
-        wandb.log({"loss": loss.item()})
+        wandb.log({"loss": loss.item(), "lr": optimizer.param_groups[0]['lr']})
 
         # SGD
         optimizer.zero_grad()
@@ -373,20 +375,24 @@ def main():
 
     # Init W&B logging
     run = wandb.init(
-        project='SupCon',
+        project='SupCon', #project=f"SupCon-v{args.trial}",
         config={
             "dataset" : args.dataset,
             "model_name": args.model_name,
-            "batch_size" : args.batch_size,
-            "learning_rate" : args.learning_rate,
+            "crop size" : args.size,
             "epochs" : args.epochs,
+            "batch_size" : args.batch_size,
+            "lr" : args.lr,
+            "lr_warmup" : args.lr_warmup,
+            "lr_cosine" : args.lr_cosine,
             "weight_decay" : args.weight_decay,
             "temperature" : args.temp,
-            "cosine" : args.cosine,
+            
         },
     )
 
     # Training routine
+    print("Initiating training...")
     for epoch in range(1, args.epochs + 1):
         adjust_learning_rate(args, optimizer, epoch)
 

@@ -51,8 +51,8 @@ def accuracy(output, target, topk=(1,)):
 
 
 def adjust_learning_rate(args, optimizer, epoch):
-    lr = args.learning_rate
-    if args.cosine:
+    lr = args.lr
+    if args.lr_cosine:
         eta_min = lr * (args.lr_decay_rate ** 3)
         lr = eta_min + (lr - eta_min) * (
                 1 + math.cos(math.pi * epoch / args.epochs)) / 2
@@ -66,10 +66,10 @@ def adjust_learning_rate(args, optimizer, epoch):
 
 
 def warmup_learning_rate(args, epoch, batch_id, total_batches, optimizer):
-    if args.warm and epoch <= args.warm_epochs:
+    if args.lr_warmup and epoch <= args.lr_warmup_epochs:
         p = (batch_id + (epoch - 1) * total_batches) / \
-            (args.warm_epochs * total_batches)
-        lr = args.warmup_from + p * (args.warmup_to - args.warmup_from)
+            (args.lr_warmup_epochs * total_batches)
+        lr = args.lr_warmup_from + p * (args.lr_warmup_to - args.lr_warmup_from)
 
         for param_group in optimizer.param_groups:
             param_group['lr'] = lr
@@ -77,7 +77,7 @@ def warmup_learning_rate(args, epoch, batch_id, total_batches, optimizer):
 
 def set_optimizer(opt, model):
     optimizer = optim.SGD(model.parameters(),
-                          lr=opt.learning_rate,
+                          lr=opt.lr,
                           momentum=opt.momentum,
                           weight_decay=opt.weight_decay)
     return optimizer
