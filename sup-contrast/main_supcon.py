@@ -69,12 +69,13 @@ class MVIPDataset(Dataset):
 
             del self.class_names[20:]
 
-        self.all_images, self.all_masks = self.get_all_image_paths(self.class_names)
+        self.all_images, self.all_masks = self.get_all_image_paths(self.class_names, self.split)
         self.num_images = len(self.all_images)
 
         self.class_to_label_id = {self.class_names[i]: i for i in range(len(self.class_names))}
-        self.all_labels = [self.class_to_label_id[self.all_images[i].split("/")[-6]] for i in range(self.num_images)]
+        self.all_labels = [self.class_to_label_id[self.all_images[i].split("/")[-6 if split == "train" else -5]] for i in range(self.num_images)]
         # Example: "/mnt/HDD/MVIP/sets/ >CLASS_NAME< /train_data/0/0/cam0/0_rgb.png"
+        # Example: "/mnt/HDD/MVIP/sets/ >CLASS_NAME< /valid_data/0/cam0/0_rgb.png"
 
         # Shuffle dataset
         np.random.seed(0)
@@ -121,21 +122,29 @@ class MVIPDataset(Dataset):
 
         return self.transform(image), label
     
-    def get_all_image_paths(self, class_names): # Example: "/mnt/HDD/MVIP/sets/class_name/train_data/0/0/cam0/0_rgb.png"
+    def get_all_image_paths(self, class_names, split): # Example: "/mnt/HDD/MVIP/sets/class_name/train_data/0/0/cam0/0_rgb.png"
         images = []
         masks = []
 
         for class_name in class_names:
-            root = os.path.join(self.data_root, class_name, self.split)
+            root = os.path.join(self.data_root, class_name, split)
 
             for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
-                for orientation in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
-                    for cam in [f for f in os.listdir(os.path.join(root, set, orientation)) if os.path.isdir(os.path.join(root, set, orientation, f))]:
-                        for file in os.listdir(os.path.join(root, set, orientation, cam)):
+                if split == "train_data":
+                    for orientation in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
+                        for cam in [f for f in os.listdir(os.path.join(root, set, orientation)) if os.path.isdir(os.path.join(root, set, orientation, f))]:
+                            for file in os.listdir(os.path.join(root, set, orientation, cam)):
+                                if file.endswith("rgb.png"):
+                                    images.append(os.path.join(root, set, orientation, cam, file))
+                                elif file.endswith("rgb_mask_gen.png"):
+                                    masks.append(os.path.join(root, set, orientation, cam, file))
+                else:
+                    for cam in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
+                        for file in os.listdir(os.path.join(root, set, cam)):
                             if file.endswith("rgb.png"):
-                                images.append(os.path.join(root, set, orientation, cam, file))
+                                images.append(os.path.join(root, set, cam, file))
                             elif file.endswith("rgb_mask_gen.png"):
-                                masks.append(os.path.join(root, set, orientation, cam, file))
+                                masks.append(os.path.join(root, set, cam, file))
         
         return images, masks
     
@@ -378,7 +387,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
         # Update metric & log
         losses.update(loss.item(), bsz)
-        wandb.log({"loss": loss.item(), "lr": optimizer.param_groups[0]['lr']})
+        wandb.log({"train_loss": loss.item(), "lr": optimizer.param_groups[0]['lr']})
 
         # SGD
         optimizer.zero_grad()
@@ -494,7 +503,7 @@ def main():
 
         end_time = time.time()
 
-        print('epoch {}, total time {:.2f}, average train loss: {}, validation loss: {}'.format(
+        print('epoch {}, total time {:.2f}, average train loss: {}, average validation loss: {}'.format(
             epoch, end_time - start_time, avg_train_loss, avg_val_loss))
 
         # Log average epoch loss
