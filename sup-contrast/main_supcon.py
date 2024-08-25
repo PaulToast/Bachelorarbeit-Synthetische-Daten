@@ -39,7 +39,7 @@ class MVIPDataset(Dataset):
     def __init__(
         self,
         split="train",
-        size=256,
+        size=224,
         transform=None,
         repeats=1, # da-fusion: 100
         synt=None
@@ -269,41 +269,49 @@ def parse_args():
 
 
 # Construct data loader
-def set_loader(args):
-    print("Preparing dataloader...")
-    
+def set_loader(args, split="train"):
     mean_std = {
         'cifar10': ([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
         'cifar100': ([0.5071, 0.4867, 0.4408], [0.2675, 0.2565, 0.2761]),
         'mvip': ([0.4213, 0.4252, 0.4242], [0.1955, 0.1923, 0.1912]),
     }
 
-    train_transform = transforms.Compose([
-        transforms.RandomResizedCrop(size=args.size, scale=(0.8, 1.)),# ratio=(1.0, 1.0)),
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(degrees=15.0),
-        transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
-        transforms.RandomGrayscale(p=0.2),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=mean_std[args.dataset][0], std=mean_std[args.dataset][1]),
-    ])
+    if split == "train":
+        transform = transforms.Compose([
+            transforms.RandomResizedCrop(size=args.size, scale=(0.8, 1.)),# ratio=(1.0, 1.0)),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomRotation(degrees=15.0),
+            transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
+            transforms.RandomGrayscale(p=0.2),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=mean_std[args.dataset][0], std=mean_std[args.dataset][1]),
+        ])
+    else:
+        transform = transforms.Compose([
+            transforms.Resize(size=args.size),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=mean_std[args.dataset][0], std=mean_std[args.dataset][1]),
+        ])
 
     if args.dataset == "cifar10":
-        train_dataset = datasets.CIFAR10(root=args.data_dir,
-                                        transform=TwoCropTransform(train_transform),
-                                        download=True)
+        dataset = datasets.CIFAR10(root=args.data_dir,
+                                   train=(split == "train"),
+                                   transform=TwoCropTransform(transform),
+                                   download=True)
     elif args.dataset == "cifar100":
-        train_dataset = datasets.CIFAR100(root=args.data_dir,
-                                        transform=TwoCropTransform(train_transform),
-                                        download=True)
+        dataset = datasets.CIFAR100(root=args.data_dir,
+                                    train=(split == "train"),
+                                    transform=TwoCropTransform(transform),
+                                    download=True)
     elif args.dataset == "mvip":
-        train_dataset = MVIPDataset(split="train",
-                                    transform=TwoCropTransform(train_transform))
+        dataset = MVIPDataset(split=split,
+                              size=args.size,
+                              transform=TwoCropTransform(transform))
 
-    train_sampler = None
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
-        num_workers=args.num_workers, pin_memory=True, sampler=train_sampler)
+    sampler = None
+    dataloader = torch.utils.data.DataLoader(
+        dataset, batch_size=args.batch_size, shuffle=(sampler is None),
+        num_workers=args.num_workers, pin_memory=True, sampler=sampler)
     
     """if args.get_samples:
         print("Exporting sample images...")
@@ -313,10 +321,8 @@ def set_loader(args):
             class_name = train_dataset.class_names[label]
             save_image(img1, f"sample_{i}_{class_name}_0.png")
             save_image(img2, f"sample_{i}_{class_name}_1.png")"""
-    
-    print("Dataloader ready.")
 
-    return train_loader
+    return dataloader
 
 
 def set_model(args):
@@ -394,12 +400,61 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
     return losses.avg
 
+def validate(val_loader, model, criterion, args):
+    """One epoch validation"""
+    model.eval()
+
+    batch_time = AverageMeter()
+    losses = AverageMeter()
+
+    with torch.no_grad():
+        start_time = time.time()
+        for idx, (images, labels) in enumerate(val_loader):
+            images = torch.cat([images[0], images[1]], dim=0)
+            if torch.cuda.is_available():
+                images = images.cuda(non_blocking=True)
+                labels = labels.cuda(non_blocking=True)
+            bsz = labels.shape[0]
+
+            # Compute loss
+            features = model(images)
+            f1, f2 = torch.split(features, [bsz, bsz], dim=0)
+            features = torch.cat([f1.unsqueeze(1), f2.unsqueeze(1)], dim=1)
+            if args.method == 'SupCon':
+                loss = criterion(features, labels)
+            elif args.method == 'SimCLR':
+                loss = criterion(features)
+            else:
+                raise ValueError('Contrastive method not supported: {}'.format(args.method))
+
+            # Update metric & log
+            losses.update(loss.item(), bsz)
+
+            # Measure elapsed time
+            batch_time.update(time.time() - start_time)
+
+            # Print info
+            if (idx + 1) % args.print_freq == 0:
+                print('Validation: [{0}/{1}]\t'
+                      'BT {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                      'loss {loss.val:.3f} ({loss.avg:.3f})'.format(
+                       idx + 1, len(val_loader), batch_time=batch_time,
+                       loss=losses))
+                sys.stdout.flush()
+
+    return losses.avg
+
 
 def main():
     args = parse_args()
 
-    # Build data loader
-    train_loader = set_loader(args)
+    # Build dataloaders
+    print("Preparing dataloaders...")
+
+    train_loader = set_loader(args, "train")
+    val_loader = set_loader(args, "val")
+
+    print("Dataloaders ready.")
 
     # Build model and criterion
     model, criterion = set_model(args)
@@ -427,20 +482,26 @@ def main():
 
     # Training routine
     print("Initiating training...")
+
     for epoch in range(1, args.epochs + 1):
         adjust_learning_rate(args, optimizer, epoch)
 
         # Train for one epoch
         start_time = time.time()
-        loss = train(train_loader, model, criterion, optimizer, epoch, args)
-        end_time = time.time()
-        print('epoch {}, total time {:.2f}'.format(epoch, end_time - start_time))
 
-        """# Log average epoch loss
+        avg_train_loss = train(train_loader, model, criterion, optimizer, epoch, args)
+        avg_val_loss = validate(val_loader, model, criterion, args)
+
+        end_time = time.time()
+
+        print('epoch {}, total time {:.2f}, average train loss: {}, validation loss: {}'.format(
+            epoch, end_time - start_time, avg_train_loss, avg_val_loss))
+
+        # Log average epoch loss
         wandb.log({
-            "loss": loss,
-            "learning_rate": optimizer.param_groups[0]['lr'],
-        })"""
+            "avg_train_loss": avg_train_loss,
+            "avg_val_loss": avg_val_loss,
+        })
 
         if epoch % args.save_freq == 0:
             save_file = os.path.join(
@@ -448,8 +509,7 @@ def main():
             save_model(model, optimizer, args, epoch, save_file)
 
     # Save the last model
-    save_file = os.path.join(
-        args.save_dir, 'last.pth')
+    save_file = os.path.join(args.save_dir, 'last.pth')
     save_model(model, optimizer, args, args.epochs, save_file)
 
 
