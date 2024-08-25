@@ -37,10 +37,10 @@ if is_wandb_available():
 class MVIPDataset(Dataset):
     def __init__(
         self,
-        size=512,
+        split="train",
+        size=256,
         transform=None,
         repeats=1, # da-fusion: 100
-        split="train",
         synt=None
     ):
         self.data_root = '/mnt/HDD/MVIP/sets'
@@ -68,13 +68,19 @@ class MVIPDataset(Dataset):
 
             del self.class_names[20:]
 
-        self.class_to_idx = {self.class_names[i]: i for i in range(len(self.class_names))}
-
-        self.all_images, self.all_masks = self.get_all_image_paths()
+        self.all_images, self.all_masks = self.get_all_image_paths(self.class_names)
         self.num_images = len(self.all_images)
 
+        self.class_to_label_id = {self.class_names[i]: i for i in range(len(self.class_names))}
+        self.all_labels = [self.class_to_label_id[self.all_images[i].split("/")[-6]] for i in range(self.num_images)]
         # Example: "/mnt/HDD/MVIP/sets/ >CLASS_NAME< /train_data/0/0/cam0/0_rgb.png"
-        self.all_labels = [self.class_to_idx[self.all_images[i].split("/")[-6]] for i in range(self.num_images)]
+
+        # Shuffle dataset
+        np.random.seed(0)
+        shuffle_idx = np.random.permutation(self.num_images)
+        self.all_images = [self.all_images[i] for i in shuffle_idx]
+        self.all_masks = [self.all_masks[i] for i in shuffle_idx]
+        self.all_labels = [self.all_labels[i] for i in shuffle_idx]
 
         if split == "train":
             self._length = self.num_images * repeats
@@ -85,9 +91,11 @@ class MVIPDataset(Dataset):
             self.transform = transform
         else:
             self.transform = transforms.Compose([
+                #transforms.RandomResizedCrop(self.size, scale=(0.8, 1.), ratio=(1.0, 1.0)),
                 transforms.Resize(self.size),
-                transforms.RandomResizedCrop(self.size, scale=(0.8, 1.)),
                 transforms.RandomHorizontalFlip(p=0.5),
+                transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
+                transforms.RandomGrayscale(p=0.2),
                 transforms.ToTensor(),
             ])
 
@@ -104,34 +112,20 @@ class MVIPDataset(Dataset):
         if not image.mode == "RGB":
             image = image.convert("RGB")
 
-        # Get the bounding box of the object mask (with maximum filter for dilation)
+        # Get object mask & use maximum filter to dilate it
         mask = np.array(Image.open(self.all_masks[idx % self.num_images]).convert('L'))
         mask = Image.fromarray(maximum_filter(mask, size=32))
-        mask_box = mask.getbbox()
 
-        # Make mask_box square without offsetting the center
-        mask_box_width = mask_box[2] - mask_box[0]
-        mask_box_height = mask_box[3] - mask_box[1]
-        mask_box_size = max(mask_box_width, mask_box_height)
-        mask_box_center_x = (mask_box[2] + mask_box[0]) // 2
-        mask_box_center_y = (mask_box[3] + mask_box[1]) // 2
-        mask_box = (
-            mask_box_center_x - mask_box_size // 2,
-            mask_box_center_y - mask_box_size // 2,
-            mask_box_center_x + mask_box_size // 2,
-            mask_box_center_y + mask_box_size // 2
-        )
-
-        # Crop image with mask_box
-        image = image.crop(mask_box)
+        # Use mask to crop image
+        image = self.mask_crop(image, mask)
 
         return self.transform(image), label
     
-    def get_all_image_paths(self): # Example: "/mnt/HDD/MVIP/sets/class_name/train_data/0/0/cam0/0_rgb.png"
+    def get_all_image_paths(self, class_names): # Example: "/mnt/HDD/MVIP/sets/class_name/train_data/0/0/cam0/0_rgb.png"
         images = []
         masks = []
 
-        for class_name in self.class_names:
+        for class_name in class_names:
             root = os.path.join(self.data_root, class_name, self.split)
 
             for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
@@ -159,6 +153,25 @@ class MVIPDataset(Dataset):
         std /= len(self.all_images)
 
         return mean, std
+    
+    def mask_crop(self, image: Image, mask: Image):
+        mask_box = mask.getbbox()
+
+        # Make mask_box square without offsetting the center
+        mask_box_width = mask_box[2] - mask_box[0]
+        mask_box_height = mask_box[3] - mask_box[1]
+        mask_box_size = max(mask_box_width, mask_box_height)
+        mask_box_center_x = (mask_box[2] + mask_box[0]) // 2
+        mask_box_center_y = (mask_box[3] + mask_box[1]) // 2
+        mask_box = (
+            mask_box_center_x - mask_box_size // 2,
+            mask_box_center_y - mask_box_size // 2,
+            mask_box_center_x + mask_box_size // 2,
+            mask_box_center_y + mask_box_size // 2
+        )
+
+        # Crop image with mask_box
+        return image.crop(mask_box)
 
 
 def parse_args():
@@ -168,8 +181,9 @@ def parse_args():
     parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100', 'mvip'])
     parser.add_argument('--data_dir', type=str, default=None)
 
-    parser.add_argument('--experiment_name', type=str, default=None)
+    parser.add_argument('--get_samples', action='store_true', help='Export sample images from dataset.')
 
+    parser.add_argument('--experiment_name', type=str, default=None)
     parser.add_argument('--model', type=str, default='resnet50')
     parser.add_argument('--trial', type=str, default='0', help='id for recording multiple runs.')
 
@@ -265,8 +279,8 @@ def set_loader(args):
     }
 
     train_transform = transforms.Compose([
+        #transforms.RandomResizedCrop(size=args.size, scale=(0.8, 1.), ratio=(1.0, 1.0)),
         transforms.Resize(args.size),
-        transforms.RandomResizedCrop(size=args.size, scale=(0.8, 1.)),
         transforms.RandomHorizontalFlip(),
         transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
         transforms.RandomGrayscale(p=0.2),
@@ -290,6 +304,14 @@ def set_loader(args):
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
         num_workers=args.num_workers, pin_memory=True, sampler=train_sampler)
+    
+    if args.get_samples:
+        print("Exporting sample images...")
+        for i in range(10):
+            image, label = train_dataset[i]
+            image = transforms.ToPILImage()(image)
+            class_name = train_dataset.class_names[label]
+            image.save(f"sample_{i}_{class_name}.png")
     
     print("Dataloader ready.")
 
