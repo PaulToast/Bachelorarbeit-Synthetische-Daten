@@ -12,6 +12,7 @@ import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
 from torchvision import transforms, datasets
+from torchvision.utils import save_image
 
 from util import TwoCropTransform, AverageMeter
 from util import adjust_learning_rate, warmup_learning_rate
@@ -91,8 +92,7 @@ class MVIPDataset(Dataset):
             self.transform = transform
         else:
             self.transform = transforms.Compose([
-                #transforms.RandomResizedCrop(self.size, scale=(0.8, 1.), ratio=(1.0, 1.0)),
-                transforms.Resize(self.size),
+                transforms.RandomResizedCrop(self.size, scale=(0.8, 1.)),# ratio=(1.0, 1.0)),
                 transforms.RandomHorizontalFlip(p=0.5),
                 transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
                 transforms.RandomGrayscale(p=0.2),
@@ -209,8 +209,8 @@ def parse_args():
     #parser.add_argument('--syncBN', action='store_true', help='Using synchronized batch normalization.')
 
     # Output & logging
-    parser.add_argument('--save_freq', type=int, default=50,)
-    parser.add_argument('--print_freq', type=int, default=10,)
+    parser.add_argument('--save_freq', type=int, default=10, help='Save model every N epochs.')
+    parser.add_argument('--print_freq', type=int, default=10, help='Print training progress every N steps.')
 
     args = parser.parse_args()
 
@@ -249,7 +249,7 @@ def parse_args():
     if args.lr_warmup:
         args.model_name = '{}_warm'.format(args.model_name)
         args.lr_warmup_from = 0.0001
-        args.lr_warmup_epochs = 5
+        args.lr_warmup_epochs = 1
         if args.lr_cosine:
             eta_min = args.lr * (args.lr_decay_rate ** 3)
             args.lr_warmup_to = eta_min + (args.lr - eta_min) * (
@@ -279,9 +279,9 @@ def set_loader(args):
     }
 
     train_transform = transforms.Compose([
-        #transforms.RandomResizedCrop(size=args.size, scale=(0.8, 1.), ratio=(1.0, 1.0)),
-        transforms.Resize(args.size),
+        transforms.RandomResizedCrop(size=args.size, scale=(0.8, 1.)),# ratio=(1.0, 1.0)),
         transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(degrees=15.0),
         transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
         transforms.RandomGrayscale(p=0.2),
         transforms.ToTensor(),
@@ -305,13 +305,14 @@ def set_loader(args):
         train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
         num_workers=args.num_workers, pin_memory=True, sampler=train_sampler)
     
-    if args.get_samples:
+    """if args.get_samples:
         print("Exporting sample images...")
-        for i in range(10):
-            image, label = train_dataset[i]
-            image = transforms.ToPILImage()(image)
+        for i in range(4):
+            images, label = train_dataset[i]
+            img1, img2 = images
             class_name = train_dataset.class_names[label]
-            image.save(f"sample_{i}_{class_name}.png")
+            save_image(img1, f"sample_{i}_{class_name}_0.png")
+            save_image(img2, f"sample_{i}_{class_name}_1.png")"""
     
     print("Dataloader ready.")
 
@@ -412,9 +413,9 @@ def main():
         config={
             "dataset" : args.dataset,
             "model_name": args.model_name,
-            "crop size" : args.size,
-            "epochs" : args.epochs,
+            "image_size" : args.size,
             "batch_size" : args.batch_size,
+            "epochs" : args.epochs,
             "lr" : args.lr,
             "lr_warmup" : args.lr_warmup,
             "lr_cosine" : args.lr_cosine,
