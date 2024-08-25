@@ -104,11 +104,25 @@ class MVIPDataset(Dataset):
         if not image.mode == "RGB":
             image = image.convert("RGB")
 
-        # Crop image with mask
+        # Get the bounding box of the object mask (with maximum filter for dilation)
         mask = np.array(Image.open(self.all_masks[idx % self.num_images]).convert('L'))
         mask = Image.fromarray(maximum_filter(mask, size=32))
         mask_box = mask.getbbox()
 
+        # Make mask_box square without offsetting the center
+        mask_box_width = mask_box[2] - mask_box[0]
+        mask_box_height = mask_box[3] - mask_box[1]
+        mask_box_size = max(mask_box_width, mask_box_height)
+        mask_box_center_x = (mask_box[2] + mask_box[0]) // 2
+        mask_box_center_y = (mask_box[3] + mask_box[1]) // 2
+        mask_box = (
+            mask_box_center_x - mask_box_size // 2,
+            mask_box_center_y - mask_box_size // 2,
+            mask_box_center_x + mask_box_size // 2,
+            mask_box_center_y + mask_box_size // 2
+        )
+
+        # Crop image with mask_box
         image = image.crop(mask_box)
 
         return self.transform(image), label
