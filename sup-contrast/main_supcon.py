@@ -199,13 +199,13 @@ def parse_args():
     # Training parameters
     parser.add_argument('--method', type=str, default='SupCon', choices=['SupCon', 'SimCLR'])
 
-    parser.add_argument('--size', type=int, default=512, help='Size for RandomResizedCrop.')
+    parser.add_argument('--size', type=int, default=224, help='Size for RandomResizedCrop.') #32
 
-    parser.add_argument('--batch_size', type=int, default=12)
-    parser.add_argument('--num_workers', type=int, default=16)
-    parser.add_argument('--epochs', type=int, default=1000)
+    parser.add_argument('--batch_size', type=int, default=16) #256
+    parser.add_argument('--num_workers', type=int, default=4) #16
+    parser.add_argument('--epochs', type=int, default=110) #1000
 
-    parser.add_argument('--lr', type=float, default=0.002)
+    parser.add_argument('--lr', type=float, default=0.002) #0.05
     parser.add_argument('--lr_warmup', action='store_true', help='Learning rate warm-up for large batch training.')
     parser.add_argument('--lr_decay_epochs', type=str, default='700,800,900', help='When to decay lr, as string seperated by ","')
     parser.add_argument('--lr_decay_rate', type=float, default=0.1)
@@ -218,7 +218,7 @@ def parse_args():
     #parser.add_argument('--syncBN', action='store_true', help='Using synchronized batch normalization.')
 
     # Output & logging
-    parser.add_argument('--save_freq', type=int, default=10, help='Save model every N epochs.')
+    parser.add_argument('--save_freq', type=int, default=10, help='Save model every N epochs.') #50
     parser.add_argument('--print_freq', type=int, default=10, help='Print training progress every N steps.')
 
     args = parser.parse_args()
@@ -508,6 +508,7 @@ def main():
 
         # Log average epoch loss
         wandb.log({
+            "epoch": epoch,
             "avg_train_loss": avg_train_loss,
             "avg_val_loss": avg_val_loss,
         })
