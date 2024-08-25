@@ -37,9 +37,11 @@ if is_wandb_available():
 class MVIPDataset(Dataset):
     def __init__(
         self,
+        size=512,
         transform=None,
         repeats=1, # da-fusion: 100
         split="train",
+        synt=None
     ):
         self.data_root = '/mnt/HDD/MVIP/sets'
 
@@ -49,6 +51,8 @@ class MVIPDataset(Dataset):
             "test": "test_data",
         }
         self.split = split_dir[split]
+
+        self.size = size
 
         # Limit dataset to 20 classes from the "CarComponent" super class
         self.class_names = []
@@ -81,8 +85,8 @@ class MVIPDataset(Dataset):
             self.transform = transform
         else:
             self.transform = transforms.Compose([
-                transforms.Resize(512),
-                transforms.RandomResizedCrop(256, scale=(0.2, 1.)),
+                transforms.Resize(self.size),
+                transforms.RandomResizedCrop(self.size, scale=(0.8, 1.)),
                 transforms.RandomHorizontalFlip(p=0.5),
                 transforms.ToTensor(),
             ])
@@ -102,15 +106,8 @@ class MVIPDataset(Dataset):
 
         # Crop image with mask
         mask = np.array(Image.open(self.all_masks[idx % self.num_images]).convert('L'))
-        mask = Image.fromarray(maximum_filter(mask, size=16))
+        mask = Image.fromarray(maximum_filter(mask, size=32))
         mask_box = mask.getbbox()
-        padding = 10
-        mask_box = (
-            mask_box[0] - padding,
-            mask_box[1] - padding,
-            mask_box[2] + padding,
-            mask_box[3] + padding
-        )
 
         image = image.crop(mask_box)
 
@@ -171,7 +168,7 @@ def parse_args():
     parser.add_argument('--num_workers', type=int, default=16)
     parser.add_argument('--epochs', type=int, default=1000)
 
-    parser.add_argument('--lr', type=float, default=0.05)
+    parser.add_argument('--lr', type=float, default=0.002)
     parser.add_argument('--lr_warmup', action='store_true', help='Learning rate warm-up for large batch training.')
     parser.add_argument('--lr_decay_epochs', type=str, default='700,800,900', help='When to decay lr, as string seperated by ","')
     parser.add_argument('--lr_decay_rate', type=float, default=0.1)
@@ -223,8 +220,8 @@ def parse_args():
         args.lr_warmup = True
     if args.lr_warmup:
         args.model_name = '{}_warm'.format(args.model_name)
-        args.lr_warmup_from = 0.01
-        args.lr_warmup_epochs = 10
+        args.lr_warmup_from = 0.0001
+        args.lr_warmup_epochs = 5
         if args.lr_cosine:
             eta_min = args.lr * (args.lr_decay_rate ** 3)
             args.lr_warmup_to = eta_min + (args.lr - eta_min) * (
@@ -254,8 +251,8 @@ def set_loader(args):
     }
 
     train_transform = transforms.Compose([
-        transforms.Resize(512),
-        transforms.RandomResizedCrop(size=args.size, scale=(0.2, 1.)),
+        transforms.Resize(args.size),
+        transforms.RandomResizedCrop(size=args.size, scale=(0.8, 1.)),
         transforms.RandomHorizontalFlip(),
         transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
         transforms.RandomGrayscale(p=0.2),
