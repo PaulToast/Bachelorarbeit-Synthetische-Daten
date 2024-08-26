@@ -3,6 +3,7 @@ from semantic_aug.datasets.spurge import SpurgeDataset
 from semantic_aug.datasets.imagenet import ImageNetDataset
 from semantic_aug.datasets.pascal import PASCALDataset
 from semantic_aug.datasets.mvip import MVIPDataset
+from semantic_aug.datasets.mvip import crop_object
 from semantic_aug.datasets.mvip_mini import MVIPMiniDataset
 
 from semantic_aug.augmentations.compose import ComposeParallel
@@ -21,8 +22,6 @@ import torch
 import argparse
 import numpy as np
 import random
-
-from scipy.ndimage import maximum_filter
 
 
 DATASETS = {
@@ -100,14 +99,13 @@ if __name__ == "__main__":
     parser.add_argument("--guidance_scale", nargs="+", type=float, default=[7.5])
     parser.add_argument("--strength", nargs="+", type=float, default=[0.5])
 
-    parser.add_argument("--mask", nargs="+", type=int, default=[0], choices=[0, 1])
-    parser.add_argument("--inverted", nargs="+", type=int, default=[0], choices=[0, 1])
-    parser.add_argument("--mask_crop", action="store_true")
+    parser.add_argument("--crop_object", type=bool, default=False, help="Before augmenting, create a crop using the object mask bounding box.")
+    parser.add_argument("--mask", nargs="+", type=int, default=[0], choices=[0, 1], help="Only augment masked regions.")
+    parser.add_argument("--inverted", nargs="+", type=int, default=[0], choices=[0, 1], help="Invert mask.")
     
     parser.add_argument("--probs", nargs="+", type=float, default=None)
     
-    parser.add_argument("--compose", type=str, default="parallel", 
-                        choices=["parallel", "sequential"])
+    parser.add_argument("--compose", type=str, default="parallel", choices=["parallel", "sequential"])
 
     parser.add_argument("--class_name", type=str, default=None)
     
@@ -165,31 +163,9 @@ if __name__ == "__main__":
 
         metadata = train_dataset.get_metadata_by_idx(idx)
 
-        if args.mask_crop:
-            # Get mask from metadata
-            mask = Image.fromarray((
-                np.where(metadata["mask"], 255, 0)
-            ).astype(np.uint8))
-            mask = Image.fromarray(
-                maximum_filter(np.array(mask), size=16))
-
-            # Get bounding box for crop from masked area
-            mask_box = mask.getbbox()
-            padding = 20
-
-            mask_box = (
-                mask_box[0] - padding,
-                mask_box[1] - padding,
-                mask_box[2] + padding,
-                mask_box[3] + padding
-            )
-
-            # Crop image
-            image = image.crop(mask_box)
-
-            # Also update the mask to fit the now cropped image
-            mask = mask.crop(mask_box)
-            metadata["mask"] = np.array(mask)
+        # Crop the image using object mask
+        if args.crop_object:
+            image, metadata["mask"] = crop_object(image, metadata["mask"])
 
         if args.class_name is not None: 
             if metadata["name"] != args.class_name: continue

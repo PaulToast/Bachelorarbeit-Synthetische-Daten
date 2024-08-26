@@ -37,7 +37,6 @@ from accelerate.utils import ProjectConfiguration, set_seed
 from huggingface_hub import create_repo, upload_folder
 
 from datetime import datetime
-from scipy.ndimage import maximum_filter
 
 # TODO: remove and import from diffusers.utils when the new version of diffusers is released
 from packaging import version
@@ -68,6 +67,7 @@ from semantic_aug.datasets.pascal import PASCALDataset
 from semantic_aug.datasets.caltech101 import CalTech101Dataset
 from semantic_aug.datasets.flowers102 import Flowers102Dataset
 from semantic_aug.datasets.mvip import MVIPDataset
+from semantic_aug.datasets.mvip import crop_object
 from semantic_aug.datasets.mvip_mini import MVIPMiniDataset
 
 
@@ -260,10 +260,9 @@ def parse_args():
         )
     )
     parser.add_argument(
-        "--mask",
-        type=str,
-        default=None,
-        choices=["noise", "crop"],
+        "--crop_object",
+        type=bool,
+        default=False,
     )
     parser.add_argument(
         "--seed",
@@ -1164,36 +1163,9 @@ if __name__ == "__main__":
             image = train_dataset.get_image_by_idx(idx)
             metadata = train_dataset.get_metadata_by_idx(idx)
 
-            if args.mask is not None:
-                # Create mask from metadata
-                mask = Image.fromarray((
-                    np.where(metadata["mask"], 255, 0)
-                ).astype(np.uint8))
-                mask = Image.fromarray(
-                    maximum_filter(np.array(mask), size=32))
-
-                if args.mask == "noise":
-                    noise = Image.effect_noise(image.size, 25).convert("RGB")
-                    image = Image.composite(image, noise, mask)
-                elif args.mask == "crop":
-                    # Get bounding box of object mask
-                    mask_box = mask.getbbox()
-
-                    # Make mask_box square without offsetting the center
-                    mask_box_width = mask_box[2] - mask_box[0]
-                    mask_box_height = mask_box[3] - mask_box[1]
-                    mask_box_size = max(mask_box_width, mask_box_height)
-                    mask_box_center_x = (mask_box[2] + mask_box[0]) // 2
-                    mask_box_center_y = (mask_box[3] + mask_box[1]) // 2
-                    mask_box = (
-                        mask_box_center_x - mask_box_size // 2,
-                        mask_box_center_y - mask_box_size // 2,
-                        mask_box_center_x + mask_box_size // 2,
-                        mask_box_center_y + mask_box_size // 2
-                    )
-                    
-                    # Crop image with mask
-                    image = image.crop(mask_box)
+            # Crop the image using object mask
+            if args.crop_object:
+                image, metadata["mask"] = crop_object(image, metadata["mask"])
 
             if metadata["name"] == class_name:
 

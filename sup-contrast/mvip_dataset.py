@@ -95,13 +95,10 @@ class MVIPDataset(Dataset):
         if not image.mode == "RGB":
             image = image.convert("RGB")
 
-        # Get object mask & use maximum filter to dilate it
+        # Crop object using mask
         if self.all_masks[idx % self._length] is not None:
-            mask = np.array(Image.open(self.all_masks[idx % self._length]).convert('L'))
-            mask = Image.fromarray(maximum_filter(mask, size=32))
-
-            # Use mask to crop image
-            image = self.mask_crop(image, mask)
+            mask = Image.open(self.all_masks[idx % self._length]).convert('L')
+            image, mask = self.crop_object(image, mask)
 
         return self.transform(image), label
     
@@ -169,7 +166,9 @@ class MVIPDataset(Dataset):
 
         return mean, std
     
-    def mask_crop(self, image: Image, mask: Image):
+    def crop_object(self, image: Image, mask: Image):
+        mask = Image.fromarray(maximum_filter(np.array(mask), size=32))
+        
         mask_box = mask.getbbox()
 
         # Make mask_box square without offsetting the center
@@ -186,4 +185,4 @@ class MVIPDataset(Dataset):
         )
 
         # Crop image with mask_box
-        return image.crop(mask_box)
+        return image.crop(mask_box), mask.crop(mask_box)
