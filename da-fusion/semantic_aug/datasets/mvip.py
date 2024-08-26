@@ -115,9 +115,12 @@ class MVIPDataset(FewShotDataset):
         ])
 
         else: train_transform = transforms.Compose([
-            transforms.Resize(image_size),
+            #transforms.Resize(image_size),
+            transforms.RandomResizedCrop(image_size, scale=(0.8, 1.)),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomRotation(degrees=15.0),
+            transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
+            transforms.RandomGrayscale(p=0.2),
             transforms.ToTensor(),
             transforms.ConvertImageDtype(torch.float),
             transforms.Lambda(lambda x: x.expand(3, *image_size)),
