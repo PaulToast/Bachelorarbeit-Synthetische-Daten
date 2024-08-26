@@ -626,6 +626,7 @@ class TextualInversionDataset(Dataset):
         set="train",
         placeholder_token="*",
         center_crop=False,
+        transform=None
     ):
         self.data_root = data_root
         self.tokenizer = tokenizer
@@ -657,7 +658,11 @@ class TextualInversionDataset(Dataset):
         else:
             self.templates = imagenet_templates_small
         
-        self.flip_transform = transforms.RandomHorizontalFlip(p=self.flip_p)
+        if transform == None:
+            self.transform = None
+            self.flip_transform = transforms.RandomHorizontalFlip(p=self.flip_p)
+        else:
+            self.transform = transform
 
     def __len__(self):
         return self._length
@@ -681,27 +686,31 @@ class TextualInversionDataset(Dataset):
         ).input_ids[0]
 
         # default to score-sde preprocessing
-        img = np.array(image).astype(np.uint8)
+        if self.transform == None:
+            img = np.array(image).astype(np.uint8)
 
-        if self.center_crop:
-            crop = min(img.shape[0], img.shape[1])
-            (
-                h,
-                w,
-            ) = (
-                img.shape[0],
-                img.shape[1],
-            )
-            img = img[(h - crop) // 2 : (h + crop) // 2, (w - crop) // 2 : (w + crop) // 2]
+            if self.center_crop:
+                crop = min(img.shape[0], img.shape[1])
+                (
+                    h,
+                    w,
+                ) = (
+                    img.shape[0],
+                    img.shape[1],
+                )
+                img = img[(h - crop) // 2 : (h + crop) // 2, (w - crop) // 2 : (w + crop) // 2]
 
-        image = Image.fromarray(img)
-        image = image.resize((self.size, self.size), resample=self.interpolation)
+            image = Image.fromarray(img)
+            image = image.resize((self.size, self.size), resample=self.interpolation)
 
-        image = self.flip_transform(image)
-        image = np.array(image).astype(np.uint8)
-        image = (image / 127.5 - 1.0).astype(np.float32)
+            image = self.flip_transform(image)
+            image = np.array(image).astype(np.uint8)
+            image = (image / 127.5 - 1.0).astype(np.float32)
 
-        example["pixel_values"] = torch.from_numpy(image).permute(2, 0, 1)
+            example["pixel_values"] = torch.from_numpy(image).permute(2, 0, 1)
+        else:
+            example["pixel_values"] = self.transform(image)
+        
         return example
 
 
@@ -868,6 +877,7 @@ def main(args):
         learnable_property=args.learnable_property,
         center_crop=args.center_crop,
         set="train",
+        transform=args.transform,
     )
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, batch_size=args.train_batch_size, shuffle=True, num_workers=args.dataloader_num_workers
@@ -1194,10 +1204,13 @@ if __name__ == "__main__":
         else:
             args.placeholder_token = f"<{formatted_name}>"
 
+        train_transform = train_dataset.transform["train"]
+
         args.train_data_dir = os.path.join(
             output_dir, "extracted", dirname)
         args.output_dir = os.path.join(
             output_dir, "fine-tuned", dirname)
+        args.transform = train_transform
 
         word_name = class_name.replace(" ", "")
 

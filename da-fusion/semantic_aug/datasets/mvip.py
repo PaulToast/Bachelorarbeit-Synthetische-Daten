@@ -125,8 +125,8 @@ class MVIPDataset(FewShotDataset):
             transforms.ToTensor(),
             transforms.ConvertImageDtype(torch.float),
             transforms.Lambda(lambda x: x.expand(3, *image_size)),
-            transforms.Normalize(mean=[0.5, 0.5, 0.5], 
-                                  std=[0.5, 0.5, 0.5])
+            transforms.Normalize(mean=[0.4213, 0.4252, 0.4242],
+                                  std=[0.1955, 0.1923, 0.1912])
         ])
 
         val_transform = transforms.Compose([
@@ -134,8 +134,8 @@ class MVIPDataset(FewShotDataset):
             transforms.ToTensor(),
             transforms.ConvertImageDtype(torch.float),
             transforms.Lambda(lambda x: x.expand(3, *image_size)),
-            transforms.Normalize(mean=[0.5, 0.5, 0.5], 
-                                  std=[0.5, 0.5, 0.5])
+            transforms.Normalize(mean=[0.4213, 0.4252, 0.4242],
+                                  std=[0.1955, 0.1923, 0.1912])
         ])
 
         self.transform = {"train": train_transform, "val": val_transform}[split]
