@@ -25,15 +25,21 @@ if is_wandb_available():
 def parse_args():
     parser = argparse.ArgumentParser('Arguments for training')
 
-    # Dataset & model
+    parser.add_argument('--experiment_name', type=str, default=None, help='Output directory name for experiment.')
+    parser.add_argument('--trial', type=str, default='0', help='id for recording multiple runs.')
+
+    # Data
     parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100', 'mvip'])
     parser.add_argument('--data_dir', type=str, default=None)
 
-    parser.add_argument('--experiment_name', type=str, default=None)
-    parser.add_argument('--model', type=str, default='resnet50')
-    parser.add_argument('--trial', type=str, default='0', help='id for recording multiple runs.')
+    #parser.add_argument('--aug_method', type=str, default=None, choices=[None, 'positive', 'both'])
+    parser.add_argument('--aug_experiment', type=str, default=None)
+    parser.add_argument('--aug_name_positive', type=str, default=None)
+    parser.add_argument('--aug_name_negative', type=str, default=None)
 
-    # Training parameters
+    # Training
+    parser.add_argument('--model', type=str, default='resnet50')
+
     parser.add_argument('--method', type=str, default='SupCon', choices=['SupCon', 'SimCLR'])
 
     parser.add_argument('--size', type=int, default=224, help='Size for RandomResizedCrop.') #32
@@ -60,12 +66,28 @@ def parse_args():
 
     args = parser.parse_args()
 
+    # Set aug directory
+    if args.aug_method is not None:
+        assert args.aug_experiment is not None \
+            and args.aug_name_positive is not None \
+            and args.aug_name_negative is not None
+
+        args.aug_dir_positive = os.path.abspath(os.path.join(
+            os.path.dirname( __file__ ), '..', f'_experiments/{args.aug_experiment}/{args.aug_name_positive}'
+        ))
+        args.aug_dir_negative = os.path.abspath(os.path.join(
+            os.path.dirname( __file__ ), '..', f'_experiments/{args.aug_experiment}/{args.aug_name_negative}'
+        ))
+    else:
+        args.aug_dir_positive = None
+        args.aug_dir_negative = None
+
     # Set output directories
     args.save_dir = os.path.abspath(os.path.join(
-        os.path.dirname( __file__ ), '..', f'_experiments/{args.experiment_name}/SupCon/models'
+        os.path.dirname( __file__ ), '..', f'_experiments/{args.experiment_name}/models'
     ))
     args.logging_dir = os.path.abspath(os.path.join(
-        os.path.dirname( __file__ ), '..', f'_experiments/{args.experiment_name}/SupCon/logs'
+        os.path.dirname( __file__ ), '..', f'_experiments/{args.experiment_name}/logs'
     ))
 
     # Set learning rate decay epochs from string argument
@@ -75,9 +97,9 @@ def parse_args():
         args.lr_decay_epochs.append(int(it))
 
     # Set model name for output
-    args.model_name = '{}_{}_{}_lr={}_decay={}_bs={}_temp={}_trial={}'.\
-        format(args.method, args.dataset, args.model, args.lr,
-               args.weight_decay, args.batch_size, args.temp, args.trial)
+    args.model_name = '{}_{}_{}_trial={}_lr={}_decay={}_bs={}_temp={}'.\
+        format(args.method, args.dataset, args.model, args.trial, args.lr,
+               args.weight_decay, args.batch_size, args.temp)
 
     if args.lr_cosine:
         args.model_name = '{}_cosine'.format(args.model_name)
@@ -144,6 +166,8 @@ def set_loader(args, split="train"):
                                     download=True)
     elif args.dataset == "mvip":
         dataset = MVIPDataset(split=split,
+                              aug_dir_positive=args.aug_dir_positive,
+                              aug_dir_negative=args.aug_dir_negative,
                               size=args.size,
                               transform=TwoCropTransform(transform))
 

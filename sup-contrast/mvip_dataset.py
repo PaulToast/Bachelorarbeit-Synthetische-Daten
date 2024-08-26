@@ -13,23 +13,21 @@ class MVIPDataset(Dataset):
     def __init__(
         self,
         split="train",
+        aug_dir_positive=None,
+        aug_dir_negative=None,
         size=224,
         transform=None,
-        repeats=1, # da-fusion: 100
-        synt=None
+        repeats=1, #da-fusion: 100
     ):
         self.data_root = '/mnt/HDD/MVIP/sets'
+        self.aug_dir_positive = aug_dir_positive
+        self.aug_dir_negative = aug_dir_negative
 
-        split_dir = {
-            "train": "train_data",
-            "val": "valid_data",
-            "test": "test_data",
-        }
-        self.split = split_dir[split]
+        self.split = split
 
         self.size = size
 
-        # Limit dataset to 20 classes from the "CarComponent" super class
+        # Define class names list; Limit dataset to 20 classes from the "CarComponent" super class
         self.class_names = []
 
         for class_name in [f for f in os.listdir(self.data_root) if os.path.isdir(os.path.join(self.data_root, f))]:
@@ -42,27 +40,37 @@ class MVIPDataset(Dataset):
             meta_file.close()
 
             del self.class_names[20:]
-
-        self.all_images, self.all_masks = self.get_all_image_paths(self.class_names, self.split)
-        self.num_images = len(self.all_images)
-
+        
         self.class_to_label_id = {self.class_names[i]: i for i in range(len(self.class_names))}
-        self.all_labels = [self.class_to_label_id[self.all_images[i].split("/")[-6 if split == "train" else -5]] for i in range(self.num_images)]
-        # Example: "/mnt/HDD/MVIP/sets/ >CLASS_NAME< /train_data/0/0/cam0/0_rgb.png"
-        # Example: "/mnt/HDD/MVIP/sets/ >CLASS_NAME< /valid_data/0/cam0/0_rgb.png"
+
+        # Collect all real images
+        self.all_images, self.all_masks, self.all_labels = self.parse_dataset(self.class_names, self.split)
+
+        # Collect all augmentations
+        if self.split == "train":
+            if self.aug_dir_positive is not None:
+                self.all_augs_positive, self.all_augs_labels_positive = self.parse_augs(self.class_names, self.aug_dir_positive)
+                for i in range(len(self.all_augs_positive)):
+                    self.all_images.append(self.all_augs_positive[i])
+                    self.all_masks.append(None)
+                    self.all_labels.append(self.all_augs_labels_positive[i])
+            """if self.aug_dir_negative is not None:
+                self.all_augs_negative, self.all_augs_labels_negative = self.parse_augs(self.class_names, self.aug_dir_negative)
+                for i in range(len(self.all_augs_negative)):
+                    self.all_images.append(self.all_augs_negative[i])
+                    self.all_masks.append(None)
+                    self.all_labels.append(-1)"""
+
+        self._length = len(self.all_images)
 
         # Shuffle dataset
         np.random.seed(0)
-        shuffle_idx = np.random.permutation(self.num_images)
+        shuffle_idx = np.random.permutation(self._length)
         self.all_images = [self.all_images[i] for i in shuffle_idx]
         self.all_masks = [self.all_masks[i] for i in shuffle_idx]
         self.all_labels = [self.all_labels[i] for i in shuffle_idx]
 
-        if split == "train":
-            self._length = self.num_images * repeats
-        else:
-            self._length = self.num_images
-
+        # Set transform
         if transform is not None:
             self.transform = transform
         else:
@@ -79,48 +87,72 @@ class MVIPDataset(Dataset):
 
     def __getitem__(self, idx):
         # Get label
-        label = self.all_labels[idx % self.num_images]
+        label = self.all_labels[idx % self._length]
 
         # Get image
-        image = Image.open(self.all_images[idx % self.num_images])
+        image = Image.open(self.all_images[idx % self._length])
 
         if not image.mode == "RGB":
             image = image.convert("RGB")
 
         # Get object mask & use maximum filter to dilate it
-        mask = np.array(Image.open(self.all_masks[idx % self.num_images]).convert('L'))
-        mask = Image.fromarray(maximum_filter(mask, size=32))
+        if self.all_masks[idx % self._length] is not None:
+            mask = np.array(Image.open(self.all_masks[idx % self._length]).convert('L'))
+            mask = Image.fromarray(maximum_filter(mask, size=32))
 
-        # Use mask to crop image
-        image = self.mask_crop(image, mask)
+            # Use mask to crop image
+            image = self.mask_crop(image, mask)
 
         return self.transform(image), label
     
-    def get_all_image_paths(self, class_names, split):
+    def parse_dataset(self, class_names, split):
         images = []
         masks = []
+        labels = []
+
+        split_dir = {
+            "train": "train_data",
+            "val": "valid_data",
+            "test": "test_data",
+        }
 
         for class_name in class_names:
-            root = os.path.join(self.data_root, class_name, split)
+            root = os.path.join(self.data_root, class_name, split_dir[split])
 
-            for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
-                if split == "train_data":
+            if split == "train_data":
+                for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
                     for orientation in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
                         for cam in [f for f in os.listdir(os.path.join(root, set, orientation)) if os.path.isdir(os.path.join(root, set, orientation, f))]:
                             for file in os.listdir(os.path.join(root, set, orientation, cam)):
                                 if file.endswith("rgb.png"):
                                     images.append(os.path.join(root, set, orientation, cam, file))
+                                    labels.append(self.class_to_label_id[class_name])
                                 elif file.endswith("rgb_mask_gen.png"):
                                     masks.append(os.path.join(root, set, orientation, cam, file))
-                else:
+                
+            else:
+                for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
                     for cam in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
                         for file in os.listdir(os.path.join(root, set, cam)):
                             if file.endswith("rgb.png"):
                                 images.append(os.path.join(root, set, cam, file))
+                                labels.append(self.class_to_label_id[class_name])
                             elif file.endswith("rgb_mask_gen.png"):
                                 masks.append(os.path.join(root, set, cam, file))
         
-        return images, masks
+        return images, masks, labels
+    
+    def parse_augs(self, class_names, aug_dir):
+        augs = []
+        labels = []
+
+        for class_name in class_names:
+            for file in os.listdir(aug_dir):
+                if class_name in file:
+                    augs.append(os.path.join(aug_dir, file))
+                    labels.append(self.class_to_label_id[class_name])
+        
+        return augs, labels
     
     def get_mean_std(self):
         mean = torch.zeros(3)
