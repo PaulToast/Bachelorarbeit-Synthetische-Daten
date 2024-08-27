@@ -54,12 +54,12 @@ class MVIPDataset(Dataset):
                     self.all_images.append(self.all_augs_positive[i])
                     self.all_masks.append(None)
                     self.all_labels.append(self.all_augs_labels_positive[i])
-            """if self.aug_dir_negative is not None:
+            if self.aug_dir_negative is not None:
                 self.all_augs_negative, self.all_augs_labels_negative = self.parse_augs(self.class_names, self.aug_dir_negative)
                 for i in range(len(self.all_augs_negative)):
                     self.all_images.append(self.all_augs_negative[i])
                     self.all_masks.append(None)
-                    self.all_labels.append(-1)"""
+                    self.all_labels.append(-1) # -1 as OOD-label
 
         self._length = len(self.all_images)
 

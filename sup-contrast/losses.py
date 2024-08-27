@@ -53,6 +53,10 @@ class SupConLoss(nn.Module):
             mask = torch.eq(labels, labels.T).float().to(device)
         else:
             mask = mask.float().to(device)
+        
+        # Make sure OOD samples are never considered as positive pairs
+        ood_mask = (labels == -1).float().to(device)
+        mask *= (1 - ood_mask @ ood_mask.T)
 
         contrast_count = features.shape[1]
         contrast_feature = torch.cat(torch.unbind(features, dim=1), dim=0)
@@ -65,17 +69,17 @@ class SupConLoss(nn.Module):
         else:
             raise ValueError('Unknown mode: {}'.format(self.contrast_mode))
 
-        # compute logits
+        # Compute logits
         anchor_dot_contrast = torch.div(
             torch.matmul(anchor_feature, contrast_feature.T),
             self.temperature)
-        # for numerical stability
+        # For numerical stability
         logits_max, _ = torch.max(anchor_dot_contrast, dim=1, keepdim=True)
         logits = anchor_dot_contrast - logits_max.detach()
 
-        # tile mask
+        # Tile mask
         mask = mask.repeat(anchor_count, contrast_count)
-        # mask-out self-contrast cases
+        # Mask-out self-contrast cases
         logits_mask = torch.scatter(
             torch.ones_like(mask),
             1,
@@ -84,13 +88,12 @@ class SupConLoss(nn.Module):
         )
         mask = mask * logits_mask
 
-        # compute log_prob
+        # Compute log_prob
         exp_logits = torch.exp(logits) * logits_mask
         log_prob = logits - torch.log(exp_logits.sum(1, keepdim=True))
 
-        # compute mean of log-likelihood over positive
-        # modified to handle edge cases when there is no positive pair
-        # for an anchor point. 
+        # Compute mean of log-likelihood over positive
+        # Modified to handle edge cases when there is no positive pair for an anchor point. 
         # Edge case e.g.:- 
         # features of shape: [4,1,...]
         # labels:            [0,1,1,2]
@@ -99,7 +102,7 @@ class SupConLoss(nn.Module):
         mask_pos_pairs = torch.where(mask_pos_pairs < 1e-6, 1, mask_pos_pairs)
         mean_log_prob_pos = (mask * log_prob).sum(1) / mask_pos_pairs
 
-        # loss
+        # Loss calculation
         loss = - (self.temperature / self.base_temperature) * mean_log_prob_pos
         loss = loss.view(anchor_count, batch_size).mean()
 

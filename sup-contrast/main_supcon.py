@@ -32,7 +32,7 @@ def parse_args():
     parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100', 'mvip'])
     parser.add_argument('--data_dir', type=str, default=None)
 
-    #parser.add_argument('--aug_method', type=str, default=None, choices=[None, 'positive', 'both'])
+    parser.add_argument('--aug_method', type=str, default=None, choices=[None, 'positive', 'both'])
     parser.add_argument('--aug_experiment', type=str, default=None)
     parser.add_argument('--aug_name_positive', type=str, default=None)
     parser.add_argument('--aug_name_negative', type=str, default=None)
@@ -44,9 +44,9 @@ def parse_args():
 
     parser.add_argument('--size', type=int, default=224, help='Size for RandomResizedCrop.') #32
 
+    parser.add_argument('--epochs', type=int, default=110) #1000
     parser.add_argument('--batch_size', type=int, default=16) #256
     parser.add_argument('--num_workers', type=int, default=4) #16
-    parser.add_argument('--epochs', type=int, default=110) #1000
 
     parser.add_argument('--lr', type=float, default=0.002) #0.05
     parser.add_argument('--lr_warmup', action='store_true', help='Learning rate warm-up for large batch training.')
@@ -66,29 +66,31 @@ def parse_args():
 
     args = parser.parse_args()
 
-    # Set aug directory
+    # Set aug directories
     if args.aug_method is not None:
         assert args.aug_experiment is not None \
             and args.aug_name_positive is not None \
             and args.aug_name_negative is not None
 
-        args.aug_dir_positive = os.path.abspath(os.path.join(
-            os.path.dirname( __file__ ), '..', f'_experiments/{args.aug_experiment}/{args.aug_name_positive}'
-        ))
-        args.aug_dir_negative = os.path.abspath(os.path.join(
-            os.path.dirname( __file__ ), '..', f'_experiments/{args.aug_experiment}/{args.aug_name_negative}'
-        ))
+        if args.aug_method == 'positive':
+            args.aug_dir_positive = os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_positive}'
+            ))
+            args.aug_dir_negative = None
+        elif args.aug_method == 'both':
+            args.aug_dir_positive = os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_positive}'
+            ))
+            args.aug_dir_negative = os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_negative}'
+            ))
     else:
         args.aug_dir_positive = None
         args.aug_dir_negative = None
 
     # Set output directories
-    args.save_dir = os.path.abspath(os.path.join(
-        os.path.dirname( __file__ ), '..', f'_experiments/{args.experiment_name}/models'
-    ))
-    args.logging_dir = os.path.abspath(os.path.join(
-        os.path.dirname( __file__ ), '..', f'_experiments/{args.experiment_name}/logs'
-    ))
+    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/models')
+    args.logging_dir = os.path.abspath(f'output/{args.experiment_name}/logs')
 
     # Set learning rate decay epochs from string argument
     iterations = args.lr_decay_epochs.split(',')
