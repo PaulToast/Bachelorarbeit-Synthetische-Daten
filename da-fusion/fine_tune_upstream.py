@@ -611,7 +611,7 @@ imagenet_style_templates_small = [
     "a large painting in the style of {}",
 ]
 
-# Defines how to handle and preprocess the chosen dataset for training.
+# This is the *extracted* dataset which is created temporarily for training
 # (loads images, applies transformations, and generates text prompts with placeholder token)
 class TextualInversionDataset(Dataset):
     def __init__(
@@ -619,7 +619,7 @@ class TextualInversionDataset(Dataset):
         data_root,
         tokenizer,
         learnable_property="object",  # [object, style]
-        size=512,
+        size=256,
         repeats=100,
         interpolation="bicubic",
         flip_p=0.5,
@@ -635,6 +635,7 @@ class TextualInversionDataset(Dataset):
         self.placeholder_token = placeholder_token
         self.center_crop = center_crop
         self.flip_p = flip_p
+        self.transform = transform
 
         self.image_paths = [os.path.join(self.data_root, file_path) for file_path in os.listdir(self.data_root)]
 
@@ -657,12 +658,6 @@ class TextualInversionDataset(Dataset):
             self.templates = imagenet_templates_small #mvip_templates
         else:
             self.templates = imagenet_templates_small
-        
-        if transform == None:
-            self.transform = None
-            self.flip_transform = transforms.RandomHorizontalFlip(p=self.flip_p)
-        else:
-            self.transform = transform
 
     def __len__(self):
         return self._length
@@ -703,13 +698,20 @@ class TextualInversionDataset(Dataset):
             image = Image.fromarray(img)
             image = image.resize((self.size, self.size), resample=self.interpolation)
 
-            image = self.flip_transform(image)
+            flip_transform = transforms.RandomHorizontalFlip(p=self.flip_p)
+            image = flip_transform(image)
+
             image = np.array(image).astype(np.uint8)
             image = (image / 127.5 - 1.0).astype(np.float32)
 
             example["pixel_values"] = torch.from_numpy(image).permute(2, 0, 1)
         else:
-            example["pixel_values"] = self.transform(image)
+            image = self.transform(image)
+            
+            image = np.array(image).astype(np.uint8)
+            image = (image / 127.5 - 1.0).astype(np.float32)
+
+            example["pixel_values"] = torch.from_numpy(image).permute(2, 0, 1)
         
         return example
 
@@ -1166,7 +1168,8 @@ if __name__ == "__main__":
         
         train_dataset = DATASETS[
             args.dataset](split="train", seed=seed, 
-                          examples_per_class=examples_per_class)
+                          examples_per_class=examples_per_class,
+                          image_size=(args.resolution, args.resolution))
 
         for idx in range(len(train_dataset)):
 
@@ -1200,11 +1203,11 @@ if __name__ == "__main__":
         # Otherwise, use "<{class_name}>"
         if args.dataset == "mvip":
             class_index = class_names.index(class_name)
-            args.placeholder_token = f"<car_part_{class_index}>"
+            args.placeholder_token = f"<{args.initializer_token}_{class_index}>"
         else:
             args.placeholder_token = f"<{formatted_name}>"
 
-        train_transform = train_dataset.transform["train"]
+        train_transform = train_dataset.transform
 
         args.train_data_dir = os.path.join(
             output_dir, "extracted", dirname)
