@@ -164,8 +164,5 @@ cython_debug/
 # DA-Fusion & SupCon outputs
 output/
 
-# DA-Fusion specific
+# Logging with weights & biases
 wandb/
-
-# SupCon specific
-save/
