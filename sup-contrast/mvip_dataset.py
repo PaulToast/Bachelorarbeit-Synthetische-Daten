@@ -15,7 +15,7 @@ class MVIPDataset(Dataset):
         split="train",
         aug_dir_positive=None,
         aug_dir_negative=None,
-        size=224,
+        size=512,
         transform=None,
         repeats=1, #da-fusion: 100
     ):

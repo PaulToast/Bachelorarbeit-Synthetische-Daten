@@ -1,17 +1,13 @@
+[Zurück](https://github.com/PaulToast/Bachelorarbeit-Synthetische-Daten)
 # SupContrast: Supervised Contrastive Learning
-<p align="center">
-  <img src="figures/teaser.png" width="700">
-</p>
 
-This repo covers an reference implementation for the following papers in PyTorch, using CIFAR as an illustrative example:  
-(1) Supervised Contrastive Learning. [Paper](https://arxiv.org/abs/2004.11362)  
-(2) A Simple Framework for Contrastive Learning of Visual Representations. [Paper](https://arxiv.org/abs/2002.05709)  
+[Original Repository](https://github.com/HobbitLong/SupContrast) | [Paper](https://arxiv.org/abs/2004.11362)
 
-## Update
+![](figures/teaser.png)
 
-${\color{red}Note}$: if you found it not easy to parse the supcon loss implementation in this repo, we got you. Supcon loss essentially is just a cross-entropy loss (see eq 4 in the [StableRep](https://arxiv.org/pdf/2306.00984.pdf) paper). So we got a cleaner and simpler implementation [here](https://github.com/google-research/syn-rep-learn/blob/main/StableRep/models/losses.py#L49). Hope it helps.
+### Abstract
 
-ImageNet model (small batch size with the trick of the momentum encoder) is released [here](https://www.dropbox.com/s/l4a69ececk4spdt/supcon.pth?dl=0). It achieved > 79% top-1 accuracy.
+Contrastive learning applied to self-supervised representation learning has seen a resurgence in recent years, leading to state of the art performance in the unsupervised training of deep image models. Modern batch contrastive approaches subsume or significantly outperform traditional contrastive losses such as triplet, max-margin and the N-pairs loss. In this work, we extend the self-supervised batch contrastive approach to the fully-supervised setting, allowing us to effectively leverage label information. Clusters of points belonging to the same class are pulled together in embedding space, while simultaneously pushing apart clusters of samples from different classes. We analyze two possible versions of the supervised contrastive (SupCon) loss, identifying the best-performing formulation of the loss. On ResNet-200, we achieve top-1 accuracy of 81.4% on the ImageNet dataset, which is 0.8% above the best number reported for this architecture. We show consistent outperformance over cross-entropy on other datasets and two ResNet variants. The loss shows benefits for robustness to natural corruptions and is more stable to hyperparameter settings such as optimizers and data augmentations. Our loss function is simple to implement, and reference TensorFlow code is released at [this https URL](https://github.com/google-research/google-research/tree/master/supcon).
 
 ## Loss Function
 The loss function [`SupConLoss`](https://github.com/HobbitLong/SupContrast/blob/master/losses.py#L11) in `losses.py` takes `features` (L2 normalized) and `labels` as input, and return the loss. If `labels` is `None` or not passed to the it, it degenerates to SimCLR.
@@ -36,28 +32,6 @@ loss = criterion(features, labels)
 loss = criterion(features)
 ...
 ```
-
-## Comparison
-Results on CIFAR-10:
-|          |Arch | Setting | Loss | Accuracy(%) |
-|----------|:----:|:---:|:---:|:---:|
-|  SupCrossEntropy | ResNet50 | Supervised   | Cross Entropy |  95.0  |
-|  SupContrast     | ResNet50 | Supervised   | Contrastive   |  96.0  | 
-|  SimCLR          | ResNet50 | Unsupervised | Contrastive   |  93.6  |
-
-Results on CIFAR-100:
-|          |Arch | Setting | Loss | Accuracy(%) |
-|----------|:----:|:---:|:---:|:---:|
-|  SupCrossEntropy | ResNet50 | Supervised   | Cross Entropy |  75.3 |
-|  SupContrast     | ResNet50 | Supervised   | Contrastive   |  76.5 | 
-|  SimCLR          | ResNet50 | Unsupervised | Contrastive   |  70.7 |
-
-Results on ImageNet (Stay tuned):
-|          |Arch | Setting | Loss | Accuracy(%) |
-|----------|:----:|:---:|:---:|:---:|
-|  SupCrossEntropy | ResNet50 | Supervised   | Cross Entropy |  -  |
-|  SupContrast     | ResNet50 | Supervised   | Contrastive   |  79.1 (MoCo trick)  | 
-|  SimCLR          | ResNet50 | Unsupervised | Contrastive   |  -  |
 
 ## Running
 You might use `CUDA_VISIBLE_DEVICES` to set proper number of GPUs, and/or switch to CIFAR100 by `--dataset cifar100`.  
@@ -134,13 +108,3 @@ and
 <p align="center">
   <img src="figures/SimCLR.jpg" width="800">
 </p>
-
-## Reference
-```
-@Article{khosla2020supervised,
-    title   = {Supervised Contrastive Learning},
-    author  = {Prannay Khosla and Piotr Teterwak and Chen Wang and Aaron Sarna and Yonglong Tian and Phillip Isola and Aaron Maschinot and Ce Liu and Dilip Krishnan},
-    journal = {arXiv preprint arXiv:2004.11362},
-    year    = {2020},
-}
-```

@@ -26,8 +26,9 @@ class SupConLoss(nn.Module):
         Args:
             features: hidden vector of shape [bsz, n_views, ...].
             labels: ground truth of shape [bsz].
-            mask: contrastive mask of shape [bsz, bsz], mask_{i,j}=1 if sample j
-                has the same class as sample i. Can be asymmetric.
+            mask: contrastive mask of shape [bsz, bsz],
+                mask_{i,j}=1 if sample j has the same class as sample i.
+                Can be asymmetric.
         Returns:
             A loss scalar.
         """
@@ -37,11 +38,14 @@ class SupConLoss(nn.Module):
 
         if len(features.shape) < 3:
             raise ValueError('`features` needs to be [bsz, n_views, ...],'
-                             'at least 3 dimensions are required')
+                             ' at least 3 dimensions are required')
         if len(features.shape) > 3:
             features = features.view(features.shape[0], features.shape[1], -1)
 
         batch_size = features.shape[0]
+
+        # Get/calculate contrastive mask for this batch (shape=[bsz, bsz])
+        # mask_{i,j}=1 if sample j has the same class as sample i, otherwise 0
         if labels is not None and mask is not None:
             raise ValueError('Cannot define both `labels` and `mask`')
         elif labels is None and mask is None:
@@ -54,10 +58,11 @@ class SupConLoss(nn.Module):
         else:
             mask = mask.float().to(device)
         
-        # Make sure OOD samples are never considered as positive pairs
+        # Make sure there are no positive pairs with any OOD samples (label=-1)
         ood_mask = (labels == -1).float().to(device)
         mask *= (1 - ood_mask @ ood_mask.T)
 
+        # Determine whether all views or just one of each sample will be used as the anchor
         contrast_count = features.shape[1]
         contrast_feature = torch.cat(torch.unbind(features, dim=1), dim=0)
         if self.contrast_mode == 'one':
@@ -69,7 +74,7 @@ class SupConLoss(nn.Module):
         else:
             raise ValueError('Unknown mode: {}'.format(self.contrast_mode))
 
-        # Compute logits
+        # Compute logits, representing the similarity scores between anchor & contrast features
         anchor_dot_contrast = torch.div(
             torch.matmul(anchor_feature, contrast_feature.T),
             self.temperature)
@@ -77,7 +82,7 @@ class SupConLoss(nn.Module):
         logits_max, _ = torch.max(anchor_dot_contrast, dim=1, keepdim=True)
         logits = anchor_dot_contrast - logits_max.detach()
 
-        # Tile mask
+        # Repeat mask to match the dimensions of the logits
         mask = mask.repeat(anchor_count, contrast_count)
         # Mask-out self-contrast cases
         logits_mask = torch.scatter(
@@ -88,7 +93,7 @@ class SupConLoss(nn.Module):
         )
         mask = mask * logits_mask
 
-        # Compute log_prob
+        # Compute the log-probabilities
         exp_logits = torch.exp(logits) * logits_mask
         log_prob = logits - torch.log(exp_logits.sum(1, keepdim=True))
 
@@ -102,7 +107,7 @@ class SupConLoss(nn.Module):
         mask_pos_pairs = torch.where(mask_pos_pairs < 1e-6, 1, mask_pos_pairs)
         mean_log_prob_pos = (mask * log_prob).sum(1) / mask_pos_pairs
 
-        # Loss calculation
+        # Final loss calculation, averaging the negative log-probabilities over all positive pairs
         loss = - (self.temperature / self.base_temperature) * mean_log_prob_pos
         loss = loss.view(anchor_count, batch_size).mean()
 

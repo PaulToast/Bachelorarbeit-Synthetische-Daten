@@ -203,13 +203,14 @@ def save_progress(text_encoder, placeholder_token_ids, accelerator, args, save_p
 def parse_args():
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
     
-    # Output
     parser.add_argument(
         "--experiment_name",
         type=str,
         default=None,
         help="Will default to {dataset}-{datetime} ('YYYYmmddHHMM')."
     )
+
+    # Output
     parser.add_argument(
         "--output_dir",
         type=str,
@@ -217,15 +218,15 @@ def parse_args():
         help="Will default to 'output/{experiment_name}/'",
     )
     parser.add_argument(
+        "--save_as_full_pipeline",
+        action="store_true",
+        help="Save the complete stable diffusion pipeline."
+    )
+    parser.add_argument(
         "--save_steps",
         type=int,
         default=500,
         help="Save learned_embeds.bin every X updates steps."
-    )
-    parser.add_argument(
-        "--save_as_full_pipeline",
-        action="store_true",
-        help="Save the complete stable diffusion pipeline."
     )
     parser.add_argument(
         "--checkpointing_steps",
@@ -263,7 +264,7 @@ def parse_args():
         ),
     )
 
-    # Repository
+    # Source control
     parser.add_argument(
         "--push_to_hub",
         action="store_true",
@@ -318,7 +319,7 @@ def parse_args():
         help="Pretrained tokenizer name or path, if not the same as model_name",
     )
 
-    # Training data
+    # Data
     parser.add_argument(
         "--dataset",
         type=str,
@@ -330,12 +331,6 @@ def parse_args():
         type=int,
         default=100,
         help="How many times to repeat the training data."
-    )
-    parser.add_argument(
-        "--learnable_property",
-        type=str,
-        default="object",
-        help="Choose between 'object' and 'style'"
     )
     parser.add_argument(
         "--examples_per_class",
@@ -361,7 +356,7 @@ def parse_args():
         help="Whether to (also) center crop images before resizing to resolution.",
     )
     
-    # Training parameters
+    # Training
     parser.add_argument(
         "--num_trials",
         type=int,
@@ -373,6 +368,12 @@ def parse_args():
         type=int,
         default=None,
         help="A seed for reproducible training."
+    )
+    parser.add_argument(
+        "--learnable_property",
+        type=str,
+        default="object",
+        help="Choose between 'object' and 'style'"
     )
     parser.add_argument(
         "--initializer_token",
@@ -496,7 +497,7 @@ def parse_args():
         help="erase text inversion concepts first",
     )
 
-    # Training validation
+    # Validation
     parser.add_argument(
         "--validation_prompt",
         type=str,

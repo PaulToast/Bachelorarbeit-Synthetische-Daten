@@ -50,7 +50,7 @@ def parse_args():
 
     parser.add_argument('--lr', type=float, default=0.002) #0.05
     parser.add_argument('--lr_warmup', action='store_true', help='Learning rate warm-up for large batch training.')
-    parser.add_argument('--lr_decay_epochs', type=str, default='700,800,900', help='When to decay lr, as string seperated by ","')
+    parser.add_argument('--lr_decay_epochs', type=str, default='700,800,900', help='When to decay lr, as string separated by comma')
     parser.add_argument('--lr_decay_rate', type=float, default=0.1)
     parser.add_argument('--lr_cosine', action='store_true', help='Using cosine annealing.')
 

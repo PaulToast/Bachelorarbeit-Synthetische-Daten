@@ -23,108 +23,97 @@ except ImportError:
     pass
 
 
-def parse_option():
-    parser = argparse.ArgumentParser('argument for training')
+def parse_args():
+    parser = argparse.ArgumentParser('Arguments for training')
 
-    parser.add_argument('--print_freq', type=int, default=10,
-                        help='print frequency')
-    parser.add_argument('--save_freq', type=int, default=50,
-                        help='save frequency')
-    parser.add_argument('--batch_size', type=int, default=256,
-                        help='batch_size')
-    parser.add_argument('--num_workers', type=int, default=16,
-                        help='num of workers to use')
-    parser.add_argument('--epochs', type=int, default=500,
-                        help='number of training epochs')
+    parser.add_argument('--experiment_name', type=str, default=None, help='Output directory name for experiment.')
+    parser.add_argument('--trial', type=str, default='0', help='id for recording multiple runs.')
 
-    # optimization
-    parser.add_argument('--learning_rate', type=float, default=0.2,
-                        help='learning rate')
-    parser.add_argument('--lr_decay_epochs', type=str, default='350,400,450',
-                        help='where to decay lr, can be a list')
-    parser.add_argument('--lr_decay_rate', type=float, default=0.1,
-                        help='decay rate for learning rate')
-    parser.add_argument('--weight_decay', type=float, default=1e-4,
-                        help='weight decay')
-    parser.add_argument('--momentum', type=float, default=0.9,
-                        help='momentum')
+    # Data
+    parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100'])
+    parser.add_argument('--data_dir', type=str, default=None)
 
-    # model dataset
+    # Training
     parser.add_argument('--model', type=str, default='resnet50')
-    parser.add_argument('--dataset', type=str, default='cifar10',
-                        choices=['cifar10', 'cifar100'], help='dataset')
 
-    # other setting
-    parser.add_argument('--cosine', action='store_true',
-                        help='using cosine annealing')
-    parser.add_argument('--syncBN', action='store_true',
-                        help='using synchronized batch normalization')
-    parser.add_argument('--warm', action='store_true',
-                        help='warm-up for large batch training')
-    parser.add_argument('--trial', type=str, default='0',
-                        help='id for recording multiple runs')
+    parser.add_argument('--epochs', type=int, default=500, help='number of training epochs')
+    parser.add_argument('--batch_size', type=int, default=256, help='batch_size')
+    parser.add_argument('--num_workers', type=int, default=16, help='num of workers to use')
 
-    opt = parser.parse_args()
+    parser.add_argument('--lr', type=float, default=0.2) #0.2
+    parser.add_argument('--lr_warmup', action='store_true', help='Learning rate warm-up for large batch training')
+    parser.add_argument('--lr_decay_epochs', type=str, default='350,400,450', help='When to decay lr, as string separated by comma')
+    parser.add_argument('--lr_decay_rate', type=float, default=0.1, help='Decay rate for learning rate')
+    parser.add_argument('--cosine', action='store_true', help='Using cosine annealing')
+    parser.add_argument('--weight_decay', type=float, default=1e-4)
+    parser.add_argument('--momentum', type=float, default=0.9)
+    
+    #parser.add_argument('--syncBN', action='store_true', help='using synchronized batch normalization')
+
+    # Output & logging
+    parser.add_argument('--save_freq', type=int, default=50, help='Save model every N epochs.')
+    parser.add_argument('--print_freq', type=int, default=10, help='Print training progress every N steps.')
+    
+    args = parser.parse_args()
 
     # set the path according to the environment
-    opt.data_folder = './datasets/'
-    opt.model_path = './save/SupCon/{}_models'.format(opt.dataset)
-    opt.tb_path = './save/SupCon/{}_tensorboard'.format(opt.dataset)
+    args.model_dir = f'./output/{args.experiment_name}/models'
+    args.logging_dir = f'./output/{args.experiment_name}/logs'
 
-    iterations = opt.lr_decay_epochs.split(',')
-    opt.lr_decay_epochs = list([])
+    iterations = args.lr_decay_epochs.split(',')
+    args.lr_decay_epochs = list([])
     for it in iterations:
-        opt.lr_decay_epochs.append(int(it))
+        args.lr_decay_epochs.append(int(it))
 
-    opt.model_name = 'SupCE_{}_{}_lr_{}_decay_{}_bsz_{}_trial_{}'.\
-        format(opt.dataset, opt.model, opt.learning_rate, opt.weight_decay,
-               opt.batch_size, opt.trial)
+    args.model_name = 'SupCE_{}_{}_lr_{}_decay_{}_bsz_{}_trial_{}'.\
+        format(args.dataset, args.model, args.lr, args.weight_decay,
+               args.batch_size, args.trial)
 
-    if opt.cosine:
-        opt.model_name = '{}_cosine'.format(opt.model_name)
+    if args.cosine:
+        args.model_name = '{}_cosine'.format(args.model_name)
 
     # warm-up for large-batch training,
-    if opt.batch_size > 256:
-        opt.warm = True
-    if opt.warm:
-        opt.model_name = '{}_warm'.format(opt.model_name)
-        opt.warmup_from = 0.01
-        opt.warm_epochs = 10
-        if opt.cosine:
-            eta_min = opt.learning_rate * (opt.lr_decay_rate ** 3)
-            opt.warmup_to = eta_min + (opt.learning_rate - eta_min) * (
-                    1 + math.cos(math.pi * opt.warm_epochs / opt.epochs)) / 2
+    if args.batch_size > 256:
+        args.warm = True
+    if args.lr_warmup:
+        args.model_name = '{}_warmup'.format(args.model_name)
+        args.lr_warmup_from = 0.01
+        args.lr_warmup_epochs = 10
+        if args.lr_cosine:
+            eta_min = args.lr * (args.lr_decay_rate ** 3)
+            args.lr_warmup_to = eta_min + (args.lr - eta_min) * (
+                    1 + math.cos(math.pi * args.lr_warmup_epochs / args.epochs)) / 2
         else:
-            opt.warmup_to = opt.learning_rate
+            args.lr_warmup_to = args.lr
 
-    opt.tb_folder = os.path.join(opt.tb_path, opt.model_name)
-    if not os.path.isdir(opt.tb_folder):
-        os.makedirs(opt.tb_folder)
+    args.logging_dir = os.path.join(args.logging_dir, args.model_name)
+    if not os.path.isdir(args.logging_dir):
+        os.makedirs(args.logging_dir)
 
-    opt.save_folder = os.path.join(opt.model_path, opt.model_name)
-    if not os.path.isdir(opt.save_folder):
-        os.makedirs(opt.save_folder)
+    args.save_dir = os.path.join(args.model_dir, args.model_name)
+    if not os.path.isdir(args.save_dir):
+        os.makedirs(args.save_dir)
 
-    if opt.dataset == 'cifar10':
-        opt.n_cls = 10
-    elif opt.dataset == 'cifar100':
-        opt.n_cls = 100
+    if args.dataset == 'cifar10':
+        args.n_cls = 10
+    elif args.dataset == 'cifar100':
+        args.n_cls = 100
     else:
-        raise ValueError('dataset not supported: {}'.format(opt.dataset))
+        raise ValueError('dataset not supported: {}'.format(args.dataset))
 
-    return opt
+    return args
 
 
-def set_loader(opt):
+def set_loader(args):
     # construct data loader
-    if opt.dataset == 'cifar10':
+    if args.dataset == 'cifar10':
         mean = (0.4914, 0.4822, 0.4465)
         std = (0.2023, 0.1994, 0.2010)
-    elif opt.dataset == 'cifar100':
+    elif args.dataset == 'cifar100':
         mean = (0.5071, 0.4867, 0.4408)
         std = (0.2675, 0.2565, 0.2761)
     else:
-        raise ValueError('dataset not supported: {}'.format(opt.dataset))
+        raise ValueError('dataset not supported: {}'.format(args.dataset))
     normalize = transforms.Normalize(mean=mean, std=std)
 
     train_transform = transforms.Compose([
@@ -139,27 +128,27 @@ def set_loader(opt):
         normalize,
     ])
 
-    if opt.dataset == 'cifar10':
-        train_dataset = datasets.CIFAR10(root=opt.data_folder,
+    if args.dataset == 'cifar10':
+        train_dataset = datasets.CIFAR10(root=args.data_dir,
                                          transform=train_transform,
                                          download=True)
-        val_dataset = datasets.CIFAR10(root=opt.data_folder,
+        val_dataset = datasets.CIFAR10(root=args.data_dir,
                                        train=False,
                                        transform=val_transform)
-    elif opt.dataset == 'cifar100':
-        train_dataset = datasets.CIFAR100(root=opt.data_folder,
+    elif args.dataset == 'cifar100':
+        train_dataset = datasets.CIFAR100(root=args.data_dir,
                                           transform=train_transform,
                                           download=True)
-        val_dataset = datasets.CIFAR100(root=opt.data_folder,
+        val_dataset = datasets.CIFAR100(root=args.data_dir,
                                         train=False,
                                         transform=val_transform)
     else:
-        raise ValueError(opt.dataset)
+        raise ValueError(args.dataset)
 
     train_sampler = None
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=opt.batch_size, shuffle=(train_sampler is None),
-        num_workers=opt.num_workers, pin_memory=True, sampler=train_sampler)
+        train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
+        num_workers=args.num_workers, pin_memory=True, sampler=train_sampler)
     val_loader = torch.utils.data.DataLoader(
         val_dataset, batch_size=256, shuffle=False,
         num_workers=8, pin_memory=True)
@@ -167,12 +156,12 @@ def set_loader(opt):
     return train_loader, val_loader
 
 
-def set_model(opt):
-    model = SupCEResNet(name=opt.model, num_classes=opt.n_cls)
+def set_model(args):
+    model = SupCEResNet(name=args.model, num_classes=args.n_cls)
     criterion = torch.nn.CrossEntropyLoss()
 
     # enable synchronized Batch Normalization
-    if opt.syncBN:
+    if args.syncBN:
         model = apex.parallel.convert_syncbn_model(model)
 
     if torch.cuda.is_available():
@@ -185,7 +174,7 @@ def set_model(opt):
     return model, criterion
 
 
-def train(train_loader, model, criterion, optimizer, epoch, opt):
+def train(train_loader, model, criterion, optimizer, epoch, args):
     """one epoch training"""
     model.train()
 
@@ -203,7 +192,7 @@ def train(train_loader, model, criterion, optimizer, epoch, opt):
         bsz = labels.shape[0]
 
         # warm-up learning rate
-        warmup_learning_rate(opt, epoch, idx, len(train_loader), optimizer)
+        warmup_learning_rate(args, epoch, idx, len(train_loader), optimizer)
 
         # compute loss
         output = model(images)
@@ -224,7 +213,7 @@ def train(train_loader, model, criterion, optimizer, epoch, opt):
         end = time.time()
 
         # print info
-        if (idx + 1) % opt.print_freq == 0:
+        if (idx + 1) % args.print_freq == 0:
             print('Train: [{0}][{1}/{2}]\t'
                   'BT {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                   'DT {data_time.val:.3f} ({data_time.avg:.3f})\t'
@@ -237,7 +226,7 @@ def train(train_loader, model, criterion, optimizer, epoch, opt):
     return losses.avg, top1.avg
 
 
-def validate(val_loader, model, criterion, opt):
+def validate(val_loader, model, criterion, args):
     """validation"""
     model.eval()
 
@@ -265,7 +254,7 @@ def validate(val_loader, model, criterion, opt):
             batch_time.update(time.time() - end)
             end = time.time()
 
-            if idx % opt.print_freq == 0:
+            if idx % args.print_freq == 0:
                 print('Test: [{0}/{1}]\t'
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
@@ -279,27 +268,27 @@ def validate(val_loader, model, criterion, opt):
 
 def main():
     best_acc = 0
-    opt = parse_option()
+    args = parse_args()
 
     # build data loader
-    train_loader, val_loader = set_loader(opt)
+    train_loader, val_loader = set_loader(args)
 
     # build model and criterion
-    model, criterion = set_model(opt)
+    model, criterion = set_model(args)
 
     # build optimizer
-    optimizer = set_optimizer(opt, model)
+    optimizer = set_optimizer(args, model)
 
     # tensorboard
-    logger = tb_logger.Logger(logdir=opt.tb_folder, flush_secs=2)
+    logger = tb_logger.Logger(logdir=args.logging_dir, flush_secs=2)
 
     # training routine
-    for epoch in range(1, opt.epochs + 1):
-        adjust_learning_rate(opt, optimizer, epoch)
+    for epoch in range(1, args.epochs + 1):
+        adjust_learning_rate(args, optimizer, epoch)
 
         # train for one epoch
         time1 = time.time()
-        loss, train_acc = train(train_loader, model, criterion, optimizer, epoch, opt)
+        loss, train_acc = train(train_loader, model, criterion, optimizer, epoch, args)
         time2 = time.time()
         print('epoch {}, total time {:.2f}'.format(epoch, time2 - time1))
 
@@ -309,22 +298,22 @@ def main():
         logger.log_value('learning_rate', optimizer.param_groups[0]['lr'], epoch)
 
         # evaluation
-        loss, val_acc = validate(val_loader, model, criterion, opt)
+        loss, val_acc = validate(val_loader, model, criterion, args)
         logger.log_value('val_loss', loss, epoch)
         logger.log_value('val_acc', val_acc, epoch)
 
         if val_acc > best_acc:
             best_acc = val_acc
 
-        if epoch % opt.save_freq == 0:
+        if epoch % args.save_freq == 0:
             save_file = os.path.join(
-                opt.save_folder, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
-            save_model(model, optimizer, opt, epoch, save_file)
+                args.save_dir, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
+            save_model(model, optimizer, args, epoch, save_file)
 
     # save the last model
     save_file = os.path.join(
-        opt.save_folder, 'last.pth')
-    save_model(model, optimizer, opt, opt.epochs, save_file)
+        args.save_dir, 'last.pth')
+    save_model(model, optimizer, args, args.epochs, save_file)
 
     print('best accuracy: {:.2f}'.format(best_acc))
 
