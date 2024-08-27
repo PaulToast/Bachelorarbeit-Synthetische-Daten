@@ -140,7 +140,7 @@ These are textual inversion adaption weights for {base_model}. You can find some
 
 def log_validation(text_encoder, tokenizer, unet, vae, args, accelerator, weight_dtype, epoch):
     
-    # Replace "*" in prompt with placeholder_token (class name)
+    # Replace "*" in prompt with placeholder_token
     formatted_prompt = args.validation_prompt.replace("*", args.placeholder_token)
     
     logger.info(
@@ -203,12 +203,7 @@ def save_progress(text_encoder, placeholder_token_ids, accelerator, args, save_p
 def parse_args():
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
     
-    parser.add_argument(
-        "--dataset",
-        type=str,
-        default="mvip",
-        choices=DATASETS.keys(),
-    )
+    # Output
     parser.add_argument(
         "--experiment_name",
         type=str,
@@ -219,14 +214,81 @@ def parse_args():
         "--output_dir",
         type=str,
         default=None,
-        help="Will default to '_experiments/{experiment_name}/'",
+        help="Will default to 'output/{experiment_name}/'",
     )
+    parser.add_argument(
+        "--save_steps",
+        type=int,
+        default=500,
+        help="Save learned_embeds.bin every X updates steps."
+    )
+    parser.add_argument(
+        "--save_as_full_pipeline",
+        action="store_true",
+        help="Save the complete stable diffusion pipeline."
+    )
+    parser.add_argument(
+        "--checkpointing_steps",
+        type=int,
+        default=500,
+        help=(
+            "Save a checkpoint of the training state every X updates. These checkpoints are only suitable for resuming"
+            " training using `--resume_from_checkpoint`."
+        ),
+    )
+    parser.add_argument(
+        "--checkpoints_total_limit",
+        type=int,
+        default=None,
+        help=("Max number of checkpoints to store."),
+    )
+
+    # Logging
+    parser.add_argument(
+        "--report_to",
+        type=str,
+        default="wandb",
+        help=(
+            'The integration to report the results and logs to. Supported platforms are `"tensorboard"`'
+            ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
+        ),
+    )
+    parser.add_argument(
+        "--logging_dir",
+        type=str,
+        default="logs",
+        help=(
+            "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
+            " 'output/{experiment_name}/logs/'."
+        ),
+    )
+
+    # Repository
+    parser.add_argument(
+        "--push_to_hub",
+        action="store_true",
+        help="Whether or not to push the model to the Hub.",
+    )
+    parser.add_argument(
+        "--hub_token",
+        type=str,
+        default=None,
+        help="The token to use to push to the Model Hub.",
+    )
+    parser.add_argument(
+        "--hub_model_id",
+        type=str,
+        default=None,
+        help="The name of the repository to keep in sync with the local `output_dir`.",
+    )
+
+    # Models
     parser.add_argument(
         "--pretrained_model_name_or_path",
         type=str,
         default="CompVis/stable-diffusion-v1-4",
         required=True,
-        help="Path to pretrained model or model identifier from huggingface.co/models.",
+        help="Path to pretrained model, or model identifier from huggingface.co/models.",
     )
     parser.add_argument(
         "--revision",
@@ -236,110 +298,122 @@ def parse_args():
         help="Revision of pretrained model identifier from huggingface.co/models.",
     )
     parser.add_argument(
-        "--tokenizer_name",
-        type=str,
-        default=None,
-        help="Pretrained tokenizer name or path if not the same as model_name",
-    )
-    parser.add_argument(
-        "--initializer_token",
+        "--resume_from_checkpoint",
         type=str,
         default=None,
         help=(
-            "A token to use as initializer word.",
-            " Will default to class name."
-        )
-    )
-    parser.add_argument(
-        "--placeholder_token",
-        type=str,
-        default=None,
-        help=(
-            "A token to use as a placeholder for the concept.",
-            " Will default to class name."
-        )
-    )
-    parser.add_argument(
-        "--crop_object",
-        type=bool,
-        default=False,
-    )
-    parser.add_argument(
-        "--seed",
-        type=int,
-        default=None,
-        help="A seed for reproducible training.",
-    )
-    parser.add_argument(
-        "--resolution",
-        type=int,
-        default=512,
-        help=(
-            "The resolution for input images, all the images in the train/validation "
-            "this dataset will be resized to resolution"
+            "Whether training should be resumed from a previous checkpoint. Use a path saved by"
+            ' `--checkpointing_steps`, or `"latest"` to automatically select the last available checkpoint.'
         ),
     )
     parser.add_argument(
-        "--num_trials",
-        type=int,
-        default=8,
-    )
-    parser.add_argument(
-        "--examples_per_class",
-        nargs='+',
-        type=int,
-        default=[1, 2, 4, 8, 16],
-    )
-    parser.add_argument(
-        "--train_batch_size",
-        type=int,
-        default=16,
-        help="Batch size (per device) for the training dataloader.",
-    )
-    parser.add_argument(
-        "--num_train_epochs",
-        type=int,
-        default=100,
-    )
-    parser.add_argument(
-        "--max_train_steps",
-        type=int,
-        default=5000,
-        help="Total number of training steps to perform.  If provided, overrides num_train_epochs.",
-    )
-    parser.add_argument(
-        "--save_steps",
-        type=int,
-        default=500,
-        help="Save learned_embeds.bin every X updates steps.",
-    )
-    parser.add_argument(
-        "--save_as_full_pipeline",
-        action="store_true",
-        help="Save the complete stable diffusion pipeline.",
-    )
-    parser.add_argument(
-        "--num_vectors",
-        type=int,
-        default=1,
-        help="How many textual inversion vectors shall be used to learn the concept.",
-    )
-    parser.add_argument(
-        "--learnable_property",
+        "--unet_ckpt",
         type=str,
-        default="object",
-        help="Choose between 'object' and 'style'",
+        default=None,
+    )
+    parser.add_argument(
+        "--tokenizer_name",
+        type=str,
+        default=None,
+        help="Pretrained tokenizer name or path, if not the same as model_name",
+    )
+
+    # Training data
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default="mvip",
+        choices=DATASETS.keys()
     )
     parser.add_argument(
         "--repeats",
         type=int,
         default=100,
-        help="How many times to repeat the training data.",
+        help="How many times to repeat the training data."
+    )
+    parser.add_argument(
+        "--learnable_property",
+        type=str,
+        default="object",
+        help="Choose between 'object' and 'style'"
+    )
+    parser.add_argument(
+        "--examples_per_class",
+        nargs='+',
+        type=int,
+        default=[1, 2, 4, 8, 16]
+    )
+    parser.add_argument(
+        "--resolution",
+        type=int,
+        default=512,
+        help="All train/validation images will be resized to resolution this dataset",
+    )
+    parser.add_argument(
+        "--crop_object",
+        type=bool,
+        default=False,
+        help="Crop object from image before resizing to resolution (for MVIP dataset).",
     )
     parser.add_argument(
         "--center_crop",
         action="store_true",
-        help="Whether to center crop images before resizing to resolution.",
+        help="Whether to (also) center crop images before resizing to resolution.",
+    )
+    
+    # Training parameters
+    parser.add_argument(
+        "--num_trials",
+        type=int,
+        default=8,
+        help="Number of times to repeat the training.",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="A seed for reproducible training."
+    )
+    parser.add_argument(
+        "--initializer_token",
+        type=str,
+        default=None,
+        help="A token to use as initializer word. Will default to class name.",
+    )
+    parser.add_argument(
+        "--placeholder_token",
+        type=str,
+        default=None,
+        help="A token to use as a placeholder for the concept. Will default to class name.",
+    )
+    parser.add_argument(
+        "--num_vectors",
+        type=int,
+        default=1,
+        help="How many textual inversion vectors shall be used to learn the concept."
+    )
+    parser.add_argument(
+        "--train_batch_size",
+        type=int,
+        default=16,
+        help="Batch size (per device) for the training dataloader."
+    )
+    parser.add_argument(
+        "--num_workers",
+        type=int,
+        default=0,
+        help="Number of subprocesses to use for data loading. 0 = data will be loaded in the main process."
+    )
+    parser.add_argument(
+        "--num_train_epochs",
+        type=int,
+        default=100
+    )
+    parser.add_argument(
+        "--max_train_steps",
+        type=int,
+        default=5000,
+        help="Total number of training steps to perform. If provided, overrides num_train_epochs."
     )
     parser.add_argument(
         "--gradient_accumulation_steps",
@@ -382,35 +456,10 @@ def parse_args():
         default=1,
         help="Number of hard resets of the lr in cosine_with_restarts scheduler.",
     )
-    parser.add_argument(
-        "--dataloader_num_workers",
-        type=int,
-        default=0,
-        help=(
-            "Number of subprocesses to use for data loading. 0 means that the data will be loaded in the main process."
-        ),
-    )
     parser.add_argument("--adam_beta1", type=float, default=0.9, help="The beta1 parameter for the Adam optimizer.")
     parser.add_argument("--adam_beta2", type=float, default=0.999, help="The beta2 parameter for the Adam optimizer.")
     parser.add_argument("--adam_weight_decay", type=float, default=1e-2, help="Weight decay to use.")
     parser.add_argument("--adam_epsilon", type=float, default=1e-08, help="Epsilon value for the Adam optimizer")
-    parser.add_argument(
-        "--push_to_hub",
-        action="store_true",
-        help="Whether or not to push the model to the Hub.",
-    )
-    parser.add_argument(
-        "--hub_token",
-        type=str,
-        default=None,
-        help="The token to use to push to the Model Hub.",
-    )
-    parser.add_argument(
-        "--hub_model_id",
-        type=str,
-        default=None,
-        help="The name of the repository to keep in sync with the local `output_dir`.",
-    )
     parser.add_argument(
         "--mixed_precision",
         type=str,
@@ -430,6 +479,24 @@ def parse_args():
             " https://pytorch.org/docs/stable/notes/cuda.html#tensorfloat-32-tf32-on-ampere-devices"
         ),
     )
+    parser.add_argument(
+        "--local_rank",
+        type=int,
+        default=-1,
+        help="For distributed training: local_rank",
+    )
+    parser.add_argument(
+        "--enable_xformers_memory_efficient_attention",
+        action="store_true",
+        help="Whether or not to use xformers.",
+    )
+    parser.add_argument(
+        "--erase_concepts",
+        action="store_true", 
+        help="erase text inversion concepts first",
+    )
+
+    # Training validation
     parser.add_argument(
         "--validation_prompt",
         type=str,
@@ -462,76 +529,13 @@ def parse_args():
             " and logging the images."
         ),
     )
-    parser.add_argument(
-        "--local_rank",
-        type=int,
-        default=-1,
-        help="For distributed training: local_rank",
-    )
-    parser.add_argument(
-        "--checkpointing_steps",
-        type=int,
-        default=500,
-        help=(
-            "Save a checkpoint of the training state every X updates. These checkpoints are only suitable for resuming"
-            " training using `--resume_from_checkpoint`."
-        ),
-    )
-    parser.add_argument(
-        "--checkpoints_total_limit",
-        type=int,
-        default=None,
-        help=("Max number of checkpoints to store."),
-    )
-    parser.add_argument(
-        "--resume_from_checkpoint",
-        type=str,
-        default=None,
-        help=(
-            "Whether training should be resumed from a previous checkpoint. Use a path saved by"
-            ' `--checkpointing_steps`, or `"latest"` to automatically select the last available checkpoint.'
-        ),
-    )
-    parser.add_argument(
-        "--enable_xformers_memory_efficient_attention",
-        action="store_true",
-        help="Whether or not to use xformers.",
-    )
-    parser.add_argument(
-        "--unet_ckpt",
-        type=str,
-        default=None,
-    )
-    parser.add_argument(
-        "--erase_concepts",
-        action="store_true", 
-        help="erase text inversion concepts first",
-    )
-    parser.add_argument(
-        "--logging_dir",
-        type=str,
-        default="logs",
-        help=(
-            "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
-            " '_experiments/{experiment_name}/logs/'."
-        ),
-    )
-    parser.add_argument(
-        "--report_to",
-        type=str,
-        default="wandb",
-        help=(
-            'The integration to report the results and logs to. Supported platforms are `"tensorboard"`'
-            ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
-        ),
-    )
 
     args = parser.parse_args()
 
     if args.experiment_name == None:
         args.experiment_name = f"{args.dataset}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
     if args.output_dir == None:
-        args.output_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_experiments', args.experiment_name))
+        args.output_dir = os.path.abspath(os.path.join("output", args.experiment_name))
 
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
@@ -882,7 +886,7 @@ def main(args):
         transform=args.transform,
     )
     train_dataloader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=args.train_batch_size, shuffle=True, num_workers=args.dataloader_num_workers
+        train_dataset, batch_size=args.train_batch_size, shuffle=True, num_workers=args.num_workers
     )
     if args.validation_epochs is not None:
         warnings.warn(

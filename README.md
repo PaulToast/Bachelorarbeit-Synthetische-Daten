@@ -1,16 +1,33 @@
 # Contrastive Learning mit Stable Diffusion-basierter Datenaugmentation: Verbesserung der Bildklassifikation durch synthetische Daten
 
-Diese Implementierung ist Teil einer Bachelorarbeit im Studiengang Medientechnik an der Hochschule für Angewandte Wissenschaften Hamburg.
+Teil einer Bachelorarbeit im Studiengang Medientechnik an der Hochschule für Angewandte Wissenschaften Hamburg.
 
-Ziel ist die Implmentierung einer [Supervised Contrastive Learning](https://arxiv.org/abs/2004.11362)-Methode, welche [DA-Fusion](https://arxiv.org/abs/2302.07944) zur synthetischen Datenaugmentation verwendet. Mit der Kombination soll für eine Bildklassifikations-Aufgabe eine verbesserte Generalisierungsfähigkeit und Robustheit gegenüber Out-of-Distribution-Daten erzielt werden.
+Mit dieser Methode wird ein [Supervised Contrastive Learning](https://arxiv.org/abs/2004.11362)-Klassifikator trainiert, der automatisch mit [DA-Fusion](https://arxiv.org/abs/2302.07944) synthetische Augmentationen generiert und ins Training integriert.
 
 ## Hintergrund
 
 ...
 
-## Installation & Verwendung
+## Installation
 
-Die Implementierung besteht aus zwei separaten Anwendung, die hintereinander ausgeführt werden - einmal die synthetische Datenaugmentation mit DA-Fusion, und anschließend das Training und die Bildklassifikation mit Supervised Contrastive Learning. Die Installation, das Setup, und die Verwendung mit eigenen Datensätzen werden in den jeweiligen READMEs separat beschrieben:
+...
+
+## Anwendung
+
+- Datensatz-Klasse (datasets.py)
+
+da-fusion
+    output
+        experiment_name
+            extracted
+            fine-tuned
+            fine-tuned-merged
+sup-contrast
+    output
+        experiment_name
+            models
+
+...
 
 - [DA-Fusion](da-fusion/README.md)
 - [Supervised Contrastive Learning](sup-contrast/README.md)

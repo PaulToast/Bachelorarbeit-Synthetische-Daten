@@ -70,10 +70,10 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument(
-        "--out",
+        "--output_dir",
         type=str,
         default=None,
-        help="Will default to '_experiments/{experiment_name}/aug/'."
+        help="Will default to 'output/{experiment_name}/aug/'."
     )
     parser.add_argument(
         "--model_path",
@@ -84,22 +84,21 @@ if __name__ == "__main__":
         "--embed_path",
         type=str,
         default=None,
-        help="Will default to '_experiments/{experiment_name}/fine-tuned-merged/{dataset}-0-16.pt'"
+        help="Will default to 'output/{experiment_name}/fine-tuned-merged/{dataset}-0-16.pt'"
     )
     
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--examples_per_class", type=int, default=1)
+    parser.add_argument("--crop_object", type=bool, default=False, help="Before augmenting, create a crop using the object mask bounding box.")
     parser.add_argument("--num_synthetic", type=int, default=10)
 
-    parser.add_argument("--prompt", type=str, default="a photo of a {name}")
-    
-    parser.add_argument("--aug", nargs="+", type=str, default=["real-guidance"], 
-                        choices=["real-guidance", "textual-inversion"])
+    parser.add_argument("--aug", nargs="+", type=str, default=["real-guidance"], choices=["real-guidance", "textual-inversion"])
 
+    parser.add_argument("--prompt", type=str, default="a photo of a {name}")
     parser.add_argument("--guidance_scale", nargs="+", type=float, default=[7.5])
     parser.add_argument("--strength", nargs="+", type=float, default=[0.5])
 
-    parser.add_argument("--crop_object", type=bool, default=False, help="Before augmenting, create a crop using the object mask bounding box.")
+    
     parser.add_argument("--mask", nargs="+", type=int, default=[0], choices=[0, 1], help="Only augment masked regions.")
     parser.add_argument("--inverted", nargs="+", type=int, default=[0], choices=[0, 1], help="Invert mask.")
     
@@ -114,15 +113,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.embed_path == None:
-        args.embed_path = os.path.abspath(
-            os.path.join(os.path.dirname( __file__ ), '..', '_experiments', f"{args.experiment_name}/fine-tuned-merged/seed=0_ex=16.pt")
-        )
-    if args.out == None:
-        args.out = os.path.abspath(
-            os.path.join(os.path.dirname( __file__ ), '..', '_experiments', f"{args.experiment_name}", 'aug')
-        )
+        args.embed_path = os.path.abspath(f"output/{args.experiment_name}/fine-tuned-merged/seed=0_ex=16.pt")
+    if args.output_dir == None:
+        args.output_dir = os.path.abspath(f"output/{args.experiment_name}/aug/")
 
-    os.makedirs(args.out, exist_ok=True)
+    os.makedirs(args.output_dir, exist_ok=True)
 
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
@@ -181,6 +176,6 @@ if __name__ == "__main__":
         name = metadata['name'].replace(" ", "_")
 
         pil_image, image = image, os.path.join(
-            args.out, f"{name}-{idx}-{num}.png")
+            args.output_dir, f"{name}-{idx}-{num}.png")
 
         pil_image.save(image)

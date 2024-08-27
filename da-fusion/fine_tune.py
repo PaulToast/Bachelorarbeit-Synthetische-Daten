@@ -90,12 +90,7 @@ def save_progress(text_encoder, placeholder_token_id, accelerator, args, save_pa
 def parse_args():
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
 
-    parser.add_argument(
-        "--dataset",
-        type=str,
-        default="mvip", 
-        choices=DATASETS.keys(),
-    )
+    # Output
     parser.add_argument(
         "--experiment_name",
         type=str,
@@ -108,6 +103,68 @@ def parse_args():
         default=None,
         help="Will default to '_experiments/{experiment_name}/'",
     )
+    parser.add_argument(
+        "--save_steps",
+        type=int,
+        default=500,
+        help="Save learned_embeds.bin every X updates steps.",
+    )
+    parser.add_argument(
+        "--only_save_embeds",
+        action="store_true",
+        default=False,
+        help="Save only the embeddings for the new concept.",
+    )
+    parser.add_argument(
+        "--checkpointing_steps",
+        type=int,
+        default=500,
+        help=(
+            "Save a checkpoint of the training state every X updates. These checkpoints are only suitable for resuming"
+            " training using `--resume_from_checkpoint`."
+        ),
+    )
+
+    # Logging
+    parser.add_argument(
+        "--logging_dir",
+        type=str,
+        default="logs",
+        help=(
+            "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
+            " '_experiments/{experiment_name}/logs/'."
+        ),
+    )
+    parser.add_argument(
+        "--report_to",
+        type=str,
+        default="tensorboard",
+        help=(
+            'The integration to report the results and logs to. Supported platforms are `"tensorboard"`'
+            ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
+        ),
+    )
+
+    # Repository
+    parser.add_argument(
+        "--push_to_hub",
+        action="store_true",
+        help="Whether or not to push the model to the Hub.",
+    )
+    parser.add_argument(
+        "--hub_token",
+        type=str,
+        default=None,
+        help="The token to use to push to the Model Hub.",
+    )
+    parser.add_argument(
+        "--hub_model_id",
+        type=str,
+        default=None,
+        help="The name of the repository to keep in sync with the local `output_dir`.",
+    )
+
+    # Models
     parser.add_argument(
         "--pretrained_model_name_or_path",
         type=str,
@@ -123,17 +180,50 @@ def parse_args():
         help="Revision of pretrained model identifier from huggingface.co/models.",
     )
     parser.add_argument(
-        "--mask",
-        nargs="+",
-        type=int,
-        default=[0],
-        choices=[0, 1]
+        "--resume_from_checkpoint",
+        type=str,
+        default=None,
+        help=(
+            "Whether training should be resumed from a previous checkpoint. Use a path saved by"
+            ' `--checkpointing_steps`, or `"latest"` to automatically select the last available checkpoint.'
+        ),
     )
     parser.add_argument(
-        "--seed",
-        type=int,
+        "--unet-ckpt",
+        type=str,
         default=None,
-        help="A seed for reproducible training.",
+    )
+    parser.add_argument(
+        "--tokenizer_name",
+        type=str,
+        default=None,
+        help="Pretrained tokenizer name or path if not the same as model_name",
+    )
+
+    # Training data
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default="mvip", 
+        choices=DATASETS.keys(),
+    )
+    parser.add_argument(
+        "--repeats",
+        type=int,
+        default=100,
+        help="How many times to repeat the training data.",
+    )
+    parser.add_argument(
+        "--learnable_property",
+        type=str,
+        default="object",
+        help="Choose between 'object' and 'style'",
+    )
+    parser.add_argument(
+        "--examples_per_class",
+        nargs='+',
+        type=int,
+        default=[1, 2, 4, 8, 16],
     )
     parser.add_argument(
         "--resolution",
@@ -145,44 +235,29 @@ def parse_args():
         ),
     )
     parser.add_argument(
-        "--num_trials", type=int, default=8,
-    )
-    parser.add_argument(
-        "--examples_per_class", nargs='+', type=int, default=[1, 2, 4, 8, 16],
-    )
-    parser.add_argument(
-        "--save_steps",
+        "--mask",
+        nargs="+",
         type=int,
-        default=500,
-        help="Save learned_embeds.bin every X updates steps.",
-    )
-    parser.add_argument(
-        "--only_save_embeds",
-        action="store_true",
-        default=False,
-        help="Save only the embeddings for the new concept.",
-    )
-    parser.add_argument(
-        "--tokenizer_name",
-        type=str,
-        default=None,
-        help="Pretrained tokenizer name or path if not the same as model_name",
-    )
-    parser.add_argument(
-        "--learnable_property",
-        type=str, default="object",
-        help="Choose between 'object' and 'style'",
-    )
-    parser.add_argument(
-        "--repeats",
-        type=int,
-        default=100,
-        help="How many times to repeat the training data.",
+        default=[0],
+        choices=[0, 1]
     )
     parser.add_argument(
         "--center_crop",
         action="store_true",
         help="Whether to center crop images before resizing to resolution",
+    )
+    
+    # Training parameters
+    parser.add_argument(
+        "--num_trials",
+        type=int,
+        default=8,
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="A seed for reproducible training.",
     )
     parser.add_argument(
         "--train_batch_size",
@@ -239,30 +314,10 @@ def parse_args():
         default=500,
         help="Number of steps for the warmup in the lr scheduler.",
     )
-    parser.add_argument(
-        "--adam_beta1", type=float, default=0.9, help="The beta1 parameter for the Adam optimizer.",
-    )
-    parser.add_argument(
-        "--adam_beta2", type=float, default=0.999, help="The beta2 parameter for the Adam optimizer.",
-    )
-    parser.add_argument(
-        "--adam_weight_decay", type=float, default=1e-2, help="Weight decay to use.",
-    )
-    parser.add_argument(
-        "--adam_epsilon", type=float, default=1e-08, help="Epsilon value for the Adam optimizer",
-    )
-    parser.add_argument(
-        "--push_to_hub", action="store_true", help="Whether or not to push the model to the Hub.",
-    )
-    parser.add_argument(
-        "--hub_token", type=str, default=None, help="The token to use to push to the Model Hub.",
-    )
-    parser.add_argument(
-        "--hub_model_id",
-        type=str,
-        default=None,
-        help="The name of the repository to keep in sync with the local `output_dir`.",
-    )
+    parser.add_argument("--adam_beta1", type=float, default=0.9, help="The beta1 parameter for the Adam optimizer.")
+    parser.add_argument("--adam_beta2", type=float, default=0.999, help="The beta2 parameter for the Adam optimizer.")
+    parser.add_argument("--adam_weight_decay", type=float, default=1e-2, help="Weight decay to use.")
+    parser.add_argument("--adam_epsilon", type=float, default=1e-08, help="Epsilon value for the Adam optimizer")
     parser.add_argument(
         "--mixed_precision",
         type=str,
@@ -286,51 +341,12 @@ def parse_args():
         "--local_rank", type=int, default=-1, help="For distributed training: local_rank",
     )
     parser.add_argument(
-        "--checkpointing_steps",
-        type=int,
-        default=500,
-        help=(
-            "Save a checkpoint of the training state every X updates. These checkpoints are only suitable for resuming"
-            " training using `--resume_from_checkpoint`."
-        ),
-    )
-    parser.add_argument(
-        "--resume_from_checkpoint",
-        type=str,
-        default=None,
-        help=(
-            "Whether training should be resumed from a previous checkpoint. Use a path saved by"
-            ' `--checkpointing_steps`, or `"latest"` to automatically select the last available checkpoint.'
-        ),
-    )
-    parser.add_argument(
         "--enable_xformers_memory_efficient_attention", action="store_true", help="Whether or not to use xformers.",
-    )
-    parser.add_argument(
-        "--unet-ckpt", type=str, default=None,
     )
     parser.add_argument(
         "--erase-concepts",
         action="store_true", 
         help="erase text inversion concepts first",
-    )
-    parser.add_argument(
-        "--logging_dir",
-        type=str,
-        default="logs",
-        help=(
-            "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
-            " '_experiments/{experiment_name}/logs/'."
-        ),
-    )
-    parser.add_argument(
-        "--report_to",
-        type=str,
-        default="tensorboard",
-        help=(
-            'The integration to report the results and logs to. Supported platforms are `"tensorboard"`'
-            ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
-        ),
     )
 
     args = parser.parse_args()
@@ -338,7 +354,7 @@ def parse_args():
     if args.experiment_name == None:
         args.experiment_name = f"{args.dataset}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
     if args.output_dir == None:
-        args.output_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '_experiments', args.experiment_name))
+        args.output_dir = os.path.abspath(os.path.join('output', args.experiment_name))
    
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
@@ -349,32 +365,36 @@ def parse_args():
 
 imagenet_templates_small = [
     "a photo of a {}",
-    "a rendering of a {}",
+    #"a rendering of a {}",
     "a cropped photo of the {}",
     "the photo of a {}",
     "a photo of a clean {}",
     "a photo of a dirty {}",
-    "a dark photo of the {}",
-    "a photo of my {}",
-    "a photo of the cool {}",
-    "a close-up photo of a {}",
-    "a bright photo of the {}",
+    "a photo of a used {}",
+    "a photo of a {} in used condition",
+    #"a dark photo of the {}",
+    #"a photo of my {}",
+    #"a photo of the cool {}",
+    #"a close-up photo of a {}",
+    #"a bright photo of the {}",
     "a cropped photo of a {}",
     "a photo of the {}",
-    "a good photo of the {}",
-    "a photo of one {}",
-    "a close-up photo of the {}",
-    "a rendition of the {}",
-    "a photo of the clean {}",
-    "a rendition of a {}",
-    "a photo of a nice {}",
-    "a good photo of a {}",
-    "a photo of the nice {}",
-    "a photo of the small {}",
-    "a photo of the weird {}",
-    "a photo of the large {}",
-    "a photo of a cool {}",
-    "a photo of a small {}",
+    #"a good photo of the {}",
+    #"a photo of one {}",
+    #"a close-up photo of the {}",
+    #"a rendition of the {}",
+    #"a photo of the clean {}",
+    #"a rendition of a {}",
+    #"a photo of a nice {}",
+    #"a good photo of a {}",
+    "a low quality photo of a {}",
+    "a blurry photo of a {}",
+    #"a photo of the nice {}",
+    #"a photo of the small {}",
+    #"a photo of the weird {}",
+    #"a photo of the large {}",
+    #"a photo of a cool {}",
+    #"a photo of a small {}",
 ]
 
 imagenet_style_templates_small = [
@@ -399,7 +419,7 @@ imagenet_style_templates_small = [
     "a large painting in the style of {}",
 ]
 
-# Defines how to handle and preprocess the chosen dataset for training.
+# This is the *extracted* dataset which is created temporarily for training
 # (loads images, applies transformations, and generates text prompts with placeholder token)
 class TextualInversionDataset(Dataset):
     def __init__(
@@ -511,7 +531,6 @@ def main(args):
         project_dir=logging_dir, # PREVIOUSLY: logging_dir=logging_dir
     )
 
-    # ???
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
 
