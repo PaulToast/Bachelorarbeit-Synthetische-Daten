@@ -14,9 +14,6 @@ conda create -n synt-contrast python=3.7 pytorch==1.12.1 torchvision==0.13.1 cud
 conda activate synt-contrast
 pip install diffusers["torch"] transformers pycocotools pandas matplotlib seaborn scipy
 pip install -e da-fusion
-```
-
-```bash
 pip install --upgrade huggingface_hub
 huggingface-cli login
 ```
