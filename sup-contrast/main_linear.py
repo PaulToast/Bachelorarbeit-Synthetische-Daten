@@ -48,8 +48,8 @@ def parse_args():
 
     parser.add_argument('--size', type=int, default=224, help='Size for RandomResizedCrop.') #32
 
-    parser.add_argument('--epochs', type=int, default=25) #100
-    parser.add_argument('--batch_size', type=int, default=256)
+    parser.add_argument('--epochs', type=int, default=50) #100
+    parser.add_argument('--batch_size', type=int, default=16) #256
     parser.add_argument('--num_workers', type=int, default=16)
 
     parser.add_argument('--lr', type=float, default=0.001) #0.1
@@ -62,7 +62,7 @@ def parse_args():
     parser.add_argument('--momentum', type=float, default=0.9)
 
     # Output & logging
-    parser.add_argument('--save_freq', type=int, default=50, help='Save model every N epochs.')
+    parser.add_argument('--save_freq', type=int, default=10, help='Save model every N epochs.') #50
     parser.add_argument('--print_freq', type=int, default=10, help='Print training progress every N steps.')
     
     args = parser.parse_args()
@@ -268,10 +268,10 @@ def validate(val_loader, ood_loader, model, classifier, criterion, args):
     classifier.eval()
 
     batch_time_acc = AverageMeter()
-    batch_time_ood = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
-    OOD_detection = AverageMeter()
+    ID_confidences = AverageMeter()
+    OOD_confidences = AverageMeter()
 
     with torch.no_grad():
         # Loss & accuracy validation
@@ -285,10 +285,25 @@ def validate(val_loader, ood_loader, model, classifier, criterion, args):
             output = classifier(model.encoder(images))
             loss = criterion(output, labels)
 
-            # Update metric
+            # Update metrics
             losses.update(loss.item(), bsz)
             acc1, acc5 = accuracy(output, labels, topk=(1, 5))
             top1.update(acc1[0], bsz)
+
+            # Log in-distribution confidence
+            ID_probabilities = F.softmax(output, dim=1)
+            ID_confidence = torch.max(ID_probabilities, dim=1).values.mean().item()
+            ID_confidences.update(ID_confidence, 1)
+
+            # Log out-of-distribution confidence
+            OOD_images = images[labels == -1]
+
+            if len(OOD_images) > 0:
+                OOD_output = classifier(model.encoder(OOD_images))
+                OOD_probabilities = F.softmax(OOD_output, dim=1)
+                OOD_confidence = torch.max(OOD_probabilities, dim=1).values.mean().item()
+
+                OOD_confidences.update(OOD_confidence, 1)
 
             # Measure elapsed time
             batch_time_acc.update(time.time() - end)
@@ -302,44 +317,10 @@ def validate(val_loader, ood_loader, model, classifier, criterion, args):
                       'Acc@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
                        idx, len(val_loader), batch_time=batch_time_acc,
                        loss=losses, top1=top1))
-        
-        # OOD detection validation
-        end = time.time()
-        for idx, (images, labels) in enumerate(ood_loader):
-            images = images.float().cuda()
-            labels = labels.cuda()
-
-            # Get only the OOD images from the batch (with label=-1)
-            OOD_images = images[labels == -1]
-
-            if len(OOD_images) > 0:
-                # Compute the classifier output only for the OOD images
-                OOD_output = classifier(model.encoder(OOD_images))
-                # Get the confidence scores for the highest probability classes
-                OOD_probabilities = F.softmax(OOD_output, dim=1)
-                OOD_confidence = torch.max(OOD_probabilities, dim=1).values.mean().item()
-                
-                # Calculate the proportion of OOD images with confidence below the threshold       
-                #OOD_below_threshold = sum(c < OOD_threshold for c in OOD_confidences) / len(OOD_confidences)
-
-                # Update metric
-                OOD_detection.update(1 - OOD_confidence, 1)
-            
-            # Measure elapsed time
-            batch_time_ood.update(time.time() - end)
-            end = time.time()
-            
-            # Print info
-            if idx % args.print_freq == 0:
-                print('OOD Detection Test: [{0}/{1}]\t'
-                      'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                      'OOD {ood.val:.3f} ({ood.avg:.3f})'.format(
-                       idx, len(ood_loader), batch_time=batch_time_ood,
-                       ood=OOD_detection))
 
     print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
 
-    return losses.avg, top1.avg, OOD_detection.avg
+    return losses.avg, top1.avg, ID_confidences.avg, OOD_confidences.avg
 
 
 def main():
@@ -386,15 +367,15 @@ def main():
         start_time = time.time()
 
         avg_train_loss, avg_train_acc = train(train_loader, model, classifier, criterion, optimizer, epoch, args)
-        avg_val_loss, avg_val_acc, avg_OOD_detection = validate(val_loader, ood_loader, model, classifier, criterion, args)
+        avg_val_loss, avg_val_acc, avg_ID_confidence, avg_OOD_confidence = validate(val_loader, ood_loader, model, classifier, criterion, args)
         
         end_time = time.time()
         
         if avg_val_acc > best_acc:
             best_acc = avg_val_acc
         
-        print('Epoch {}, total time {:.2f}, average train acc: {:.2f}, average val acc: {:.2f}, average OOD score: {:.2f}'.format(
-            epoch, end_time - start_time, avg_train_acc, avg_val_acc, avg_OOD_detection))
+        print('Epoch {}, total time {:.2f}, avg train acc: {:.2f}, avg val acc: {:.2f}, avg ID confidence: {:.2f}, avg OOD confidence: {:.2f}'.format(
+            epoch, end_time - start_time, avg_train_acc, avg_val_acc, avg_ID_confidence, avg_OOD_confidence))
         
         # Log average epoch metrics
         wandb.log({
@@ -402,7 +383,8 @@ def main():
             "avg_val_loss": avg_val_loss,
             "avg_train_acc": avg_train_acc,
             "avg_val_acc": avg_val_acc,
-            "avg_OOD_detection": avg_OOD_detection,
+            "avg_ID_confidence": avg_ID_confidence,
+            "avg_OOD_confidence": avg_OOD_confidence,
         })
 
         # Save model
