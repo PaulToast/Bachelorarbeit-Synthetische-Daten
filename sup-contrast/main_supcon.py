@@ -91,7 +91,7 @@ def parse_args():
         args.aug_dir_negative = None
 
     # Set-up output directories
-    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/supcon_models')
+    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/models')
     args.logging_dir = os.path.abspath(f'output/{args.experiment_name}/logs')
 
     # Set model name for output

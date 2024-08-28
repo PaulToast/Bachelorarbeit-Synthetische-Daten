@@ -60,7 +60,7 @@ def parse_args():
     args = parser.parse_args()
 
     # Set-up output directories
-    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/classifier_models')
+    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/models')
     args.logging_dir = os.path.abspath(f'output/{args.experiment_name}/logs')
 
     args.model_name = '{}_{}_lr_{}_decay_{}_bsz_{}'.\
