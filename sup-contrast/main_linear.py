@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import os
 import sys
 import argparse
 import time
@@ -12,7 +13,7 @@ import torch.nn.functional as F
 from main_ce import set_loader
 from util import AverageMeter
 from util import adjust_learning_rate, warmup_learning_rate, accuracy
-from util import set_optimizer
+from util import set_optimizer, save_model
 from networks.resnet_big import SupConResNet, LinearClassifier
 
 try:
@@ -58,23 +59,28 @@ def parse_args():
     
     args = parser.parse_args()
 
-    # Set learning rate decay epochs from string argument
+    # Set-up output directories
+    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/classifier_models')
+    args.logging_dir = os.path.abspath(f'output/{args.experiment_name}/logs')
+
+    args.model_name = '{}_{}_lr_{}_decay_{}_bsz_{}'.\
+        format(args.dataset, args.model, args.lr, args.weight_decay, args.batch_size)
+    
+    args.save_dir = os.path.join(args.save_dir, args.model_name)
+    if not os.path.isdir(args.save_dir):
+        os.makedirs(args.save_dir)
+
+    # Set-up learning rate
     iterations = args.lr_decay_epochs.split(',')
     args.lr_decay_epochs = list([])
     for it in iterations:
         args.lr_decay_epochs.append(int(it))
 
-    # Set model name for output
-    args.model_name = '{}_{}_lr_{}_decay_{}_bsz_{}'.\
-        format(args.dataset, args.model, args.lr, args.weight_decay,
-               args.batch_size)
-
     if args.lr_cosine:
         args.model_name = '{}_cosine'.format(args.model_name)
 
-    # Learning rate warm-up for large-batch training,
     if args.lr_warmup:
-        args.model_name = '{}_warm'.format(args.model_name)
+        args.model_name = '{}_warmup'.format(args.model_name)
         args.lr_warmup_from = 0.01
         args.lr_warm_epochs = 10
         if args.cosine:
@@ -84,10 +90,13 @@ def parse_args():
         else:
             args.lr_warmup_to = args.lr
 
+    # Set number of classes
     if args.dataset == 'cifar10':
-        args.n_cls = 10
+        args.num_classes = 10
     elif args.dataset == 'cifar100':
-        args.n_cls = 100
+        args.num_classes = 100
+    elif args.dataset == 'mvip':
+        args.num_classes = 20
     else:
         raise ValueError('dataset not supported: {}'.format(args.dataset))
 
@@ -98,7 +107,7 @@ def set_model(args):
     model = SupConResNet(name=args.model)
     criterion = torch.nn.CrossEntropyLoss()
 
-    classifier = LinearClassifier(name=args.model, num_classes=args.n_cls)
+    classifier = LinearClassifier(name=args.model, num_classes=args.num_classes)
 
     ckpt = torch.load(args.ckpt, map_location='cpu')
     state_dict = ckpt['model']
@@ -299,6 +308,15 @@ def main():
             "avg_train_acc": avg_train_acc,
             "avg_val_acc": avg_val_acc,
         })
+
+        # Save model
+        if epoch % args.save_freq == 0:
+            save_file = os.path.join(args.save_dir, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
+            save_model(model, optimizer, args, epoch, save_file)
+    
+    # Save the last model
+    save_file = os.path.join(args.save_dir, 'last.pth')
+    save_model(model, optimizer, args, args.epochs, save_file)
 
     print('Best accuracy: {:.2f}'.format(best_acc))
 

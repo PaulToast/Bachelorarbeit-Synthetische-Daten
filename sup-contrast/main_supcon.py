@@ -90,25 +90,32 @@ def parse_args():
         args.aug_dir_positive = None
         args.aug_dir_negative = None
 
-    # Set output directories
-    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/models')
+    # Set-up output directories
+    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/supcon_models')
     args.logging_dir = os.path.abspath(f'output/{args.experiment_name}/logs')
-
-    # Set learning rate decay epochs from string argument
-    iterations = args.lr_decay_epochs.split(',')
-    args.lr_decay_epochs = list([])
-    for it in iterations:
-        args.lr_decay_epochs.append(int(it))
 
     # Set model name for output
     args.model_name = '{}_{}_{}_trial={}_lr={}_decay={}_bs={}_temp={}'.\
         format(args.method, args.dataset, args.model, args.trial, args.lr,
                args.weight_decay, args.batch_size, args.temp)
+    
+    args.logging_dir = os.path.join(args.logging_dir, args.model_name)
+    if not os.path.isdir(args.logging_dir):
+        os.makedirs(args.logging_dir)
+
+    args.save_dir = os.path.join(args.save_dir, args.model_name)
+    if not os.path.isdir(args.save_dir):
+        os.makedirs(args.save_dir)
+
+    # Set-up learning rate
+    iterations = args.lr_decay_epochs.split(',')
+    args.lr_decay_epochs = list([])
+    for it in iterations:
+        args.lr_decay_epochs.append(int(it))
 
     if args.lr_cosine:
         args.model_name = '{}_cosine'.format(args.model_name)
 
-    # Learning rate warm-up for large-batch training
     if args.batch_size > 256:
         args.lr_warmup = True
     if args.lr_warmup:
@@ -121,14 +128,6 @@ def parse_args():
                     1 + math.cos(math.pi * args.lr_warm_epochs / args.epochs)) / 2
         else:
             args.lr_warmup_to = args.lr
-
-    args.logging_dir = os.path.join(args.logging_dir, args.model_name)
-    if not os.path.isdir(args.logging_dir):
-        os.makedirs(args.logging_dir)
-
-    args.save_dir = os.path.join(args.save_dir, args.model_name)
-    if not os.path.isdir(args.save_dir):
-        os.makedirs(args.save_dir)
 
     return args
 
@@ -362,9 +361,9 @@ def main():
             "avg_val_loss": avg_val_loss,
         })
 
+        # Save model
         if epoch % args.save_freq == 0:
-            save_file = os.path.join(
-                args.save_dir, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
+            save_file = os.path.join(args.save_dir, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
             save_model(model, optimizer, args, epoch, save_file)
 
     # Save the last model
