@@ -116,7 +116,7 @@ class MVIPDataset(Dataset):
         for class_name in class_names:
             root = os.path.join(self.data_root, class_name, split_dir[split])
 
-            if split == "train_data":
+            if split == "train":
                 for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
                     for orientation in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
                         for cam in [f for f in os.listdir(os.path.join(root, set, orientation)) if os.path.isdir(os.path.join(root, set, orientation, f))]:

@@ -26,6 +26,7 @@ def parse_args():
     parser = argparse.ArgumentParser('Arguments for training')
 
     parser.add_argument('--experiment_name', type=str, default=None, help='Output directory name for experiment.')
+    parser.add_argument('--group', type=str, default=None, help='Name for grouping runs with wandb.')
     parser.add_argument('--trial', type=str, default='0', help='id for recording multiple runs.')
 
     # Data
@@ -68,16 +69,17 @@ def parse_args():
 
     # Set aug directories
     if args.aug_method is not None:
-        assert args.aug_experiment is not None \
-            and args.aug_name_positive is not None \
-            and args.aug_name_negative is not None
+        assert args.aug_experiment is not None
 
         if args.aug_method == 'positive':
+            assert args.aug_name_positive is not None
             args.aug_dir_positive = os.path.abspath(os.path.join(
                 os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_positive}'
             ))
             args.aug_dir_negative = None
         elif args.aug_method == 'both':
+            assert args.aug_name_positive is not None \
+                and args.aug_name_negative is not None
             args.aug_dir_positive = os.path.abspath(os.path.join(
                 os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_positive}'
             ))
@@ -311,7 +313,7 @@ def main():
     train_loader = set_loader(args, "train")
     val_loader = set_loader(args, "val")
 
-    print("Dataloaders ready.")
+    print(f"Dataloaders ready. Train length: {train_loader.__len__()}, Validation length: {val_loader.__len__()}")
 
     # Build model and criterion
     model, criterion = set_model(args)
@@ -323,6 +325,7 @@ def main():
     run = wandb.init(
         project=args.experiment_name,
         config={
+            #"group" : args.group,
             "dataset" : args.dataset,
             "model_name": args.model_name,
             "image_size" : args.size,
