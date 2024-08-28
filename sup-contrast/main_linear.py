@@ -163,7 +163,16 @@ def set_loader(args, split="train"):
                                     transform=transform,
                                     download=True)
     elif args.dataset == "mvip":
+        # Prepare dataset with correct DA-Fusion augmentations
+        if split == "ood":
+            aug_mode = "negative_only"
+        elif split == "train":
+            aug_mode = args.aug_method
+        else:
+            aug_mode = None
+
         dataset = MVIPDataset(split=split,
+                              aug_mode=aug_mode,
                               aug_dir_positive=args.aug_dir_positive,
                               aug_dir_negative=args.aug_dir_negative,
                               size=args.size,
@@ -264,17 +273,19 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, args):
     return losses.avg, top1.avg
 
 
-def validate(val_loader, model, classifier, criterion, args):
+def validate(val_loader, ood_loader, model, classifier, criterion, args):
     """One epoch validation"""
     model.eval()
     classifier.eval()
 
-    batch_time = AverageMeter()
+    batch_time_acc = AverageMeter()
+    batch_time_ood = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
     OOD_detection = AverageMeter()
 
     with torch.no_grad():
+        # Loss & accuracy validation
         end = time.time()
         for idx, (images, labels) in enumerate(val_loader):
             images = images.float().cuda()
@@ -290,11 +301,31 @@ def validate(val_loader, model, classifier, criterion, args):
             acc1, acc5 = accuracy(output, labels, topk=(1, 5))
             top1.update(acc1[0], bsz)
 
+            # Measure elapsed time
+            batch_time_acc.update(time.time() - end)
+            end = time.time()
+
+            # Print info
+            if idx % args.print_freq == 0:
+                print('Generalization Test: [{0}/{1}]\t'
+                      'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                      'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                      'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
+                      'OOD {ood.val:.3f} ({ood.avg:.3f})'.format(
+                       idx, len(val_loader), batch_time=batch_time_acc,
+                       loss=losses, top1=top1, ood=OOD_detection))
+        
+        # OOD detection validation
+        end = time.time()
+        for idx, (images, labels) in enumerate(ood_loader):
+            images = images.float().cuda()
+            labels = labels.cuda()
+
             # Get only the OOD images from the batch (with label=-1)
             OOD_images = images[labels == -1]
 
             if len(OOD_images) > 0:
-                # Compute the output only for the OOD images
+                # Compute the classifier output only for the OOD images
                 OOD_output = classifier(model.encoder(OOD_images))
                 # Get the confidence scores for the highest probability classes
                 OOD_probabilities = F.softmax(OOD_output, dim=1)
@@ -305,22 +336,21 @@ def validate(val_loader, model, classifier, criterion, args):
 
                 # Update metric
                 OOD_detection.update(1 - OOD_confidence, 1)
-
+            
             # Measure elapsed time
-            batch_time.update(time.time() - end)
+            batch_time_ood.update(time.time() - end)
             end = time.time()
-
+            
             # Print info
             if idx % args.print_freq == 0:
-                print('Test: [{0}/{1}]\t'
+                print('OOD Detection Test: [{0}/{1}]\t'
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                      'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                      'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
                       'OOD {ood.val:.3f} ({ood.avg:.3f})'.format(
-                       idx, len(val_loader), batch_time=batch_time,
-                       loss=losses, top1=top1, ood=OOD_detection))
+                       idx, len(ood_loader), batch_time=batch_time_ood,
+                       ood=OOD_detection))
 
     print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
+
     return losses.avg, top1.avg, OOD_detection.avg
 
 
@@ -332,6 +362,7 @@ def main():
 
     train_loader = set_loader(args, "train")
     val_loader = set_loader(args, "val")
+    ood_loader = set_loader(args, "ood")
 
     print("Dataloaders ready.")
 
@@ -367,7 +398,7 @@ def main():
         start_time = time.time()
 
         avg_train_loss, avg_train_acc = train(train_loader, model, classifier, criterion, optimizer, epoch, args)
-        avg_val_loss, avg_val_acc, avg_OOD_detection = validate(val_loader, model, classifier, criterion, args)
+        avg_val_loss, avg_val_acc, avg_OOD_detection = validate(val_loader, ood_loader, model, classifier, criterion, args)
         
         end_time = time.time()
         

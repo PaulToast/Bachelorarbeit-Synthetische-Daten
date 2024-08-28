@@ -13,6 +13,7 @@ class MVIPDataset(Dataset):
     def __init__(
         self,
         split="train",
+        aug_mode=None, # None, "positive", "both", "negative_only"
         aug_dir_positive=None,
         aug_dir_negative=None,
         size=512,
@@ -20,6 +21,8 @@ class MVIPDataset(Dataset):
         repeats=1, #da-fusion: 100
     ):
         self.data_root = '/mnt/HDD/MVIP/sets'
+
+        self.aug_mode = aug_mode
         self.aug_dir_positive = aug_dir_positive
         self.aug_dir_negative = aug_dir_negative
 
@@ -46,20 +49,33 @@ class MVIPDataset(Dataset):
         # Collect all real images
         self.all_images, self.all_masks, self.all_labels = self.parse_dataset(self.class_names, self.split)
 
-        # Collect all augmentations
-        if self.split == "train":
-            if self.aug_dir_positive is not None:
-                self.all_augs_positive, self.all_augs_labels_positive = self.parse_augs(self.class_names, self.aug_dir_positive)
-                for i in range(len(self.all_augs_positive)):
-                    self.all_images.append(self.all_augs_positive[i])
-                    self.all_masks.append(None)
-                    self.all_labels.append(self.all_augs_labels_positive[i])
-            if self.aug_dir_negative is not None:
-                self.all_augs_negative, self.all_augs_labels_negative = self.parse_augs(self.class_names, self.aug_dir_negative)
-                for i in range(len(self.all_augs_negative)):
-                    self.all_images.append(self.all_augs_negative[i])
-                    self.all_masks.append(None)
-                    self.all_labels.append(-1) # -1 as OOD-label
+        # Collect all augmentations & OOD images
+        if self.aug_mode == "positive":
+            self.all_augs_positive, self.all_augs_positive_labels = self.parse_augs(self.class_names, self.aug_dir_positive)
+            for i in range(len(self.all_augs_positive)):
+                self.all_images.append(self.all_augs_positive[i])
+                self.all_masks.append(None)
+                self.all_labels.append(self.all_augs_positive_labels[i])
+        elif self.aug_mode == "both":
+            self.all_augs_positive, self.all_augs_positive_labels = self.parse_augs(self.class_names, self.aug_dir_positive)
+            self.all_augs_negative, self.all_augs_negative_labels = self.parse_augs(self.class_names, self.aug_dir_negative)
+            for i in range(len(self.all_augs_positive)):
+                self.all_images.append(self.all_augs_positive[i])
+                self.all_masks.append(None)
+                self.all_labels.append(self.all_augs_positive_labels[i])
+            for i in range(len(self.all_augs_negative)):
+                self.all_images.append(self.all_augs_negative[i])
+                self.all_masks.append(None)
+                self.all_labels.append(-1) # -1 as OOD-label
+        elif self.aug_mode == "negative_only":
+            self.all_augs_negative, self.all_augs_negative_labels = self.parse_augs(self.class_names, self.aug_dir_negative)
+            self.all_images = []
+            self.all_masks = []
+            self.all_labels = []
+            for i in range(len(self.all_augs_negative)):
+                self.all_images.append(self.all_augs_negative[i])
+                self.all_masks.append(None)
+                self.all_labels.append(-1) # -1 as OOD-label
 
         self._length = len(self.all_images)
 

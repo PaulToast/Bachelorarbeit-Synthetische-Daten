@@ -26,7 +26,6 @@ def parse_args():
     parser = argparse.ArgumentParser('Arguments for training')
 
     parser.add_argument('--experiment_name', type=str, default=None, help='Output directory name for experiment.')
-    parser.add_argument('--group', type=str, default=None, help='Name for grouping runs with wandb.')
     parser.add_argument('--trial', type=str, default='0', help='id for recording multiple runs.')
 
     # Data
@@ -133,6 +132,7 @@ def parse_args():
 
 
 def set_loader(args, split="train"):
+    # Set-up transforms
     mean_std = {
         'cifar10': ([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
         'cifar100': ([0.5071, 0.4867, 0.4408], [0.2675, 0.2565, 0.2761]),
@@ -156,6 +156,7 @@ def set_loader(args, split="train"):
             transforms.Normalize(mean=mean_std[args.dataset][0], std=mean_std[args.dataset][1]),
         ])
 
+    # Set-up dataset
     if args.dataset == "cifar10":
         dataset = datasets.CIFAR10(root=args.data_dir,
                                    train=(split == "train"),
@@ -167,12 +168,22 @@ def set_loader(args, split="train"):
                                     transform=TwoCropTransform(transform),
                                     download=True)
     elif args.dataset == "mvip":
+        # Prepare dataset with correct DA-Fusion augmentations
+        if split == "ood":
+            aug_mode = "negative_only"
+        elif split == "train":
+            aug_mode = args.aug_method
+        else:
+            aug_mode = None
+        
         dataset = MVIPDataset(split=split,
+                              aug_mode=aug_mode,
                               aug_dir_positive=args.aug_dir_positive,
                               aug_dir_negative=args.aug_dir_negative,
                               size=args.size,
                               transform=TwoCropTransform(transform))
 
+    # Build dataloader
     sampler = None
     dataloader = torch.utils.data.DataLoader(
         dataset, batch_size=args.batch_size, shuffle=(sampler is None),
@@ -207,9 +218,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
     data_time = AverageMeter()
     losses = AverageMeter()
 
-    start_time = time.time()
+    end = time.time()
     for idx, (images, labels) in enumerate(train_loader):
-        data_time.update(time.time() - start_time)
+        data_time.update(time.time() - end)
 
         images = torch.cat([images[0], images[1]], dim=0)
         if torch.cuda.is_available():
@@ -243,7 +254,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
         optimizer.step()
 
         # Measure elapsed time
-        batch_time.update(time.time() - start_time)
+        batch_time.update(time.time() - end)
+        end = time.time()
 
         # Print info
         if (idx + 1) % args.print_freq == 0:
@@ -265,7 +277,7 @@ def validate(val_loader, model, criterion, args):
     losses = AverageMeter()
 
     with torch.no_grad():
-        start_time = time.time()
+        end = time.time()
         for idx, (images, labels) in enumerate(val_loader):
             images = torch.cat([images[0], images[1]], dim=0)
             if torch.cuda.is_available():
@@ -288,7 +300,8 @@ def validate(val_loader, model, criterion, args):
             losses.update(loss.item(), bsz)
 
             # Measure elapsed time
-            batch_time.update(time.time() - start_time)
+            batch_time.update(time.time() - end)
+            end = time.time()
 
             # Print info
             if (idx + 1) % args.print_freq == 0:
@@ -323,7 +336,6 @@ def main():
     run = wandb.init(
         project=args.experiment_name,
         config={
-            #"group" : args.group,
             "dataset" : args.dataset,
             "model_name": args.model_name,
             "image_size" : args.size,
