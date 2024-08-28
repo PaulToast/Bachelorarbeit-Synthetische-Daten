@@ -262,7 +262,7 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, args):
     return losses.avg, top1.avg
 
 
-def validate(val_loader, ood_loader, model, classifier, criterion, args):
+def validate(val_loader, model, classifier, criterion, args):
     """One epoch validation"""
     model.eval()
     classifier.eval()
@@ -331,7 +331,6 @@ def main():
 
     train_loader = set_loader(args, split="train", aug_mode=args.aug_method)
     val_loader = set_loader(args, split="val", aug_mode=None)
-    ood_loader = set_loader(args, split="val", aug_mode="negative_only")
 
     print("Dataloaders ready.")
 
@@ -367,7 +366,7 @@ def main():
         start_time = time.time()
 
         avg_train_loss, avg_train_acc = train(train_loader, model, classifier, criterion, optimizer, epoch, args)
-        avg_val_loss, avg_val_acc, avg_ID_confidence, avg_OOD_confidence = validate(val_loader, ood_loader, model, classifier, criterion, args)
+        avg_val_loss, avg_val_acc, avg_ID_confidence, avg_OOD_confidence = validate(val_loader, model, classifier, criterion, args)
         
         end_time = time.time()
         
