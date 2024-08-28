@@ -9,8 +9,9 @@ import math
 import torch
 import torch.backends.cudnn as cudnn
 import torch.nn.functional as F
+from torchvision import transforms, datasets
 
-from main_ce import set_loader
+from mvip_dataset import MVIPDataset
 from util import AverageMeter
 from util import adjust_learning_rate, warmup_learning_rate, accuracy
 from util import set_optimizer, save_model
@@ -36,9 +37,17 @@ def parse_args():
     parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100', 'mvip'])
     parser.add_argument('--data_dir', type=str, default=None)
 
+    # Linear classification stage does not support OOD augmentations
+    parser.add_argument('--aug_method', type=str, default=None, choices=[None, 'positive'])
+    parser.add_argument('--aug_experiment', type=str, default=None)
+    parser.add_argument('--aug_name_positive', type=str, default=None)
+    #parser.add_argument('--aug_name_negative', type=str, default=None)
+
     # Training
     parser.add_argument('--model', type=str, default='resnet50')
     parser.add_argument('--ckpt', type=str, default='', help='Path to pre-trained model.')
+
+    parser.add_argument('--size', type=int, default=512, help='Size for RandomResizedCrop.')
 
     parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--batch_size', type=int, default=256)
@@ -90,17 +99,75 @@ def parse_args():
         else:
             args.lr_warmup_to = args.lr
 
-    # Set number of classes
+    # Prepare datasets
     if args.dataset == 'cifar10':
         args.num_classes = 10
     elif args.dataset == 'cifar100':
         args.num_classes = 100
     elif args.dataset == 'mvip':
         args.num_classes = 20
+
+        if args.aug_method == 'positive':
+            args.aug_dir_positive = os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_positive}'
+            ))
+            args.aug_dir_negative = None
+        else:
+            args.aug_dir_positive = None
+            args.aug_dir_negative = None
     else:
         raise ValueError('dataset not supported: {}'.format(args.dataset))
 
     return args
+
+
+def set_loader(args, split="train"):
+    mean_std = {
+        'cifar10': ([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+        'cifar100': ([0.5071, 0.4867, 0.4408], [0.2675, 0.2565, 0.2761]),
+        'mvip': ([0.4213, 0.4252, 0.4242], [0.1955, 0.1923, 0.1912]),
+    }
+
+    if split == "train":
+        transform = transforms.Compose([
+            transforms.RandomResizedCrop(size=args.size, scale=(0.8, 1.)), # ratio=(1.0, 1.0))
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomRotation(degrees=15.0),
+            transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
+            transforms.RandomGrayscale(p=0.2),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=mean_std[args.dataset][0], std=mean_std[args.dataset][1]),
+        ])
+    else:
+        transform = transforms.Compose([
+            transforms.Resize(size=args.size),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=mean_std[args.dataset][0], std=mean_std[args.dataset][1]),
+        ])
+
+    if args.dataset == "cifar10":
+        dataset = datasets.CIFAR10(root=args.data_dir,
+                                   train=(split == "train"),
+                                   transform=transform,
+                                   download=True)
+    elif args.dataset == "cifar100":
+        dataset = datasets.CIFAR100(root=args.data_dir,
+                                    train=(split == "train"),
+                                    transform=transform,
+                                    download=True)
+    elif args.dataset == "mvip":
+        dataset = MVIPDataset(split=split,
+                              aug_dir_positive=args.aug_dir_positive,
+                              aug_dir_negative=args.aug_dir_negative,
+                              size=args.size,
+                              transform=transform)
+
+    sampler = None
+    dataloader = torch.utils.data.DataLoader(
+        dataset, batch_size=args.batch_size, shuffle=(sampler is None),
+        num_workers=args.num_workers, pin_memory=True, sampler=sampler)
+
+    return dataloader
 
 
 def set_model(args):
@@ -255,7 +322,8 @@ def main():
     # Build dataloaders
     print("Preparing dataloaders...")
 
-    train_loader, val_loader = set_loader(args)
+    train_loader = set_loader(args, "train")
+    val_loader = set_loader(args, "val")
 
     print("Dataloaders ready.")
 

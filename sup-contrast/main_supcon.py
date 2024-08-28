@@ -10,12 +10,12 @@ import torch
 import torch.backends.cudnn as cudnn
 from torchvision import transforms, datasets
 
+from mvip_dataset import MVIPDataset
 from util import TwoCropTransform, AverageMeter
 from util import adjust_learning_rate, warmup_learning_rate, accuracy
 from util import set_optimizer, save_model
 from networks.resnet_big import SupConResNet
 from losses import SupConLoss
-from mvip_dataset import MVIPDataset
 
 from diffusers.utils import check_min_version, is_wandb_available
 if is_wandb_available():
@@ -132,7 +132,6 @@ def parse_args():
     return args
 
 
-# Construct data loader
 def set_loader(args, split="train"):
     mean_std = {
         'cifar10': ([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),

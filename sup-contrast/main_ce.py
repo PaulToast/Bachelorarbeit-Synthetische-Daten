@@ -11,6 +11,7 @@ import torch
 import torch.backends.cudnn as cudnn
 from torchvision import transforms, datasets
 
+from main_linear import set_loader
 from util import AverageMeter
 from util import adjust_learning_rate, warmup_learning_rate, accuracy
 from util import set_optimizer, save_model
@@ -22,6 +23,9 @@ try:
 except ImportError:
     pass
 
+from diffusers.utils import check_min_version, is_wandb_available
+if is_wandb_available():
+    import wandb
 
 def parse_args():
     parser = argparse.ArgumentParser('Arguments for training')
@@ -102,58 +106,6 @@ def parse_args():
         raise ValueError('dataset not supported: {}'.format(args.dataset))
 
     return args
-
-
-def set_loader(args):
-    # construct data loader
-    if args.dataset == 'cifar10':
-        mean = (0.4914, 0.4822, 0.4465)
-        std = (0.2023, 0.1994, 0.2010)
-    elif args.dataset == 'cifar100':
-        mean = (0.5071, 0.4867, 0.4408)
-        std = (0.2675, 0.2565, 0.2761)
-    else:
-        raise ValueError('dataset not supported: {}'.format(args.dataset))
-    normalize = transforms.Normalize(mean=mean, std=std)
-
-    train_transform = transforms.Compose([
-        transforms.RandomResizedCrop(size=32, scale=(0.2, 1.)),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        normalize,
-    ])
-
-    val_transform = transforms.Compose([
-        transforms.ToTensor(),
-        normalize,
-    ])
-
-    if args.dataset == 'cifar10':
-        train_dataset = datasets.CIFAR10(root=args.data_dir,
-                                         transform=train_transform,
-                                         download=True)
-        val_dataset = datasets.CIFAR10(root=args.data_dir,
-                                       train=False,
-                                       transform=val_transform)
-    elif args.dataset == 'cifar100':
-        train_dataset = datasets.CIFAR100(root=args.data_dir,
-                                          transform=train_transform,
-                                          download=True)
-        val_dataset = datasets.CIFAR100(root=args.data_dir,
-                                        train=False,
-                                        transform=val_transform)
-    else:
-        raise ValueError(args.dataset)
-
-    train_sampler = None
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
-        num_workers=args.num_workers, pin_memory=True, sampler=train_sampler)
-    val_loader = torch.utils.data.DataLoader(
-        val_dataset, batch_size=256, shuffle=False,
-        num_workers=8, pin_memory=True)
-
-    return train_loader, val_loader
 
 
 def set_model(args):
@@ -267,11 +219,11 @@ def validate(val_loader, model, criterion, args):
 
 
 def main():
-    best_acc = 0
     args = parse_args()
 
     # build data loader
-    train_loader, val_loader = set_loader(args)
+    train_loader = set_loader(args, "train")
+    val_loader = set_loader(args, "val")
 
     # build model and criterion
     model, criterion = set_model(args)
@@ -283,6 +235,7 @@ def main():
     logger = tb_logger.Logger(logdir=args.logging_dir, flush_secs=2)
 
     # training routine
+    best_acc = 0
     for epoch in range(1, args.epochs + 1):
         adjust_learning_rate(args, optimizer, epoch)
 
