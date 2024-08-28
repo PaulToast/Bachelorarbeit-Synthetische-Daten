@@ -181,4 +181,4 @@ def crop_object(image, mask):
         mask_box_center_y + mask_box_size // 2
     )
     
-    return image.crop(mask_box), mask.crop(mask_box)
+    return image.crop(mask_box), np.array(mask.crop(mask_box))

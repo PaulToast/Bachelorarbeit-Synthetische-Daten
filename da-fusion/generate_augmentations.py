@@ -113,7 +113,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.embed_path == None:
-        args.embed_path = os.path.abspath(f"output/{args.experiment_name}/fine-tuned-merged/seed=0_ex=16.pt")
+        args.embed_path = os.path.abspath(f"output/{args.experiment_name}/fine-tuned-merged/seed=0_ex=32.pt")
     if args.output_dir == None:
         args.output_dir = os.path.abspath(f"output/{args.experiment_name}/aug/")
 
