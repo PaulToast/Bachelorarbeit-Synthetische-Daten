@@ -11,7 +11,7 @@ import torch.backends.cudnn as cudnn
 from torchvision import transforms, datasets
 
 from util import TwoCropTransform, AverageMeter
-from util import adjust_learning_rate, warmup_learning_rate
+from util import adjust_learning_rate, warmup_learning_rate, accuracy
 from util import set_optimizer, save_model
 from networks.resnet_big import SupConResNet
 from losses import SupConLoss
@@ -234,6 +234,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
         # Update metric & log
         losses.update(loss.item(), bsz)
+        
         wandb.log({"train_loss": loss.item(), "lr": optimizer.param_groups[0]['lr']})
 
         # SGD
@@ -332,7 +333,6 @@ def main():
             "lr_cosine" : args.lr_cosine,
             "weight_decay" : args.weight_decay,
             "temperature" : args.temp,
-            
         },
     )
 
@@ -342,7 +342,7 @@ def main():
     for epoch in range(1, args.epochs + 1):
         adjust_learning_rate(args, optimizer, epoch)
 
-        # Train for one epoch
+        # Train & validate for one epoch
         start_time = time.time()
 
         avg_train_loss = train(train_loader, model, criterion, optimizer, epoch, args)

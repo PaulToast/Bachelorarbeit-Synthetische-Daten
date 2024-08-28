@@ -43,11 +43,11 @@ def accuracy(output, target, topk=(1,)):
         pred = pred.t()
         correct = pred.eq(target.view(1, -1).expand_as(pred))
 
-        res = []
+        accuracies = []
         for k in topk:
             correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
-            res.append(correct_k.mul_(100.0 / batch_size))
-        return res
+            accuracies.append(correct_k.mul_(100.0 / batch_size))
+        return accuracies
 
 
 def adjust_learning_rate(args, optimizer, epoch):
@@ -75,18 +75,18 @@ def warmup_learning_rate(args, epoch, batch_id, total_batches, optimizer):
             param_group['lr'] = lr
 
 
-def set_optimizer(opt, model):
+def set_optimizer(args, model):
     optimizer = optim.SGD(model.parameters(),
-                          lr=opt.lr,
-                          momentum=opt.momentum,
-                          weight_decay=opt.weight_decay)
+                          lr=args.lr,
+                          momentum=args.momentum,
+                          weight_decay=args.weight_decay)
     return optimizer
 
 
-def save_model(model, optimizer, opt, epoch, save_file):
+def save_model(model, optimizer, args, epoch, save_file):
     print('==> Saving...')
     state = {
-        'opt': opt,
+        'opt': args,
         'model': model.state_dict(),
         'optimizer': optimizer.state_dict(),
         'epoch': epoch,
