@@ -7,6 +7,7 @@ import math
 
 import torch
 import torch.backends.cudnn as cudnn
+import torch.nn.functional as F
 
 from main_ce import set_loader
 from util import AverageMeter
@@ -188,6 +189,7 @@ def validate(val_loader, model, classifier, criterion, args):
     batch_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
+    OOD_confidences = AverageMeter()
 
     with torch.no_grad():
         end = time.time()
@@ -205,6 +207,18 @@ def validate(val_loader, model, classifier, criterion, args):
             acc1, acc5 = accuracy(output, labels, topk=(1, 5))
             top1.update(acc1[0], bsz)
 
+            # Get only the OOD images from the batch (with label=-1)
+            OOD_images = images[labels == -1]
+            OOD_labels = labels[labels == -1]
+
+            # Compute the output only for the OOD images
+            OOD_output = classifier(model.encoder(OOD_images))
+            # Get the confidence scores for the highest probability classes
+            OOD_prob = F.softmax(OOD_output, dim=1)
+            OOD_confidence = torch.max(OOD_prob, dim=1).values
+            # Update metric
+            OOD_confidences.update(OOD_confidence.mean().item(), OOD_confidence.shape[0])
+
             # Measure elapsed time
             batch_time.update(time.time() - end)
             end = time.time()
@@ -219,7 +233,7 @@ def validate(val_loader, model, classifier, criterion, args):
                        loss=losses, top1=top1))
 
     print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
-    return losses.avg, top1.avg
+    return losses.avg, top1.avg, OOD_confidences.avg
 
 
 def main():
@@ -264,15 +278,15 @@ def main():
         start_time = time.time()
 
         avg_train_loss, avg_train_acc = train(train_loader, model, classifier, criterion, optimizer, epoch, args)
-        avg_val_loss, avg_val_acc = validate(val_loader, model, classifier, criterion, args)
+        avg_val_loss, avg_val_acc, avg_OOD_confidence = validate(val_loader, model, classifier, criterion, args)
         
         end_time = time.time()
         
         if avg_val_acc > best_acc:
             best_acc = avg_val_acc
         
-        print('Train epoch {}, total time {:.2f}, average train accuracy: {:.2f}, average val accuracy: {:.2f}'.format(
-            epoch, end_time - start_time, avg_train_acc, avg_val_acc))
+        print('Train epoch {}, total time {:.2f}, average train acc: {:.2f}, average val acc: {:.2f}, average OOD score: {:.2f}'.format(
+            epoch, end_time - start_time, avg_train_acc, avg_val_acc, 1 - avg_OOD_confidence))
         
         # Log average epoch metrics
         wandb.log({
