@@ -189,7 +189,8 @@ def validate(val_loader, model, classifier, criterion, args):
     batch_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
-    OOD_confidences = AverageMeter()
+    OOD_score = AverageMeter()
+    OOD_threshold = 0.95
 
     with torch.no_grad():
         end = time.time()
@@ -214,10 +215,13 @@ def validate(val_loader, model, classifier, criterion, args):
             # Compute the output only for the OOD images
             OOD_output = classifier(model.encoder(OOD_images))
             # Get the confidence scores for the highest probability classes
-            OOD_prob = F.softmax(OOD_output, dim=1)
-            OOD_confidence = torch.max(OOD_prob, dim=1).values
+            OOD_probabilities = F.softmax(OOD_output, dim=1)
+            OOD_confidences = torch.max(OOD_probabilities, dim=1).values
+            # Calculate the proportion of OOD images with confidence below the threshold       
+            OOD_below_threshold = sum(c < OOD_threshold for c in OOD_confidences) / len(OOD_confidences)
+
             # Update metric
-            OOD_confidences.update(OOD_confidence.mean().item(), OOD_confidence.shape[0])
+            OOD_score.update(OOD_below_threshold, 1)
 
             # Measure elapsed time
             batch_time.update(time.time() - end)
@@ -233,7 +237,7 @@ def validate(val_loader, model, classifier, criterion, args):
                        loss=losses, top1=top1))
 
     print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
-    return losses.avg, top1.avg, OOD_confidences.avg
+    return losses.avg, top1.avg, OOD_score.avg
 
 
 def main():
@@ -278,7 +282,7 @@ def main():
         start_time = time.time()
 
         avg_train_loss, avg_train_acc = train(train_loader, model, classifier, criterion, optimizer, epoch, args)
-        avg_val_loss, avg_val_acc, avg_OOD_confidence = validate(val_loader, model, classifier, criterion, args)
+        avg_val_loss, avg_val_acc, avg_OOD_score = validate(val_loader, model, classifier, criterion, args)
         
         end_time = time.time()
         
@@ -286,7 +290,7 @@ def main():
             best_acc = avg_val_acc
         
         print('Train epoch {}, total time {:.2f}, average train acc: {:.2f}, average val acc: {:.2f}, average OOD score: {:.2f}'.format(
-            epoch, end_time - start_time, avg_train_acc, avg_val_acc, 1 - avg_OOD_confidence))
+            epoch, end_time - start_time, avg_train_acc, avg_val_acc, avg_OOD_score))
         
         # Log average epoch metrics
         wandb.log({
