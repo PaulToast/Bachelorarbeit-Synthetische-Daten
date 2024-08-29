@@ -37,11 +37,10 @@ def parse_args():
     parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100', 'mvip'])
     parser.add_argument('--data_dir', type=str, default=None)
 
-    # Linear classification stage does not support OOD augmentations
     parser.add_argument('--aug_method', type=str, default=None, choices=[None, 'positive'])
     parser.add_argument('--aug_experiment', type=str, default=None)
     parser.add_argument('--aug_name_positive', type=str, default=None)
-    #parser.add_argument('--aug_name_negative', type=str, default=None)
+    parser.add_argument('--aug_name_negative', type=str, default=None)
 
     # Training
     parser.add_argument('--model', type=str, default='resnet50')
@@ -61,13 +60,6 @@ def parse_args():
 
     parser.add_argument('--weight_decay', type=float, default=0)
     parser.add_argument('--momentum', type=float, default=0.9)
-
-    # Validation
-    parser.add_argument(
-        '--OOD_threshold',
-        type=float,
-        default=0.95,
-        help="OOD-Detection considered successfull if confidence score for prediction is below threshold.")
 
     # Output & logging
     parser.add_argument('--save_freq', type=int, default=50, help='Save model every N epochs.')
@@ -114,13 +106,18 @@ def parse_args():
     elif args.dataset == 'mvip':
         args.num_classes = 20
 
-        if args.aug_method == 'positive':
+        if args.aug_name_positive is not None:
             args.aug_dir_positive = os.path.abspath(os.path.join(
                 os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_positive}'
             ))
-            args.aug_dir_negative = None
         else:
             args.aug_dir_positive = None
+
+        if args.aug_name_negative is not None:
+            args.aug_dir_negative = os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_negative}'
+            ))
+        else:
             args.aug_dir_negative = None
     else:
         raise ValueError('dataset not supported: {}'.format(args.dataset))
@@ -128,7 +125,7 @@ def parse_args():
     return args
 
 
-def set_loader(args, split="train"):
+def set_loader(args, split="train", aug_mode=None):
     mean_std = {
         'cifar10': ([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
         'cifar100': ([0.5071, 0.4867, 0.4408], [0.2675, 0.2565, 0.2761]),
@@ -163,14 +160,6 @@ def set_loader(args, split="train"):
                                     transform=transform,
                                     download=True)
     elif args.dataset == "mvip":
-        # Prepare dataset with correct DA-Fusion augmentations
-        if split == "ood":
-            aug_mode = "negative_only"
-        elif split == "train":
-            aug_mode = args.aug_method
-        else:
-            aug_mode = None
-
         dataset = MVIPDataset(split=split,
                               aug_mode=aug_mode,
                               aug_dir_positive=args.aug_dir_positive,
@@ -310,10 +299,9 @@ def validate(val_loader, ood_loader, model, classifier, criterion, args):
                 print('Generalization Test: [{0}/{1}]\t'
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                      'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                      'OOD {ood.val:.3f} ({ood.avg:.3f})'.format(
+                      'Acc@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
                        idx, len(val_loader), batch_time=batch_time_acc,
-                       loss=losses, top1=top1, ood=OOD_detection))
+                       loss=losses, top1=top1))
         
         # OOD detection validation
         end = time.time()
@@ -360,9 +348,9 @@ def main():
     # Build dataloaders
     print("Preparing dataloaders...")
 
-    train_loader = set_loader(args, "train")
-    val_loader = set_loader(args, "val")
-    ood_loader = set_loader(args, "ood")
+    train_loader = set_loader(args, split="train", aug_mode=args.aug_method)
+    val_loader = set_loader(args, split="val", aug_mode=None)
+    ood_loader = set_loader(args, split="val", aug_mode="negative_only")
 
     print("Dataloaders ready.")
 
