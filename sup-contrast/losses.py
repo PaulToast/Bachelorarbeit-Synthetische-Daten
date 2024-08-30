@@ -42,6 +42,22 @@ class SupConLoss(nn.Module):
         if len(features.shape) > 3:
             features = features.view(features.shape[0], features.shape[1], -1)
 
+        # Remove OOD samples if necessary
+        original_batch_size = features.shape[0]
+
+        if labels is not None:
+            ood_count = torch.sum(labels == -1)
+            ood_limit = int(0.2 * original_batch_size)
+            if ood_count > ood_limit:
+                num_samples_to_remove = ood_count - ood_limit
+                ood_indices = torch.where(labels == -1)[0]
+                indices_to_remove = ood_indices[:num_samples_to_remove]
+                features = torch.index_select(features, 0, torch.arange(original_batch_size)[~indices_to_remove])
+                labels = torch.index_select(labels, 0, torch.arange(original_batch_size)[~indices_to_remove])
+                mask = torch.index_select(mask, 0, torch.arange(original_batch_size)[~indices_to_remove])
+            del ood_count, ood_limit, num_samples_to_remove, ood_indices, indices_to_remove
+
+        # Get new batch size
         batch_size = features.shape[0]
 
         # Get/calculate contrastive mask for this batch (shape=[bsz, bsz])
@@ -111,5 +127,8 @@ class SupConLoss(nn.Module):
         # Final loss calculation, averaging the negative log-probabilities over all positive pairs
         loss = - (self.temperature / self.base_temperature) * mean_log_prob_pos
         loss = loss.view(anchor_count, batch_size).mean()
+
+        # Scale loss depending on batch size reduction
+        loss *= original_batch_size / batch_size
 
         return loss
