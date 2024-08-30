@@ -111,7 +111,6 @@ class SupConLoss(nn.Module):
         mask = mask * logits_mask
 
         # Compute the log-probabilities
-        logits_mask = logits_mask.repeat(anchor_count, 1).view(-1, logits.shape[1])
         exp_logits = torch.exp(logits) * logits_mask
         log_prob = logits - torch.log(exp_logits.sum(1, keepdim=True))
 
