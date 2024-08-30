@@ -49,13 +49,13 @@ class SupConLoss(nn.Module):
             ood_count = torch.sum(labels == -1)
             ood_limit = int(0.2 * original_batch_size)
             if ood_count > ood_limit:
-                num_samples_to_remove = ood_count - ood_limit
+                num_samples_to_select = (original_batch_size - ood_count) + ood_limit
                 ood_indices = torch.where(labels == -1)[0]
-                indices_to_remove = ood_indices[:num_samples_to_remove]
-                features = torch.index_select(features, 0, torch.arange(original_batch_size)[~indices_to_remove])
-                labels = torch.index_select(labels, 0, torch.arange(original_batch_size)[~indices_to_remove])
-                mask = torch.index_select(mask, 0, torch.arange(original_batch_size)[~indices_to_remove])
-            del ood_count, ood_limit, num_samples_to_remove, ood_indices, indices_to_remove
+                indices_to_select = ood_indices[:num_samples_to_select].to(device)
+                features = torch.index_select(features, 0, indices_to_select)
+                labels = torch.index_select(labels, 0, indices_to_select)
+                mask = torch.index_select(mask, 0, indices_to_select)
+            del ood_count, ood_limit, num_samples_to_select, ood_indices, indices_to_select
 
         # Get new batch size
         batch_size = features.shape[0]
