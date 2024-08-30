@@ -36,6 +36,8 @@ def parse_args():
     parser.add_argument('--aug_experiment', type=str, default=None)
     parser.add_argument('--aug_name_positive', type=str, default=None)
     parser.add_argument('--aug_name_negative', type=str, default=None)
+    parser.add_argument('--aug_ex_positive', type=int, default=-1)
+    parser.add_argument('--aug_ex_negative', type=int, default=8)
 
     # Training
     parser.add_argument('--model', type=str, default='resnet50')
@@ -168,7 +170,6 @@ def set_loader(args, split="train"):
                                     transform=TwoCropTransform(transform),
                                     download=True)
     elif args.dataset == "mvip":
-        # Prepare dataset with correct DA-Fusion augmentations
         if split == "ood":
             aug_mode = "negative_only"
         elif split == "train":
@@ -180,6 +181,8 @@ def set_loader(args, split="train"):
                               aug_mode=aug_mode,
                               aug_dir_positive=args.aug_dir_positive,
                               aug_dir_negative=args.aug_dir_negative,
+                              aug_ex_positive=args.aug_ex_positive,
+                              aug_ex_negative=args.aug_ex_negative,
                               size=args.size,
                               transform=TwoCropTransform(transform))
 

@@ -59,8 +59,9 @@ class SupConLoss(nn.Module):
             mask = mask.float().to(device)
         
         # Make sure there are no positive pairs with any OOD samples (label=-1)
-        ood_mask = (labels == -1).float().to(device)
+        ood_mask = (labels == -1).float().to(device).detach()
         mask *= (1 - ood_mask @ ood_mask.T)
+        del ood_mask
 
         # Determine whether all views or just one of each sample will be used as the anchor
         contrast_count = features.shape[1]
