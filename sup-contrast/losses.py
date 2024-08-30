@@ -42,9 +42,29 @@ class SupConLoss(nn.Module):
         if len(features.shape) > 3:
             features = features.view(features.shape[0], features.shape[1], -1)
 
-        # Remove OOD samples if necessary
+        # Get original batch size (before potentially removing OOD samples)
         original_batch_size = features.shape[0]
 
+        # Get/calculate contrastive mask for this batch (shape=[bsz, bsz])
+        # mask_{i,j}=1 if sample j has the same class as sample i, otherwise 0
+        if labels is not None and mask is not None:
+            raise ValueError('Cannot define both `labels` and `mask`')
+        elif labels is None and mask is None:
+            mask = torch.eye(original_batch_size, dtype=torch.float32).to(device)
+        elif labels is not None:
+            labels = labels.contiguous().view(-1, 1)
+            if labels.shape[0] != original_batch_size:
+                raise ValueError('Num of labels does not match num of features')
+            mask = torch.eq(labels, labels.T).float().to(device)
+        else:
+            mask = mask.float().to(device)
+        
+        # Make sure there are no positive pairs with any OOD samples (label=-1)
+        ood_mask = (labels == -1).float().to(device).detach()
+        mask *= (1 - ood_mask @ ood_mask.T)
+        del ood_mask
+
+        # Remove OOD samples if necessary
         if labels is not None:
             ood_count = torch.sum(labels == -1)
             ood_limit = int(0.2 * original_batch_size)
@@ -58,26 +78,7 @@ class SupConLoss(nn.Module):
             del ood_count, ood_limit, num_samples_to_select, ood_indices, indices_to_select
 
         # Get new batch size
-        batch_size = features.shape[0]
-
-        # Get/calculate contrastive mask for this batch (shape=[bsz, bsz])
-        # mask_{i,j}=1 if sample j has the same class as sample i, otherwise 0
-        if labels is not None and mask is not None:
-            raise ValueError('Cannot define both `labels` and `mask`')
-        elif labels is None and mask is None:
-            mask = torch.eye(batch_size, dtype=torch.float32).to(device)
-        elif labels is not None:
-            labels = labels.contiguous().view(-1, 1)
-            if labels.shape[0] != batch_size:
-                raise ValueError('Num of labels does not match num of features')
-            mask = torch.eq(labels, labels.T).float().to(device)
-        else:
-            mask = mask.float().to(device)
-        
-        # Make sure there are no positive pairs with any OOD samples (label=-1)
-        ood_mask = (labels == -1).float().to(device).detach()
-        mask *= (1 - ood_mask @ ood_mask.T)
-        del ood_mask
+        new_batch_size = features.shape[0]
 
         # Determine whether all views or just one of each sample will be used as the anchor
         contrast_count = features.shape[1]
@@ -105,7 +106,7 @@ class SupConLoss(nn.Module):
         logits_mask = torch.scatter(
             torch.ones_like(mask),
             1,
-            torch.arange(batch_size * anchor_count).view(-1, 1).to(device),
+            torch.arange(new_batch_size * anchor_count).view(-1, 1).to(device),
             0
         )
         mask = mask * logits_mask
@@ -126,9 +127,9 @@ class SupConLoss(nn.Module):
 
         # Final loss calculation, averaging the negative log-probabilities over all positive pairs
         loss = - (self.temperature / self.base_temperature) * mean_log_prob_pos
-        loss = loss.view(anchor_count, batch_size).mean()
+        loss = loss.view(anchor_count, new_batch_size).mean()
 
         # Scale loss depending on batch size reduction
-        loss *= original_batch_size / batch_size
+        loss *= original_batch_size / new_batch_size
 
         return loss
