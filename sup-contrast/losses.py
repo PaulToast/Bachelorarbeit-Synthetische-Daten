@@ -42,7 +42,7 @@ class SupConLoss(nn.Module):
         if len(features.shape) > 3:
             features = features.view(features.shape[0], features.shape[1], -1)
 
-        # Remove OOD samples if necessary
+        """# Remove OOD samples if necessary
         original_batch_size = features.shape[0]
 
         if labels is not None:
@@ -56,7 +56,7 @@ class SupConLoss(nn.Module):
                 features = torch.index_select(features, 0,
                                               torch.tensor([i for i in range(original_batch_size) if i not in indices_to_remove]).to(device))
                 labels = torch.index_select(labels, 0,
-                                            torch.tensor([i for i in range(original_batch_size) if i not in indices_to_remove]).to(device))
+                                            torch.tensor([i for i in range(original_batch_size) if i not in indices_to_remove]).to(device))"""
 
         new_batch_size = features.shape[0]
 
@@ -77,7 +77,6 @@ class SupConLoss(nn.Module):
         # Make sure there are no positive pairs with any OOD samples (label=-1)
         ood_mask = (labels < 0).float().to(device).detach()
         mask *= (1 - ood_mask @ ood_mask.T)
-        del ood_mask
 
         # Determine whether all views or just one of each sample will be used as the anchor
         contrast_count = features.shape[1] # n_views
@@ -99,21 +98,28 @@ class SupConLoss(nn.Module):
         logits_max, _ = torch.max(anchor_dot_contrast, dim=1, keepdim=True)
         logits = anchor_dot_contrast - logits_max.detach()
 
-        # Repeat mask to match the dimensions of the logits
-        mask = mask.repeat(anchor_count, contrast_count)
-        # Mask out self-contrast cases
-        logits_mask = torch.scatter(
+        # Update contrastive mask to filter out self-contrast cases
+        mask = mask.repeat(anchor_count, contrast_count) # Repeat mask to match the dimensions of the logits
+        self_contrast_mask = torch.scatter(
             torch.ones_like(mask),
             1,
             torch.arange(new_batch_size * anchor_count).view(-1, 1).to(device),
             0
         )
-        mask = mask * logits_mask
+        mask = mask * self_contrast_mask
 
-        # Transform the logits into the log-probabilities of a pair being *more* similar than any other pair
-        # (We don't just want to maximize similarity for positive pairs,
-        #  but maximize the likelihood of them being *more* similar than negative pairs)
-        exp_logits = torch.exp(logits) * logits_mask
+        # Also ignore logits for OOD samples where OOD label is not the negative anchor label
+        id_mask = 1 - ood_mask # shape=[bsz]
+        id_mask = torch.eq(id_mask, id_mask.T).float().to(device) # shape=[bsz, bsz]
+        ood_logits_mask = (labels != -labels.T).float().to(device).detach()
+        ood_logits_mask = id_mask + ood_logits_mask
+        ood_logits_mask = ood_logits_mask.repeat(anchor_count, contrast_count)
+        logits = logits * ood_logits_mask
+
+        # Transform the logits into log-probabilities (of a pair being *more* similar than any other pair)
+        # -> We don't just want to maximize similarity for positive pairs,
+        #    but maximize the likelihood of them being *more* similar than negative pairs
+        exp_logits = torch.exp(logits) * self_contrast_mask
         log_prob = logits - torch.log(exp_logits.sum(1, keepdim=True))
 
         # Look only at the positive pairs & compute the mean log-probabilities for each anchor
@@ -126,7 +132,9 @@ class SupConLoss(nn.Module):
         loss = - (self.temperature / self.base_temperature) * mean_log_prob_pos
         loss = loss.view(anchor_count, new_batch_size).mean()
 
-        # Scale loss depending on batch size reduction
-        loss *= original_batch_size / new_batch_size
+        """# Scale loss depending on batch size reduction
+        loss *= original_batch_size / new_batch_size"""
+
+        del id_mask, ood_mask, ood_logits_mask
 
         return loss
