@@ -42,7 +42,7 @@ class SupConLoss(nn.Module):
         if len(features.shape) > 3:
             features = features.view(features.shape[0], features.shape[1], -1)
 
-        """# Remove OOD samples if necessary
+        """# Remove OOD samples if necessary (limit to 20% of batch size)
         original_batch_size = features.shape[0]
 
         if labels is not None:
@@ -109,12 +109,9 @@ class SupConLoss(nn.Module):
         mask = mask * self_contrast_mask
 
         # Also ignore logits for OOD samples where OOD label is not the negative anchor label
-        id_mask = 1 - ood_mask # shape=[bsz]
-        id_mask = torch.eq(id_mask, id_mask.T).float().to(device) # shape=[bsz, bsz]
-        ood_logits_mask = (labels != -labels.T).float().to(device).detach()
-        ood_logits_mask = id_mask + ood_logits_mask
-        ood_logits_mask = ood_logits_mask.repeat(anchor_count, contrast_count)
-        logits = logits * ood_logits_mask
+        id_mask = 1 - ood_mask
+        valid_oods_mask = (labels == -labels.T).float().to(device).detach()
+        logits *= (id_mask + valid_oods_mask).repeat(anchor_count, contrast_count)
 
         # Transform the logits into log-probabilities (of a pair being *more* similar than any other pair)
         # -> We don't just want to maximize similarity for positive pairs,
@@ -135,6 +132,6 @@ class SupConLoss(nn.Module):
         """# Scale loss depending on batch size reduction
         loss *= original_batch_size / new_batch_size"""
 
-        del id_mask, ood_mask, ood_logits_mask
+        del id_mask, ood_mask, valid_oods_mask
 
         return loss
