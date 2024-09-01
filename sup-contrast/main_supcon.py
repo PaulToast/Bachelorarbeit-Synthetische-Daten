@@ -74,16 +74,16 @@ def parse_args():
                args.weight_decay, args.batch_size, args.temp)
 
     # Set aug directories
-    if args.aug_method is not None:
+    if args.aug_mode is not None:
         assert args.aug_experiment is not None
 
-        if args.aug_method == 'positive':
+        if args.aug_mode == 'positive':
             assert args.aug_name_positive is not None
             args.aug_dir_positive = os.path.abspath(os.path.join(
                 os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_positive}'
             ))
             args.aug_dir_negative = None
-        elif args.aug_method == 'both':
+        elif args.aug_mode == 'both':
             assert args.aug_name_positive is not None \
                 and args.aug_name_negative is not None
             args.aug_dir_positive = os.path.abspath(os.path.join(
