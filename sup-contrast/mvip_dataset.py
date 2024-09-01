@@ -74,8 +74,11 @@ class MVIPDataset(Dataset):
                 self.all_masks.append(None)
                 self.all_labels.append(-1) # -1 as OOD-label
         elif self.aug_mode == "negative_only":
-            self.all_images, self.all_labels = self.parse_augs(self.class_names, self.aug_dir_negative, self.aug_ex_negative)
-            self.all_masks = self.all_images * 0
+            self.all_augs_negative, self.all_augs_negative_labels = self.parse_augs(self.class_names, self.aug_dir_negative, self.aug_ex_negative)
+            for i in range(len(self.all_augs_negative)):
+                self.all_images.append(self.all_augs_negative[i])
+                self.all_masks.append(None)
+                self.all_labels.append(-1)
 
         self._length = len(self.all_images)
 
