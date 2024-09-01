@@ -31,44 +31,60 @@ if is_wandb_available():
 def parse_args():
     parser = argparse.ArgumentParser('Arguments for training')
 
-    parser.add_argument('--experiment_name', type=str, default=None, help='Output directory name for experiment.')
-    parser.add_argument('--trial', type=str, default='0', help='id for recording multiple runs.')
+    parser.add_argument('--output_name', type=str, default=None, help='Output directory name for run.')
 
     # Data
-    parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100'])
+    parser.add_argument('--dataset', type=str, default='mvip', choices=['cifar10', 'cifar100', 'mvip'])
     parser.add_argument('--data_dir', type=str, default=None)
 
-    parser.add_argument('--aug_mode', type=str, default=None, choices=[None, 'positive'])
-    parser.add_argument('--aug_experiment', type=str, default="mvip-v9-final")
-    parser.add_argument('--aug_name_positive', type=str, default="aug=0.2_ex=16_num=4_g=15")
-    parser.add_argument('--aug_name_negative', type=str, default="aug=0.5_ex=16_num=4_g=15")
+    parser.add_argument('--aug_mode',
+                        type=str,
+                        default=None,
+                        choices=[None, 'positive'],
+                        help=("Augmentation mode for contrastive training. ",
+                              "If None, no augmentations are used. ",
+                              "If 'positive', normal augmentations are added for training. ",
+                              "OOD augmentations are not supported for linear classification stage, ",
+                              "but are used for validating OOD detection."))
+    parser.add_argument('--aug_output_name',
+                        type=str,
+                        default="mvip-v9-final",
+                        help="DA-Fusion output name for the augmentations.")
+    parser.add_argument('--aug_name_positive',
+                        type=str,
+                        default="aug=0.2_ex=16_num=4_g=15",
+                        help="Name of the subfolder containing the positive augmentations.")
+    parser.add_argument('--aug_name_negative',
+                        type=str,
+                        default="aug=0.5_ex=16_num=4_g=15",
+                        help="Name of the subfolder containing the negative augmentations.")
 
     # Training
     parser.add_argument('--model', type=str, default='resnet50')
 
-    parser.add_argument('--epochs', type=int, default=500, help='number of training epochs')
-    parser.add_argument('--batch_size', type=int, default=256, help='batch_size')
-    parser.add_argument('--num_workers', type=int, default=16, help='num of workers to use')
+    parser.add_argument('--image_size', type=int, default=224, help='Size for RandomResizedCrop.') #32
 
-    parser.add_argument('--lr', type=float, default=0.2) #0.2
-    parser.add_argument('--lr_warmup', action='store_true', help='Learning rate warm-up for large batch training')
-    parser.add_argument('--lr_decay_epochs', type=str, default='350,400,450', help='When to decay lr, as string separated by comma')
-    parser.add_argument('--lr_decay_rate', type=float, default=0.1, help='Decay rate for learning rate')
-    parser.add_argument('--lr_cosine', action='store_true', help='Using cosine annealing')
-    parser.add_argument('--weight_decay', type=float, default=1e-4)
+    parser.add_argument('--epochs', type=int, default=50) #100
+    parser.add_argument('--batch_size', type=int, default=16) #256
+    parser.add_argument('--num_workers', type=int, default=16)
+
+    parser.add_argument('--lr', type=float, default=0.001) #0.1
+    parser.add_argument('--lr_warmup', action='store_true', help='Learning rate warm-up for large batch training.')
+    parser.add_argument('--lr_decay_epochs', type=str, default='700,800,900', help='When to decay lr, as string separated by comma.')
+    parser.add_argument('--lr_decay_rate', type=float, default=0.1)
+    parser.add_argument('--lr_cosine', action='store_true', help='Using cosine annealing.')
+
+    parser.add_argument('--weight_decay', type=float, default=0)
     parser.add_argument('--momentum', type=float, default=0.9)
-    
-    #parser.add_argument('--syncBN', action='store_true', help='using synchronized batch normalization')
 
     # Output & logging
-    parser.add_argument('--save_freq', type=int, default=50, help='Save model every N epochs.')
+    parser.add_argument('--save_freq', type=int, default=10, help='Save model every N epochs.') #50
     parser.add_argument('--print_freq', type=int, default=10, help='Print training progress every N steps.')
     
     args = parser.parse_args()
 
     args.model_name = 'SupCE_{}_{}_lr_{}_decay_{}_bsz_{}_trial_{}'.\
-        format(args.dataset, args.model, args.lr, args.weight_decay,
-               args.batch_size, args.trial)
+        format(args.dataset, args.model, args.lr, args.weight_decay, args.batch_size, args.trial)
 
     # Set-up learning rate
     iterations = args.lr_decay_epochs.split(',')
@@ -101,7 +117,7 @@ def parse_args():
         raise ValueError('dataset not supported: {}'.format(args.dataset))
     
     # Set-up output directory
-    args.save_dir = f'./output/{args.experiment_name}/{args.model_name}'
+    args.save_dir = f'./output/{args.output_name}/{args.model_name}'
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
 
@@ -111,10 +127,6 @@ def parse_args():
 def set_model(args):
     model = SupCEResNet(name=args.model, num_classes=args.num_classes)
     criterion = torch.nn.CrossEntropyLoss()
-
-    # Enable synchronized Batch Normalization
-    """if args.syncBN:
-        model = apex.parallel.convert_syncbn_model(model)"""
 
     if torch.cuda.is_available():
         if torch.cuda.device_count() > 1:

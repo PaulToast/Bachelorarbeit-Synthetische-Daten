@@ -32,22 +32,39 @@ if is_wandb_available():
 def parse_args():
     parser = argparse.ArgumentParser('Arguments for training')
 
-    parser.add_argument('--experiment_name', type=str, default=None, help='Output directory name for experiment.')
+    parser.add_argument('--output_name', type=str, default=None, help='Output directory name for run.')
 
     # Data
-    parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100', 'mvip'])
+    parser.add_argument('--dataset', type=str, default='mvip', choices=['cifar10', 'cifar100', 'mvip'])
     parser.add_argument('--data_dir', type=str, default=None)
 
-    parser.add_argument('--aug_method', type=str, default=None, choices=[None, 'positive'])
-    parser.add_argument('--aug_experiment', type=str, default="mvip-v9-final")
-    parser.add_argument('--aug_name_positive', type=str, default="aug=0.2_ex=16_num=4_g=15")
-    parser.add_argument('--aug_name_negative', type=str, default="aug=0.5_ex=16_num=4_g=15")
+    parser.add_argument('--aug_mode',
+                        type=str,
+                        default=None,
+                        choices=[None, 'positive'],
+                        help=("Augmentation mode for contrastive training. ",
+                              "If None, no augmentations are used. ",
+                              "If 'positive', normal augmentations are added for training. ",
+                              "OOD augmentations are not supported for linear classification stage, ",
+                              "but are used for validating OOD detection."))
+    parser.add_argument('--aug_output_name',
+                        type=str,
+                        default="mvip-v9-final",
+                        help="DA-Fusion output name for the augmentations.")
+    parser.add_argument('--aug_name_positive',
+                        type=str,
+                        default="aug=0.2_ex=16_num=4_g=15",
+                        help="Name of the subfolder containing the positive augmentations.")
+    parser.add_argument('--aug_name_negative',
+                        type=str,
+                        default="aug=0.5_ex=16_num=4_g=15",
+                        help="Name of the subfolder containing the negative augmentations.")
 
     # Training
     parser.add_argument('--model', type=str, default='resnet50')
-    parser.add_argument('--ckpt', type=str, default='', help='Path to pre-trained model.')
+    parser.add_argument('--ckpt', type=str, default='', help='Path to model from contrastive pre-training stage.')
 
-    parser.add_argument('--size', type=int, default=224, help='Size for RandomResizedCrop.') #32
+    parser.add_argument('--image_size', type=int, default=224, help='Size for RandomResizedCrop.') #32
 
     parser.add_argument('--epochs', type=int, default=50) #100
     parser.add_argument('--batch_size', type=int, default=16) #256
@@ -101,14 +118,14 @@ def parse_args():
 
         if args.aug_name_positive is not None:
             args.aug_dir_positive = os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_positive}'
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_positive}'
             ))
         else:
             args.aug_dir_positive = None
 
         if args.aug_name_negative is not None:
             args.aug_dir_negative = os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_negative}'
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_negative}'
             ))
         else:
             args.aug_dir_negative = None
@@ -116,7 +133,7 @@ def parse_args():
         raise ValueError('dataset not supported: {}'.format(args.dataset))
 
     # Set-up output directory
-    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/{args.model_name}')
+    args.save_dir = os.path.abspath(f'output/{args.output_name}/{args.model_name}')
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
 
@@ -132,7 +149,7 @@ def set_loader(args, split="train", aug_mode=None):
 
     if split == "train":
         transform = transforms.Compose([
-            transforms.RandomResizedCrop(size=args.size, scale=(0.8, 1.)), # ratio=(1.0, 1.0))
+            transforms.RandomResizedCrop(size=args.image_size, scale=(0.8, 1.)), # ratio=(1.0, 1.0))
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation(degrees=15.0),
             transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
@@ -142,7 +159,7 @@ def set_loader(args, split="train", aug_mode=None):
         ])
     else:
         transform = transforms.Compose([
-            transforms.Resize(size=args.size),
+            transforms.Resize(size=args.image_size),
             transforms.ToTensor(),
             transforms.Normalize(mean=mean_std[args.dataset][0], std=mean_std[args.dataset][1]),
         ])
@@ -162,7 +179,6 @@ def set_loader(args, split="train", aug_mode=None):
                               aug_mode=aug_mode,
                               aug_dir_positive=args.aug_dir_positive,
                               aug_dir_negative=args.aug_dir_negative,
-                              size=args.size,
                               transform=transform)
 
     sampler = None
@@ -360,7 +376,7 @@ def main():
 
     # Init W&B logging
     run = wandb.init(
-        project=args.experiment_name,
+        project=args.output_name,
         config={
             "dataset" : args.dataset,
             "model_name": args.model_name,

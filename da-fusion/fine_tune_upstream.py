@@ -34,7 +34,6 @@ import transformers
 from accelerate import Accelerator
 from accelerate.logging import get_logger
 from accelerate.utils import ProjectConfiguration, set_seed
-from huggingface_hub import create_repo, upload_folder
 
 from datetime import datetime
 
@@ -110,112 +109,15 @@ check_min_version("0.20.0.dev0")
 logger = get_logger(__name__)
 
 
-def save_model_card(repo_id: str, images=None, base_model=str, repo_folder=None):
-    img_str = ""
-    for i, image in enumerate(images):
-        image.save(os.path.join(repo_folder, f"image_{i}.png"))
-        img_str += f"![img_{i}](./image_{i}.png)\n"
-
-    yaml = f"""
----
-license: creativeml-openrail-m
-base_model: {base_model}
-tags:
-- stable-diffusion
-- stable-diffusion-diffusers
-- text-to-image
-- diffusers
-- textual_inversion
-inference: true
----
-    """
-    model_card = f"""
-# Textual inversion text2image fine-tuning - {repo_id}
-These are textual inversion adaption weights for {base_model}. You can find some example images in the following. \n
-{img_str}
-"""
-    with open(os.path.join(repo_folder, "README.md"), "w") as f:
-        f.write(yaml + model_card)
-
-
-def log_validation(text_encoder, tokenizer, unet, vae, args, accelerator, weight_dtype, epoch):
-    
-    # Replace "*" in prompt with placeholder_token
-    formatted_prompt = args.validation_prompt.replace("*", args.placeholder_token)
-    
-    logger.info(
-        f"Running validation... \n Generating {args.num_validation_images} images with prompt:"
-        f" {formatted_prompt}."
-    )
-
-    # Create pipeline (note: unet and vae are loaded again in float32)
-    pipeline = DiffusionPipeline.from_pretrained(
-        args.pretrained_model_name_or_path,
-        text_encoder=accelerator.unwrap_model(text_encoder),
-        tokenizer=tokenizer,
-        unet=unet,
-        vae=vae,
-        safety_checker=None,
-        revision=args.revision,
-        torch_dtype=weight_dtype,
-    )
-    pipeline.scheduler = DPMSolverMultistepScheduler.from_config(pipeline.scheduler.config)
-    pipeline = pipeline.to(accelerator.device)
-    pipeline.set_progress_bar_config(disable=True)
-
-    # Run inference
-    generator = None if args.seed is None else torch.Generator(device=accelerator.device).manual_seed(args.seed)
-    images = []
-    for _ in range(args.num_validation_images):
-        with torch.autocast("cuda"):
-            image = pipeline(formatted_prompt, num_inference_steps=25, generator=generator).images[0]
-        images.append(image)
-
-    for tracker in accelerator.trackers:
-        if tracker.name == "tensorboard":
-            np_images = np.stack([np.asarray(img) for img in images])
-            tracker.writer.add_images("validation", np_images, epoch, dataformats="NHWC")
-        if tracker.name == "wandb":
-            tracker.log(
-                {
-                    "validation": [
-                        wandb.Image(image, caption=f"{i}: {formatted_prompt}") for i, image in enumerate(images)
-                    ]
-                }
-            )
-
-    del pipeline
-    torch.cuda.empty_cache()
-    return images
-
-
-def save_progress(text_encoder, placeholder_token_ids, accelerator, args, save_path):
-    logger.info("Saving embeddings")
-    learned_embeds = (
-        accelerator.unwrap_model(text_encoder)
-        .get_input_embeddings()
-        .weight[min(placeholder_token_ids) : max(placeholder_token_ids) + 1]
-    )
-    learned_embeds_dict = {args.placeholder_token: learned_embeds.detach().cpu()}
-    torch.save(learned_embeds_dict, save_path)
-
-
 def parse_args():
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
     
+    # Output
     parser.add_argument(
-        "--experiment_name",
+        "--output_name",
         type=str,
         default=None,
         help="Will default to {dataset}-{datetime} ('YYYYmmddHHMM')."
-    )
-
-    # Output
-    parser.add_argument(
-        "--output_dir",
-        type=str,
-        default=None,
-        help="Will default to 'output/{experiment_name}/'",
     )
     parser.add_argument(
         "--save_as_full_pipeline",
@@ -260,27 +162,8 @@ def parse_args():
         default="logs",
         help=(
             "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
-            " 'output/{experiment_name}/logs/'."
+            " 'output/{output_name}/logs/'."
         ),
-    )
-
-    # Source control
-    parser.add_argument(
-        "--push_to_hub",
-        action="store_true",
-        help="Whether or not to push the model to the Hub.",
-    )
-    parser.add_argument(
-        "--hub_token",
-        type=str,
-        default=None,
-        help="The token to use to push to the Model Hub.",
-    )
-    parser.add_argument(
-        "--hub_model_id",
-        type=str,
-        default=None,
-        help="The name of the repository to keep in sync with the local `output_dir`.",
     )
 
     # Models
@@ -533,10 +416,10 @@ def parse_args():
 
     args = parser.parse_args()
 
-    if args.experiment_name == None:
-        args.experiment_name = f"{args.dataset}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
-    if args.output_dir == None:
-        args.output_dir = os.path.abspath(os.path.join("output", args.experiment_name))
+    if args.output_name == None:
+        args.output_name = f"{args.dataset}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
+    
+    args.output_dir = os.path.abspath(os.path.join("output", args.output_name))
 
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
@@ -616,9 +499,71 @@ imagenet_style_templates_small = [
     "a large painting in the style of {}",
 ]
 
-# This is the *extracted* dataset which is created temporarily for training
-# (loads images, applies transformations, and generates text prompts with placeholder token)
+def log_validation(text_encoder, tokenizer, unet, vae, args, accelerator, weight_dtype, epoch):
+    """Generate images with the validation prompt and log them."""
+    formatted_prompt = args.validation_prompt.replace("*", args.placeholder_token)
+    
+    logger.info(
+        f"Running validation... \n Generating {args.num_validation_images} images with prompt:"
+        f" {formatted_prompt}."
+    )
+
+    # Create pipeline (note: unet and vae are loaded again in float32)
+    pipeline = DiffusionPipeline.from_pretrained(
+        args.pretrained_model_name_or_path,
+        text_encoder=accelerator.unwrap_model(text_encoder),
+        tokenizer=tokenizer,
+        unet=unet,
+        vae=vae,
+        safety_checker=None,
+        revision=args.revision,
+        torch_dtype=weight_dtype,
+    )
+    pipeline.scheduler = DPMSolverMultistepScheduler.from_config(pipeline.scheduler.config)
+    pipeline = pipeline.to(accelerator.device)
+    pipeline.set_progress_bar_config(disable=True)
+
+    # Run inference
+    generator = None if args.seed is None else torch.Generator(device=accelerator.device).manual_seed(args.seed)
+    images = []
+    for _ in range(args.num_validation_images):
+        with torch.autocast("cuda"):
+            image = pipeline(formatted_prompt, num_inference_steps=25, generator=generator).images[0]
+        images.append(image)
+
+    # Log images
+    for tracker in accelerator.trackers:
+        if tracker.name == "tensorboard":
+            np_images = np.stack([np.asarray(img) for img in images])
+            tracker.writer.add_images("validation", np_images, epoch, dataformats="NHWC")
+        if tracker.name == "wandb":
+            tracker.log(
+                {
+                    "validation": [
+                        wandb.Image(image, caption=f"{i}: {formatted_prompt}") for i, image in enumerate(images)
+                    ]
+                }
+            )
+
+    del pipeline
+    torch.cuda.empty_cache()
+    return images
+
+
+def save_progress(text_encoder, placeholder_token_ids, accelerator, args, save_path):
+    """Save the learned embeddings of the placeholder tokens."""
+    logger.info("Saving embeddings")
+    learned_embeds = (
+        accelerator.unwrap_model(text_encoder)
+        .get_input_embeddings()
+        .weight[min(placeholder_token_ids) : max(placeholder_token_ids) + 1]
+    )
+    learned_embeds_dict = {args.placeholder_token: learned_embeds.detach().cpu()}
+    torch.save(learned_embeds_dict, save_path)
+
+
 class TextualInversionDataset(Dataset):
+    """This is the *extracted* dataset which is created temporarily during training."""
     def __init__(
         self,
         data_root,
@@ -722,6 +667,7 @@ class TextualInversionDataset(Dataset):
 
 
 def main(args):
+    # Set up accelerator
     logging_dir = os.path.join(args.output_dir, args.logging_dir)
     accelerator_project_config = ProjectConfiguration(project_dir=args.output_dir, logging_dir=logging_dir)
     accelerator = Accelerator(
@@ -735,7 +681,6 @@ def main(args):
         if not is_wandb_available():
             raise ImportError("Make sure to install wandb if you want to use it for logging during training.")
 
-    # ???
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
     
@@ -761,11 +706,6 @@ def main(args):
     if accelerator.is_main_process:
         if args.output_dir is not None:
             os.makedirs(args.output_dir, exist_ok=True)
-
-        if args.push_to_hub:
-            repo_id = create_repo(
-                repo_id=args.hub_model_id or Path(args.output_dir).name, exist_ok=True, token=args.hub_token
-            ).repo_id
 
     # Load tokenizer
     if args.tokenizer_name:
@@ -1098,11 +1038,7 @@ def main(args):
     # Create the pipeline using the trained modules and save it.
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
-        if args.push_to_hub and not args.save_as_full_pipeline:
-            logger.warn("Enabling full model saving because --push_to_hub=True was specified.")
-            save_full_model = True
-        else:
-            save_full_model = args.save_as_full_pipeline
+        save_full_model = args.save_as_full_pipeline
         if save_full_model:
             pipeline = StableDiffusionPipeline.from_pretrained(
                 args.pretrained_model_name_or_path,
@@ -1116,20 +1052,6 @@ def main(args):
         # Save the newly trained embeddings
         save_path = os.path.join(args.output_dir, "learned_embeds.bin")
         save_progress(text_encoder, placeholder_token_ids, accelerator, args, save_path)
-
-        if args.push_to_hub:
-            save_model_card(
-                repo_id,
-                images=images,
-                base_model=args.pretrained_model_name_or_path,
-                repo_folder=args.output_dir,
-            )
-            upload_folder(
-                repo_id=repo_id,
-                folder_path=args.output_dir,
-                commit_message="End of training",
-                ignore_patterns=["step_*", "epoch_*"],
-            )
 
     accelerator.end_training()
     accelerator.free_memory()

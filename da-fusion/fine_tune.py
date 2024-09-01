@@ -92,16 +92,10 @@ def parse_args():
 
     # Output
     parser.add_argument(
-        "--experiment_name",
+        "--output_name",
         type=str,
         default=None,
         help="Will default to {dataset}-{datetime} ('YYYYmmddHHMM')."
-    )
-    parser.add_argument(
-        "--output_dir",
-        type=str,
-        default=None,
-        help="Will default to '_experiments/{experiment_name}/'",
     )
     parser.add_argument(
         "--save_steps",
@@ -132,7 +126,7 @@ def parse_args():
         default="logs",
         help=(
             "[TensorBoard](https://www.tensorflow.org/tensorboard) log directory. Will default to"
-            " '_experiments/{experiment_name}/logs/'."
+            " 'output/{output_name}/logs/'."
         ),
     )
     parser.add_argument(
@@ -143,25 +137,6 @@ def parse_args():
             'The integration to report the results and logs to. Supported platforms are `"tensorboard"`'
             ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
         ),
-    )
-
-    # Repository
-    parser.add_argument(
-        "--push_to_hub",
-        action="store_true",
-        help="Whether or not to push the model to the Hub.",
-    )
-    parser.add_argument(
-        "--hub_token",
-        type=str,
-        default=None,
-        help="The token to use to push to the Model Hub.",
-    )
-    parser.add_argument(
-        "--hub_model_id",
-        type=str,
-        default=None,
-        help="The name of the repository to keep in sync with the local `output_dir`.",
     )
 
     # Models
@@ -184,7 +159,7 @@ def parse_args():
         type=str,
         default=None,
         help=(
-            "Whether training should be resumed from a previous checkpoint. Use a path saved by"
+            "Whether training should be resumed from a previous checkpoint. Use a path saved by "
             ' `--checkpointing_steps`, or `"latest"` to automatically select the last available checkpoint.'
         ),
     )
@@ -351,10 +326,10 @@ def parse_args():
 
     args = parser.parse_args()
 
-    if args.experiment_name == None:
-        args.experiment_name = f"{args.dataset}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
-    if args.output_dir == None:
-        args.output_dir = os.path.abspath(os.path.join('output', args.experiment_name))
+    if args.output_name == None:
+        args.output_name = f"{args.dataset}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
+    
+    args.output_dir = os.path.abspath(os.path.join('output', args.output_name))
    
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
@@ -419,9 +394,9 @@ imagenet_style_templates_small = [
     "a large painting in the style of {}",
 ]
 
-# This is the *extracted* dataset which is created temporarily for training
-# (loads images, applies transformations, and generates text prompts with placeholder token)
+
 class TextualInversionDataset(Dataset):
+    """This is the *extracted* dataset which is created temporarily during training."""
     def __init__(
         self,
         data_root,
@@ -509,18 +484,7 @@ class TextualInversionDataset(Dataset):
         return example
 
 
-def get_full_repo_name(model_id: str, organization: Optional[str] = None, token: Optional[str] = None):
-    if token is None:
-        token = HfFolder.get_token()
-    if organization is None:
-        username = whoami(token)["name"]
-        return f"{username}/{model_id}"
-    else:
-        return f"{organization}/{model_id}"
-
-
 def main(args):
-
     output_dir = args.output_dir
     logging_dir = os.path.join(output_dir, args.logging_dir)
 
@@ -553,23 +517,6 @@ def main(args):
     # If passed along, set the training seed now.
     if args.seed is not None:
         set_seed(args.seed)
-
-    """# Handle the repository creation
-    if accelerator.is_main_process:
-        if args.push_to_hub:
-            if args.hub_model_id is None:
-                repo_name = get_full_repo_name(Path(args.output_dir).name, token=args.hub_token)
-            else:
-                repo_name = args.hub_model_id
-            repo = Repository(args.output_dir, clone_from=repo_name)
-
-            with open(os.path.join(args.output_dir, ".gitignore"), "w+") as gitignore:
-                if "step_*" not in gitignore:
-                    gitignore.write("step_*\n")
-                if "epoch_*" not in gitignore:
-                    gitignore.write("epoch_*\n")
-        elif args.output_dir is not None:
-            os.makedirs(args.output_dir, exist_ok=True)"""
 
     # Load tokenizer
     if args.tokenizer_name:
@@ -837,7 +784,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-
     args = parse_args()
     output_dir = args.output_dir
 

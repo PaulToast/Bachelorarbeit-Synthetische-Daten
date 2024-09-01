@@ -65,7 +65,7 @@ if __name__ == "__main__":
         choices=DATASETS.keys(),
     )
     parser.add_argument(
-        "--experiment_name",
+        "--output_name",
         type=str,
         required=True,
     )
@@ -73,7 +73,7 @@ if __name__ == "__main__":
         "--output_dir",
         type=str,
         default=None,
-        help="Will default to 'output/{experiment_name}/aug/'."
+        help="Will default to 'output/{output_name}/aug/'."
     )
     parser.add_argument(
         "--model_path",
@@ -84,7 +84,7 @@ if __name__ == "__main__":
         "--embed_path",
         type=str,
         default=None,
-        help="Will default to 'output/{experiment_name}/fine-tuned-merged/{dataset}-0-16.pt'"
+        help="Will default to 'output/{output_name}/fine-tuned-merged/{dataset}-0-16.pt'"
     )
     
     parser.add_argument("--seed", type=int, default=0)
@@ -113,9 +113,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.embed_path == None:
-        args.embed_path = os.path.abspath(f"output/{args.experiment_name}/fine-tuned-merged/seed=0_ex=32.pt")
+        args.embed_path = os.path.abspath(f"output/{args.output_name}/fine-tuned-merged/seed=0_ex=32.pt")
     if args.output_dir == None:
-        args.output_dir = os.path.abspath(f"output/{args.experiment_name}/aug/")
+        args.output_dir = os.path.abspath(f"output/{args.output_name}/aug/")
 
     os.makedirs(args.output_dir, exist_ok=True)
 

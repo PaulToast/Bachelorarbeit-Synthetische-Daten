@@ -26,26 +26,40 @@ if is_wandb_available():
 def parse_args():
     parser = argparse.ArgumentParser('Arguments for training')
 
-    parser.add_argument('--experiment_name', type=str, default=None, help='Output directory name for experiment.')
+    parser.add_argument('--output_name', type=str, default=None, help='Output directory name for run.')
     parser.add_argument('--trial', type=str, default='0', help='id for recording multiple runs.')
 
     # Data
-    parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100', 'mvip'])
+    parser.add_argument('--dataset', type=str, default='mvip', choices=['cifar10', 'cifar100', 'mvip'])
     parser.add_argument('--data_dir', type=str, default=None)
 
-    parser.add_argument('--aug_mode', type=str, default=None, choices=[None, 'positive', 'both'])
-    parser.add_argument('--aug_experiment', type=str, default="mvip-v9-final")
-    parser.add_argument('--aug_name_positive', type=str, default="aug=0.2_ex=16_num=4_g=15")
-    parser.add_argument('--aug_name_negative', type=str, default="aug=0.5_ex=16_num=4_g=15")
-    #parser.add_argument('--aug_ex_positive', type=int, default=-1)
-    #parser.add_argument('--aug_ex_negative', type=int, default=8)
+    parser.add_argument('--aug_mode',
+                        type=str,
+                        default=None,
+                        choices=[None, 'positive', 'both'],
+                        help=("Augmentation mode for contrastive training. ",
+                              "If None, no augmentations are used. ",
+                              "If 'positive', normal augmentations are used as additional positive examples. ",
+                              "If 'both', OOD augmentations are also added for hard-negative mining. "))
+    parser.add_argument('--aug_output_name',
+                        type=str,
+                        default="mvip-v9-final",
+                        help="DA-Fusion output name for the augmentations.")
+    parser.add_argument('--aug_name_positive',
+                        type=str,
+                        default="aug=0.2_ex=16_num=4_g=15",
+                        help="Name of the subfolder containing the positive augmentations.")
+    parser.add_argument('--aug_name_negative',
+                        type=str,
+                        default="aug=0.5_ex=16_num=4_g=15",
+                        help="Name of the subfolder containing the negative augmentations.")
 
     # Training
     parser.add_argument('--model', type=str, default='resnet50')
 
     parser.add_argument('--method', type=str, default='SupCon', choices=['SupCon', 'SimCLR'])
 
-    parser.add_argument('--size', type=int, default=224, help='Size for RandomResizedCrop.') #32
+    parser.add_argument('--image_size', type=int, default=224, help='Size for RandomResizedCrop.') #32
 
     parser.add_argument('--epochs', type=int, default=110) #1000
     parser.add_argument('--batch_size', type=int, default=16) #256
@@ -61,8 +75,6 @@ def parse_args():
     parser.add_argument('--momentum', type=float, default=0.9)
     parser.add_argument('--temp', type=float, default=0.07, help='Temperature for loss function.')
 
-    #parser.add_argument('--syncBN', action='store_true', help='Using synchronized batch normalization.')
-
     # Output & logging
     parser.add_argument('--save_freq', type=int, default=10, help='Save model every N epochs.') #50
     parser.add_argument('--print_freq', type=int, default=10, help='Print training progress every N steps.')
@@ -75,22 +87,22 @@ def parse_args():
 
     # Set aug directories
     if args.aug_mode is not None:
-        assert args.aug_experiment is not None
+        assert args.aug_output_name is not None
 
         if args.aug_mode == 'positive':
             assert args.aug_name_positive is not None
             args.aug_dir_positive = os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_positive}'
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_positive}'
             ))
             args.aug_dir_negative = None
         elif args.aug_mode == 'both':
             assert args.aug_name_positive is not None \
                 and args.aug_name_negative is not None
             args.aug_dir_positive = os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_positive}'
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_positive}'
             ))
             args.aug_dir_negative = os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_experiment}/{args.aug_name_negative}'
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_negative}'
             ))
     else:
         args.aug_dir_positive = None
@@ -119,7 +131,7 @@ def parse_args():
             args.lr_warmup_to = args.lr
     
     # Set-up output directory
-    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/{args.model_name}')
+    args.save_dir = os.path.abspath(f'output/{args.output_name}/{args.model_name}')
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
 
@@ -136,7 +148,7 @@ def set_loader(args, split="train", aug_mode=None):
 
     if split == "train":
         transform = transforms.Compose([
-            transforms.RandomResizedCrop(size=args.size, scale=(0.6, 1.)), # ratio=(1.0, 1.0))
+            transforms.RandomResizedCrop(size=args.image_size, scale=(0.6, 1.)), # ratio=(1.0, 1.0))
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation(degrees=15.0),
             transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
@@ -146,7 +158,7 @@ def set_loader(args, split="train", aug_mode=None):
         ])
     else:
         transform = transforms.Compose([
-            transforms.Resize(size=args.size),
+            transforms.Resize(size=args.image_size),
             transforms.ToTensor(),
             transforms.Normalize(mean=mean_std[args.dataset][0], std=mean_std[args.dataset][1]),
         ])
@@ -167,9 +179,6 @@ def set_loader(args, split="train", aug_mode=None):
                               aug_mode=aug_mode,
                               aug_dir_positive=args.aug_dir_positive,
                               aug_dir_negative=args.aug_dir_negative,
-                              #aug_ex_positive=args.aug_ex_positive,
-                              #aug_ex_negative=args.aug_ex_negative,
-                              size=args.size,
                               transform=TwoCropTransform(transform))
 
     # Build dataloader
@@ -184,10 +193,6 @@ def set_loader(args, split="train", aug_mode=None):
 def set_model(args):
     model = SupConResNet(name=args.model)
     criterion = SupConLoss(temperature=args.temp)
-
-    """# Enable synchronized batch normalization
-    if args.syncBN:
-        model = apex.parallel.convert_syncbn_model(model)"""
 
     if torch.cuda.is_available():
         if torch.cuda.device_count() > 1:
@@ -323,13 +328,13 @@ def main():
 
     # Init W&B logging
     run = wandb.init(
-        project=args.experiment_name,
+        project=args.output_name,
         config={
             "dataset" : args.dataset,
             "model_name": args.model_name,
-            "image_size" : args.size,
-            "batch_size" : args.batch_size,
+            "image_size" : args.image_size,
             "epochs" : args.epochs,
+            "batch_size" : args.batch_size,
             "lr" : args.lr,
             "lr_warmup" : args.lr_warmup,
             "lr_cosine" : args.lr_cosine,

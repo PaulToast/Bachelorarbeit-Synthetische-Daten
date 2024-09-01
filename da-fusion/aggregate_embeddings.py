@@ -11,7 +11,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Merge token files")
 
     parser.add_argument(
-        "--experiment_name",
+        "--output_name",
         type=str,
         required=True,
     )
@@ -30,10 +30,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     input_path = os.path.abspath(
-        os.path.join("output", f"{args.experiment_name}", "fine-tuned")
+        os.path.join("output", f"{args.output_name}", "fine-tuned")
     )
     output_path = os.path.abspath(
-        os.path.join("output", f"{args.experiment_name}", "fine-tuned-merged/seed={seed}_ex={examples_per_class}.pt")
+        os.path.join("output", f"{args.output_name}", "fine-tuned-merged/seed={seed}_ex={examples_per_class}.pt")
     )
 
     for seed, examples_per_class in product(

@@ -74,18 +74,14 @@ class MVIPDataset(FewShotDataset):
                             if file.endswith("rgb_mask_gen.png"):
                                 class_to_masks[class_name].append(os.path.join(root, set, orientation, cam, file))
 
-        # Generate a sequence of ids for each class, in random order,
-        # effectively shuffling the order of images
+        # Shuffle dataset by generating a sequence of ids for each class in random order
         rng = np.random.default_rng(seed)
 
         class_to_ids = {key: rng.permutation(
             len(class_to_images[key])) for key in self.class_names}
-        
         if examples_per_class is not None:
             class_to_ids = {key: ids[:examples_per_class] 
                             for key, ids in class_to_ids.items()}
-
-        ##############################################################################
 
         # Replicate class_to_images & class_to_masks, but in the random order from class_to_ids
         self.class_to_images = {
@@ -104,7 +100,8 @@ class MVIPDataset(FewShotDataset):
 
         self.all_labels = [i for i, key in enumerate(
             self.class_names) for _ in self.class_to_images[key]]
-
+        
+        # Set transforms
         if use_randaugment: train_transform = transforms.Compose([
             transforms.Resize(image_size),
             transforms.RandAugment(),
@@ -114,7 +111,6 @@ class MVIPDataset(FewShotDataset):
             #transforms.Normalize(mean=[0.5, 0.5, 0.5], 
             #                      std=[0.5, 0.5, 0.5])
         ])
-
         else: train_transform = transforms.Compose([
             #transforms.Resize(image_size),
             transforms.RandomResizedCrop(image_size, scale=(0.8, 1.), ratio=(1., 1.)), # ratio=(1., 1.)
@@ -128,7 +124,6 @@ class MVIPDataset(FewShotDataset):
             #transforms.Normalize(mean=[0.4213, 0.4252, 0.4242],
             #                      std=[0.1955, 0.1923, 0.1912])
         ])
-
         val_transform = transforms.Compose([
             transforms.Resize(image_size),
             #transforms.ToTensor(),
@@ -137,7 +132,6 @@ class MVIPDataset(FewShotDataset):
             #transforms.Normalize(mean=[0.4213, 0.4252, 0.4242],
             #                      std=[0.1955, 0.1923, 0.1912])
         ])
-
         self.transform = {"train": train_transform, "val": val_transform}[split]
 
     def __len__(self):

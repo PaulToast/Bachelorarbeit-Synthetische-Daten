@@ -1,6 +1,9 @@
 """
 Author: Yonglong Tian (yonglong@mit.edu)
 Date: May 07, 2020
+
+Edited by: Paul Hofmann
+Date: Sep 01, 2024
 """
 from __future__ import print_function
 
@@ -20,8 +23,7 @@ class SupConLoss(nn.Module):
 
     def forward(self, features, labels=None, mask=None):
         """Compute loss for model. If both `labels` and `mask` are None,
-        it degenerates to SimCLR unsupervised loss:
-        https://arxiv.org/pdf/2002.05709.pdf
+        it degenerates to SimCLR unsupervised loss: https://arxiv.org/pdf/2002.05709.pdf
 
         Args:
             features: hidden vector of shape [bsz, n_views, ...].
@@ -58,23 +60,33 @@ class SupConLoss(nn.Module):
                 labels = torch.index_select(labels, 0,
                                             torch.tensor([i for i in range(original_batch_size) if i not in indices_to_remove]).to(device))"""
 
-        new_batch_size = features.shape[0]
+        batch_size = features.shape[0]
 
         # Get/calculate contrastive mask for this batch (shape=[bsz, bsz])
         # mask_{i,j}=1 if sample j has the same class as sample i, otherwise 0
         if labels is not None and mask is not None:
             raise ValueError('Cannot define both `labels` and `mask`')
         elif labels is None and mask is None:
-            mask = torch.eye(new_batch_size, dtype=torch.float32).to(device)
+            mask = torch.eye(batch_size, dtype=torch.float32).to(device)
         elif labels is not None:
             labels = labels.contiguous().view(-1, 1)
-            if labels.shape[0] != new_batch_size:
+            if labels.shape[0] != batch_size:
                 raise ValueError('Num of labels does not match num of features')
             mask = torch.eq(labels, labels.T).float().to(device)
         else:
             mask = mask.float().to(device)
         
-        # Make sure there are no positive pairs with any OOD samples (label=-1)
+        # Update mask, so that self-contrast cases aren't considered as positive pairs
+        mask = mask.repeat(anchor_count, contrast_count) # Repeat mask to match the dimensions of the logits
+        self_contrast_mask = torch.scatter(
+            torch.ones_like(mask),
+            1,
+            torch.arange(batch_size * anchor_count).view(-1, 1).to(device),
+            0
+        )
+        mask *= self_contrast_mask
+        
+        # Also make sure there are no positive pairs with any OOD samples (negative labels)
         ood_mask = (labels < 0).float().to(device).detach()
         mask *= (1 - ood_mask @ ood_mask.T)
 
@@ -98,17 +110,7 @@ class SupConLoss(nn.Module):
         logits_max, _ = torch.max(anchor_dot_contrast, dim=1, keepdim=True)
         logits = anchor_dot_contrast - logits_max.detach()
 
-        # Update contrastive mask to filter out self-contrast cases
-        mask = mask.repeat(anchor_count, contrast_count) # Repeat mask to match the dimensions of the logits
-        self_contrast_mask = torch.scatter(
-            torch.ones_like(mask),
-            1,
-            torch.arange(new_batch_size * anchor_count).view(-1, 1).to(device),
-            0
-        )
-        mask = mask * self_contrast_mask
-
-        # Also ignore logits for OOD samples where OOD label is not the negative anchor label
+        # Ignore logits for OOD samples where OOD label is not the negative anchor label (hard-negative mining)
         non_ood_mask = 1 - ood_mask
         valid_ood_mask = (labels == -labels.T).float().to(device).detach()
         logits *= (non_ood_mask + valid_ood_mask).repeat(anchor_count, contrast_count)
@@ -119,7 +121,7 @@ class SupConLoss(nn.Module):
         exp_logits = torch.exp(logits) * self_contrast_mask
         log_prob = logits - torch.log(exp_logits.sum(1, keepdim=True))
 
-        # Look only at the positive pairs & compute the mean log-probabilities for each anchor
+        # Looking only at positive pairs, compute the mean log-probabilities for each anchor
         # Modified to handle edge cases when there is no positive pair for an anchor point
         mask_pos_pairs = mask.sum(1)
         mask_pos_pairs = torch.where(mask_pos_pairs < 1e-6, 1, mask_pos_pairs)
@@ -127,7 +129,7 @@ class SupConLoss(nn.Module):
 
         # Final loss calculation, averaging the negative log-probabilities over all positive pairs
         loss = - (self.temperature / self.base_temperature) * mean_log_prob_pos
-        loss = loss.view(anchor_count, new_batch_size).mean()
+        loss = loss.view(anchor_count, batch_size).mean()
 
         """# Scale loss depending on batch size reduction
         loss *= original_batch_size / new_batch_size"""
