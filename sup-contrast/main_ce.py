@@ -66,6 +66,10 @@ def parse_args():
     
     args = parser.parse_args()
 
+    args.model_name = 'SupCE_{}_{}_lr_{}_decay_{}_bsz_{}_trial_{}'.\
+        format(args.dataset, args.model, args.lr, args.weight_decay,
+               args.batch_size, args.trial)
+
     # Set-up learning rate
     iterations = args.lr_decay_epochs.split(',')
     args.lr_decay_epochs = list([])
@@ -97,10 +101,6 @@ def parse_args():
         raise ValueError('dataset not supported: {}'.format(args.dataset))
     
     # Set-up output directory
-    args.model_name = 'SupCE_{}_{}_lr_{}_decay_{}_bsz_{}_trial_{}'.\
-        format(args.dataset, args.model, args.lr, args.weight_decay,
-               args.batch_size, args.trial)
-
     args.save_dir = f'./output/{args.experiment_name}/{args.model_name}'
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
