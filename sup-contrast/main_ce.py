@@ -17,6 +17,8 @@ from util import adjust_learning_rate, warmup_learning_rate, accuracy
 from util import set_optimizer, save_model
 from networks.resnet_big import SupCEResNet
 
+from datasets import MVIPDataset
+
 try:
     import apex
     from apex import amp, optimizers
@@ -48,7 +50,7 @@ def parse_args():
     parser.add_argument('--lr_warmup', action='store_true', help='Learning rate warm-up for large batch training')
     parser.add_argument('--lr_decay_epochs', type=str, default='350,400,450', help='When to decay lr, as string separated by comma')
     parser.add_argument('--lr_decay_rate', type=float, default=0.1, help='Decay rate for learning rate')
-    parser.add_argument('--cosine', action='store_true', help='Using cosine annealing')
+    parser.add_argument('--lr_cosine', action='store_true', help='Using cosine annealing')
     parser.add_argument('--weight_decay', type=float, default=1e-4)
     parser.add_argument('--momentum', type=float, default=0.9)
     
@@ -60,25 +62,21 @@ def parse_args():
     
     args = parser.parse_args()
 
-    # set the path according to the environment
+    # Set-up output directories
     args.model_dir = f'./output/{args.experiment_name}/models'
     args.logging_dir = f'./output/{args.experiment_name}/logs'
 
+    # Set-up learning rate
     iterations = args.lr_decay_epochs.split(',')
     args.lr_decay_epochs = list([])
     for it in iterations:
         args.lr_decay_epochs.append(int(it))
-
-    args.model_name = 'SupCE_{}_{}_lr_{}_decay_{}_bsz_{}_trial_{}'.\
-        format(args.dataset, args.model, args.lr, args.weight_decay,
-               args.batch_size, args.trial)
-
-    if args.cosine:
+        
+    if args.lr_cosine:
         args.model_name = '{}_cosine'.format(args.model_name)
 
-    # warm-up for large-batch training,
     if args.batch_size > 256:
-        args.warm = True
+        args.lr_warmup = True
     if args.lr_warmup:
         args.model_name = '{}_warmup'.format(args.model_name)
         args.lr_warmup_from = 0.01
@@ -90,6 +88,18 @@ def parse_args():
         else:
             args.lr_warmup_to = args.lr
 
+    if args.dataset == 'cifar10':
+        args.n_cls = 10
+    elif args.dataset == 'cifar100':
+        args.n_cls = 100
+    else:
+        raise ValueError('dataset not supported: {}'.format(args.dataset))
+    
+    # Create directories
+    args.model_name = 'SupCE_{}_{}_lr_{}_decay_{}_bsz_{}_trial_{}'.\
+        format(args.dataset, args.model, args.lr, args.weight_decay,
+               args.batch_size, args.trial)
+    
     args.logging_dir = os.path.join(args.logging_dir, args.model_name)
     if not os.path.isdir(args.logging_dir):
         os.makedirs(args.logging_dir)
@@ -97,13 +107,6 @@ def parse_args():
     args.save_dir = os.path.join(args.model_dir, args.model_name)
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
-
-    if args.dataset == 'cifar10':
-        args.n_cls = 10
-    elif args.dataset == 'cifar100':
-        args.n_cls = 100
-    else:
-        raise ValueError('dataset not supported: {}'.format(args.dataset))
 
     return args
 

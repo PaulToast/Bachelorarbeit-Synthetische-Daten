@@ -10,12 +10,13 @@ import torch
 import torch.backends.cudnn as cudnn
 from torchvision import transforms, datasets
 
-from mvip_dataset import MVIPDataset
 from util import TwoCropTransform, AverageMeter
 from util import adjust_learning_rate, warmup_learning_rate, accuracy
 from util import set_optimizer, save_model
 from networks.resnet_big import SupConResNet
 from losses import SupConLoss
+
+from datasets import MVIPDataset
 
 from diffusers.utils import check_min_version, is_wandb_available
 if is_wandb_available():
@@ -95,19 +96,6 @@ def parse_args():
     args.save_dir = os.path.abspath(f'output/{args.experiment_name}/models')
     args.logging_dir = os.path.abspath(f'output/{args.experiment_name}/logs')
 
-    # Set model name for output
-    args.model_name = '{}_{}_{}_trial={}_lr={}_decay={}_bs={}_temp={}'.\
-        format(args.method, args.dataset, args.model, args.trial, args.lr,
-               args.weight_decay, args.batch_size, args.temp)
-    
-    args.logging_dir = os.path.join(args.logging_dir, args.model_name)
-    if not os.path.isdir(args.logging_dir):
-        os.makedirs(args.logging_dir)
-
-    args.save_dir = os.path.join(args.save_dir, args.model_name)
-    if not os.path.isdir(args.save_dir):
-        os.makedirs(args.save_dir)
-
     # Set-up learning rate
     iterations = args.lr_decay_epochs.split(',')
     args.lr_decay_epochs = list([])
@@ -129,6 +117,19 @@ def parse_args():
                     1 + math.cos(math.pi * args.lr_warm_epochs / args.epochs)) / 2
         else:
             args.lr_warmup_to = args.lr
+    
+    # Create directories
+    args.model_name = '{}_{}_{}_trial={}_lr={}_decay={}_bs={}_temp={}'.\
+        format(args.method, args.dataset, args.model, args.trial, args.lr,
+               args.weight_decay, args.batch_size, args.temp)
+    
+    args.logging_dir = os.path.join(args.logging_dir, args.model_name)
+    if not os.path.isdir(args.logging_dir):
+        os.makedirs(args.logging_dir)
+
+    args.save_dir = os.path.join(args.save_dir, args.model_name)
+    if not os.path.isdir(args.save_dir):
+        os.makedirs(args.save_dir)
 
     return args
 

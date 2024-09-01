@@ -11,11 +11,12 @@ import torch.backends.cudnn as cudnn
 import torch.nn.functional as F
 from torchvision import transforms, datasets
 
-from mvip_dataset import MVIPDataset
 from util import AverageMeter
 from util import adjust_learning_rate, warmup_learning_rate, accuracy
 from util import set_optimizer, save_model
 from networks.resnet_big import SupConResNet, LinearClassifier
+
+from datasets import MVIPDataset
 
 try:
     import apex
@@ -67,16 +68,9 @@ def parse_args():
     
     args = parser.parse_args()
 
-    # Set-up output directories
-    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/models')
+    # Set-up main output directories
+    args.model_dir = os.path.abspath(f'output/{args.experiment_name}/models')
     args.logging_dir = os.path.abspath(f'output/{args.experiment_name}/logs')
-
-    args.model_name = '{}_{}_lr_{}_decay_{}_bsz_{}'.\
-        format(args.dataset, args.model, args.lr, args.weight_decay, args.batch_size)
-    
-    args.save_dir = os.path.join(args.save_dir, args.model_name)
-    if not os.path.isdir(args.save_dir):
-        os.makedirs(args.save_dir)
 
     # Set-up learning rate
     iterations = args.lr_decay_epochs.split(',')
@@ -121,6 +115,14 @@ def parse_args():
             args.aug_dir_negative = None
     else:
         raise ValueError('dataset not supported: {}'.format(args.dataset))
+
+    # Create directores
+    args.model_name = '{}_{}_lr_{}_decay_{}_bsz_{}'.\
+        format(args.dataset, args.model, args.lr, args.weight_decay, args.batch_size)
+    
+    args.model_dir = os.path.join(args.model_dir, args.model_name)
+    if not os.path.isdir(args.model_dir):
+        os.makedirs(args.model_dir)
 
     return args
 
@@ -408,11 +410,11 @@ def main():
 
         # Save model
         if epoch % args.save_freq == 0:
-            save_file = os.path.join(args.save_dir, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
+            save_file = os.path.join(args.model_dir, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
             save_model(model, optimizer, args, epoch, save_file)
     
     # Save the last model
-    save_file = os.path.join(args.save_dir, 'last.pth')
+    save_file = os.path.join(args.model_dir, 'last.pth')
     save_model(model, optimizer, args, args.epochs, save_file)
 
     print('Best accuracy: {:.2f}'.format(best_acc))
