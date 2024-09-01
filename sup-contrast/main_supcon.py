@@ -69,6 +69,10 @@ def parse_args():
 
     args = parser.parse_args()
 
+    args.model_name = '{}_{}_{}_trial={}_lr={}_decay={}_bs={}_temp={}'.\
+        format(args.method, args.dataset, args.model, args.trial, args.lr,
+               args.weight_decay, args.batch_size, args.temp)
+
     # Set aug directories
     if args.aug_method is not None:
         assert args.aug_experiment is not None
@@ -115,10 +119,6 @@ def parse_args():
             args.lr_warmup_to = args.lr
     
     # Set-up output directory
-    args.model_name = '{}_{}_{}_trial={}_lr={}_decay={}_bs={}_temp={}'.\
-        format(args.method, args.dataset, args.model, args.trial, args.lr,
-               args.weight_decay, args.batch_size, args.temp)
-
     args.save_dir = os.path.abspath(f'output/{args.experiment_name}/{args.model_name}')
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
