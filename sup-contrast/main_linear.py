@@ -30,7 +30,7 @@ if is_wandb_available():
 
 
 def parse_args():
-    parser = argparse.ArgumentParser('Argument for training')
+    parser = argparse.ArgumentParser('Arguments for training')
 
     parser.add_argument('--experiment_name', type=str, default=None, help='Output directory name for experiment.')
 
@@ -39,9 +39,9 @@ def parse_args():
     parser.add_argument('--data_dir', type=str, default=None)
 
     parser.add_argument('--aug_method', type=str, default=None, choices=[None, 'positive'])
-    parser.add_argument('--aug_experiment', type=str, default=None)
-    parser.add_argument('--aug_name_positive', type=str, default=None)
-    parser.add_argument('--aug_name_negative', type=str, default=None)
+    parser.add_argument('--aug_experiment', type=str, default="mvip-v9-final")
+    parser.add_argument('--aug_name_positive', type=str, default="aug=0.2_ex=16_num=4_g=15")
+    parser.add_argument('--aug_name_negative', type=str, default="aug=0.5_ex=16_num=4_g=15")
 
     # Training
     parser.add_argument('--model', type=str, default='resnet50')
@@ -67,10 +67,6 @@ def parse_args():
     parser.add_argument('--print_freq', type=int, default=10, help='Print training progress every N steps.')
     
     args = parser.parse_args()
-
-    # Set-up main output directories
-    args.model_dir = os.path.abspath(f'output/{args.experiment_name}/models')
-    args.logging_dir = os.path.abspath(f'output/{args.experiment_name}/logs')
 
     # Set-up learning rate
     iterations = args.lr_decay_epochs.split(',')
@@ -116,13 +112,13 @@ def parse_args():
     else:
         raise ValueError('dataset not supported: {}'.format(args.dataset))
 
-    # Create directores
+    # Set-up output directory
     args.model_name = '{}_{}_lr_{}_decay_{}_bsz_{}'.\
         format(args.dataset, args.model, args.lr, args.weight_decay, args.batch_size)
     
-    args.model_dir = os.path.join(args.model_dir, args.model_name)
-    if not os.path.isdir(args.model_dir):
-        os.makedirs(args.model_dir)
+    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/{args.model_name}')
+    if not os.path.isdir(args.save_dir):
+        os.makedirs(args.save_dir)
 
     return args
 
@@ -410,11 +406,11 @@ def main():
 
         # Save model
         if epoch % args.save_freq == 0:
-            save_file = os.path.join(args.model_dir, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
+            save_file = os.path.join(args.save_dir, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
             save_model(model, optimizer, args, epoch, save_file)
     
     # Save the last model
-    save_file = os.path.join(args.model_dir, 'last.pth')
+    save_file = os.path.join(args.save_dir, 'last.pth')
     save_model(model, optimizer, args, args.epochs, save_file)
 
     print('Best accuracy: {:.2f}'.format(best_acc))

@@ -34,9 +34,9 @@ def parse_args():
     parser.add_argument('--data_dir', type=str, default=None)
 
     parser.add_argument('--aug_method', type=str, default=None, choices=[None, 'positive', 'both'])
-    parser.add_argument('--aug_experiment', type=str, default=None)
-    parser.add_argument('--aug_name_positive', type=str, default=None)
-    parser.add_argument('--aug_name_negative', type=str, default=None)
+    parser.add_argument('--aug_experiment', type=str, default="mvip-v9-final")
+    parser.add_argument('--aug_name_positive', type=str, default="aug=0.2_ex=16_num=4_g=15")
+    parser.add_argument('--aug_name_negative', type=str, default="aug=0.5_ex=16_num=4_g=15")
     #parser.add_argument('--aug_ex_positive', type=int, default=-1)
     #parser.add_argument('--aug_ex_negative', type=int, default=8)
 
@@ -92,10 +92,6 @@ def parse_args():
         args.aug_dir_positive = None
         args.aug_dir_negative = None
 
-    # Set-up output directories
-    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/models')
-    args.logging_dir = os.path.abspath(f'output/{args.experiment_name}/logs')
-
     # Set-up learning rate
     iterations = args.lr_decay_epochs.split(',')
     args.lr_decay_epochs = list([])
@@ -118,16 +114,12 @@ def parse_args():
         else:
             args.lr_warmup_to = args.lr
     
-    # Create directories
+    # Set-up output directory
     args.model_name = '{}_{}_{}_trial={}_lr={}_decay={}_bs={}_temp={}'.\
         format(args.method, args.dataset, args.model, args.trial, args.lr,
                args.weight_decay, args.batch_size, args.temp)
-    
-    args.logging_dir = os.path.join(args.logging_dir, args.model_name)
-    if not os.path.isdir(args.logging_dir):
-        os.makedirs(args.logging_dir)
 
-    args.save_dir = os.path.join(args.save_dir, args.model_name)
+    args.save_dir = os.path.abspath(f'output/{args.experiment_name}/{args.model_name}')
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
 
