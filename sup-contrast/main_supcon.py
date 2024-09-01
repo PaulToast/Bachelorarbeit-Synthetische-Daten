@@ -33,7 +33,7 @@ def parse_args():
     parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100', 'mvip'])
     parser.add_argument('--data_dir', type=str, default=None)
 
-    parser.add_argument('--aug_method', type=str, default=None, choices=[None, 'positive', 'both'])
+    parser.add_argument('--aug_mode', type=str, default=None, choices=[None, 'positive', 'both'])
     parser.add_argument('--aug_experiment', type=str, default="mvip-v9-final")
     parser.add_argument('--aug_name_positive', type=str, default="aug=0.2_ex=16_num=4_g=15")
     parser.add_argument('--aug_name_negative', type=str, default="aug=0.5_ex=16_num=4_g=15")
@@ -126,7 +126,7 @@ def parse_args():
     return args
 
 
-def set_loader(args, split="train"):
+def set_loader(args, split="train", aug_mode=None):
     # Set-up transforms
     mean_std = {
         'cifar10': ([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
@@ -163,13 +163,6 @@ def set_loader(args, split="train"):
                                     transform=TwoCropTransform(transform),
                                     download=True)
     elif args.dataset == "mvip":
-        if split == "ood":
-            aug_mode = "negative_only"
-        elif split == "train":
-            aug_mode = args.aug_method
-        else:
-            aug_mode = None
-        
         dataset = MVIPDataset(split=split,
                               aug_mode=aug_mode,
                               aug_dir_positive=args.aug_dir_positive,
@@ -317,8 +310,8 @@ def main():
     # Build dataloaders
     print("Preparing dataloaders...")
 
-    train_loader = set_loader(args, "train")
-    val_loader = set_loader(args, "val")
+    train_loader = set_loader(args, split="train", aug_mode=args.aug_mode)
+    val_loader = set_loader(args, split="val", aug_mode=None)
 
     print(f"Dataloaders ready. Train length: {train_loader.__len__()}, Validation length: {val_loader.__len__()}")
 

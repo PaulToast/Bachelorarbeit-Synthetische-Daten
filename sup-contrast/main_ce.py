@@ -38,7 +38,7 @@ def parse_args():
     parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100'])
     parser.add_argument('--data_dir', type=str, default=None)
 
-    parser.add_argument('--aug_method', type=str, default=None, choices=[None, 'positive'])
+    parser.add_argument('--aug_mode', type=str, default=None, choices=[None, 'positive'])
     parser.add_argument('--aug_experiment', type=str, default="mvip-v9-final")
     parser.add_argument('--aug_name_positive', type=str, default="aug=0.2_ex=16_num=4_g=15")
     parser.add_argument('--aug_name_negative', type=str, default="aug=0.5_ex=16_num=4_g=15")
@@ -226,7 +226,7 @@ def main():
     # Build dataloaders
     print("Preparing dataloaders...")
 
-    train_loader = set_loader(args, split="train", aug_mode=args.aug_method)
+    train_loader = set_loader(args, split="train", aug_mode=args.aug_mode)
     val_loader = set_loader(args, split="val", aug_mode=None)
 
     print("Dataloaders ready.")

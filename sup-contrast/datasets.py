@@ -13,7 +13,7 @@ class MVIPDataset(Dataset):
     def __init__(
         self,
         split="train",
-        aug_mode=None, # None, "positive", "both", "negative_only"
+        aug_mode=None, # None, "positive", "both", "positive_only", "negative_only"
         aug_dir_positive=None,
         aug_dir_negative=None,
         aug_ex_positive=-1,
@@ -57,14 +57,14 @@ class MVIPDataset(Dataset):
 
         # Collect all augmentations & OOD images
         if self.aug_mode == "positive":
-            self.all_augs_positive, self.all_augs_positive_labels = self.parse_augs(self.class_names, self.aug_dir_positive, self.aug_ex_positive)
+            self.all_augs_positive, self.all_augs_positive_labels = self.parse_augs("positive", self.class_names, self.aug_dir_positive, self.aug_ex_positive)
             for i in range(len(self.all_augs_positive)):
                 self.all_images.append(self.all_augs_positive[i])
                 self.all_masks.append(None)
                 self.all_labels.append(self.all_augs_positive_labels[i])
         elif self.aug_mode == "both":
-            self.all_augs_positive, self.all_augs_positive_labels = self.parse_augs(self.class_names, self.aug_dir_positive, self.aug_ex_positive)
-            self.all_augs_negative, self.all_augs_negative_labels = self.parse_augs(self.class_names, self.aug_dir_negative, self.aug_ex_negative)
+            self.all_augs_positive, self.all_augs_positive_labels = self.parse_augs("positive", self.class_names, self.aug_dir_positive, self.aug_ex_positive)
+            self.all_augs_negative, self.all_augs_negative_labels = self.parse_augs("negative", self.class_names, self.aug_dir_negative, self.aug_ex_negative)
             for i in range(len(self.all_augs_positive)):
                 self.all_images.append(self.all_augs_positive[i])
                 self.all_masks.append(None)
@@ -72,13 +72,25 @@ class MVIPDataset(Dataset):
             for i in range(len(self.all_augs_negative)):
                 self.all_images.append(self.all_augs_negative[i])
                 self.all_masks.append(None)
-                self.all_labels.append(-1) # -1 as OOD-label
+                self.all_labels.append(self.all_augs_negative_labels[i])
+        elif self.aug_mode == "positive_only":
+            self.all_images.clear()
+            self.all_masks.clear()
+            self.all_labels.clear()
+            self.all_augs_positive , self.all_augs_positive_labels = self.parse_augs("positive", self.class_names, self.aug_dir_negative, self.aug_ex_negative)
+            for i in range(len(self.all_augs_positive)):
+                self.all_images.append(self.all_augs_positive[i])
+                self.all_masks.append(None)
+                self.all_labels.append(self.all_augs_positive_labels[i])
         elif self.aug_mode == "negative_only":
-            self.all_augs_negative, self.all_augs_negative_labels = self.parse_augs(self.class_names, self.aug_dir_negative, self.aug_ex_negative)
+            self.all_images.clear()
+            self.all_masks.clear()
+            self.all_labels.clear()
+            self.all_augs_negative, self.all_augs_negative_labels = self.parse_augs("negative", self.class_names, self.aug_dir_negative, self.aug_ex_negative)
             for i in range(len(self.all_augs_negative)):
                 self.all_images.append(self.all_augs_negative[i])
                 self.all_masks.append(None)
-                self.all_labels.append(-1)
+                self.all_labels.append(self.all_augs_negative_labels[i])
 
         self._length = len(self.all_images)
 
@@ -157,7 +169,7 @@ class MVIPDataset(Dataset):
         
         return images, masks, labels
     
-    def parse_augs(self, class_names, aug_dir, examples_per_class):
+    def parse_augs(self, aug_type, class_names, aug_dir, examples_per_class):
         augs = os.listdir(aug_dir)
 
         shuffle_idx = np.random.permutation(len(augs))
@@ -167,11 +179,16 @@ class MVIPDataset(Dataset):
             del augs[examples_per_class*len(class_names)*4:] # num_synthetic=4
         print(len(augs))
 
+        if aug_type == "positive":
+            label_sign = 1
+        else:
+            label_sign = -1
+
         labels = []
         for class_name in class_names:
             for file in augs:
                 if class_name in file:
-                    labels.append(self.class_to_label_id[class_name])
+                    labels.append(self.class_to_label_id[class_name] * label_sign)
         
         return augs, labels
     
