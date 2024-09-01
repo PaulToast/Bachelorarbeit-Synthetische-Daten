@@ -109,9 +109,9 @@ class SupConLoss(nn.Module):
         mask = mask * self_contrast_mask
 
         # Also ignore logits for OOD samples where OOD label is not the negative anchor label
-        id_mask = 1 - ood_mask
-        valid_oods_mask = (labels == -labels.T).float().to(device).detach()
-        logits *= (id_mask + valid_oods_mask).repeat(anchor_count, contrast_count)
+        non_ood_mask = 1 - ood_mask
+        valid_ood_mask = (labels == -labels.T).float().to(device).detach()
+        logits *= (non_ood_mask + valid_ood_mask).repeat(anchor_count, contrast_count)
 
         # Transform the logits into log-probabilities (of a pair being *more* similar than any other pair)
         # -> We don't just want to maximize similarity for positive pairs,
@@ -132,6 +132,6 @@ class SupConLoss(nn.Module):
         """# Scale loss depending on batch size reduction
         loss *= original_batch_size / new_batch_size"""
 
-        del id_mask, ood_mask, valid_oods_mask
+        del ood_mask, non_ood_mask, valid_ood_mask
 
         return loss
