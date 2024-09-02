@@ -13,11 +13,11 @@ class MVIPDataset(Dataset):
     def __init__(
         self,
         split="train",
-        aug_mode=None, # None, "positive", "both", "positive_only", "negative_only"
-        aug_dir_positive=None,
-        aug_dir_negative=None,
-        aug_ex_positive=-1, # -1 for all
-        aug_ex_negative=-1, # -1 for all
+        aug_mode=None, # None, "with_id", "with_both", "id_only", "ood_only"
+        aug_dir_id=None,
+        aug_dir_ood=None,
+        aug_ex_id=-1, # -1 for all
+        aug_ex_ood=-1, # -1 for all
         image_size=512,
         transform=None,
     ):
@@ -25,10 +25,10 @@ class MVIPDataset(Dataset):
         self.split = split
         
         self.aug_mode = aug_mode
-        self.aug_dir_positive = aug_dir_positive
-        self.aug_dir_negative = aug_dir_negative
-        self.aug_ex_positive = aug_ex_positive
-        self.aug_ex_negative = aug_ex_negative
+        self.aug_dir_id = aug_dir_id
+        self.aug_dir_ood = aug_dir_ood
+        self.aug_ex_id = aug_ex_id
+        self.aug_ex_ood = aug_ex_ood
 
         # Define classes & collect dataset
         self._initialize_classes(num_classes=20, super_class="CarComponent")
@@ -100,20 +100,20 @@ class MVIPDataset(Dataset):
         self.all_masks = []
 
         # Collect all real images
-        if self.aug_mode not in ["positive_only", "negative_only"]:
+        if self.aug_mode not in ["id_only", "ood_only"]:
             self.all_images, self.all_labels, self.all_masks = self.parse_dataset()
 
         # Collect all augmentations & OOD images
-        if self.aug_mode in ["positive", "both", "positive_only"]:
-            positive_augs, positive_labels, positive_masks = self.parse_augs("positive")
-            self.all_images += positive_augs
-            self.all_labels += positive_labels
-            self.all_masks += positive_masks
-        if self.aug_mode in ["both", "negative_only"]:
-            negative_augs, negative_labels, negative_masks = self.parse_augs("negative")
-            self.all_images += negative_augs
-            self.all_labels += negative_labels
-            self.all_masks += negative_masks
+        if self.aug_mode in ["with_id", "with_both", "id_only"]:
+            id_augs, id_labels, id_masks = self.parse_augs("id")
+            self.all_images += id_augs
+            self.all_labels += id_labels
+            self.all_masks += id_masks
+        if self.aug_mode in ["with_both", "ood_only"]:
+            ood_augs, ood_labels, ood_masks = self.parse_augs("ood")
+            self.all_images += ood_augs
+            self.all_labels += ood_labels
+            self.all_masks += ood_masks
         
         self._length = len(self.all_images)
 
@@ -162,13 +162,13 @@ class MVIPDataset(Dataset):
     def parse_augs(self, aug_type):
         """Parse the augmentation directory and return all augmented images and labels."""
 
-        if aug_type == "positive":
-            aug_dir = self.aug_dir_positive
-            examples_per_class = self.aug_ex_positive
+        if aug_type == "id":
+            aug_dir = self.aug_dir_id
+            examples_per_class = self.aug_ex_id
             label_sign = 1
         else:
-            aug_dir = self.aug_dir_negative
-            examples_per_class = self.aug_ex_negative
+            aug_dir = self.aug_dir_ood
+            examples_per_class = self.aug_ex_ood
             label_sign = -1 # OOD augmentations receive negative labels
         
         augs = os.listdir(aug_dir)

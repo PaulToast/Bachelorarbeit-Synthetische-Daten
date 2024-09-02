@@ -8,6 +8,7 @@ import math
 
 import torch
 import torch.backends.cudnn as cudnn
+import torch.nn.functional as F
 from torchvision import transforms, datasets
 
 from main_linear import set_loader
@@ -40,24 +41,24 @@ def parse_args():
     parser.add_argument('--aug_mode',
                         type=str,
                         default=None,
-                        choices=[None, 'positive'],
+                        choices=[None, 'with_id'],
                         help=("Augmentation mode for contrastive training. ",
                               "If None, no augmentations are used. ",
-                              "If 'positive', normal augmentations are added for training. ",
+                              "If 'with_id', normal augmentations are added for training. ",
                               "OOD augmentations are not supported for linear classification stage, ",
                               "but are used for validating OOD detection."))
     parser.add_argument('--aug_output_name',
                         type=str,
                         default="mvip-v9-final",
                         help="DA-Fusion output name for the augmentations.")
-    parser.add_argument('--aug_name_positive',
+    parser.add_argument('--aug_name_id',
                         type=str,
                         default="aug=0.2_ex=16_num=4_g=15",
-                        help="Name of the subfolder containing the positive augmentations.")
-    parser.add_argument('--aug_name_negative',
+                        help="Name of the subfolder containing the in-distribution augmentations.")
+    parser.add_argument('--aug_name_ood',
                         type=str,
                         default="aug=0.5_ex=16_num=4_g=15",
-                        help="Name of the subfolder containing the negative augmentations.")
+                        help="Name of the subfolder containing the out-of-distribution augmentations.")
 
     # Training
     parser.add_argument('--model', type=str, default='resnet50')
@@ -116,19 +117,19 @@ def parse_args():
     elif args.dataset == 'mvip':
         args.num_classes = 20
 
-        if args.aug_name_positive is not None:
-            args.aug_dir_positive = os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_positive}'
+        if args.aug_name_id is not None:
+            args.aug_dir_id = os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_id}'
             ))
         else:
-            args.aug_dir_positive = None
+            args.aug_dir_id = None
 
-        if args.aug_name_negative is not None:
-            args.aug_dir_negative = os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_negative}'
+        if args.aug_name_ood is not None:
+            args.aug_dir_ood = os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_ood}'
             ))
         else:
-            args.aug_dir_negative = None
+            args.aug_dir_ood = None
     else:
         raise ValueError('dataset not supported: {}'.format(args.dataset))
     
@@ -215,8 +216,8 @@ def validate(val_loader, ood_loader, model, criterion, args):
     batch_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
-    ID_confidences = AverageMeter()
-    OOD_confidences = AverageMeter()
+    id_confidences = AverageMeter()
+    ood_confidences = AverageMeter()
 
     with torch.no_grad():
         # Loss & accuracy validation
@@ -236,9 +237,9 @@ def validate(val_loader, ood_loader, model, criterion, args):
             top1.update(acc1[0], bsz)
 
             # Log in-distribution confidence
-            ID_probabilities = F.softmax(output, dim=1)
-            ID_confidence = torch.max(ID_probabilities, dim=1).values.mean().item()
-            ID_confidences.update(ID_confidence, 1)
+            id_probabilities = F.softmax(output, dim=1)
+            id_confidence = torch.max(id_probabilities, dim=1).values.mean().item()
+            id_confidences.update(id_confidence, 1)
 
             # Measure elapsed time
             batch_time.update(time.time() - end)
@@ -254,16 +255,16 @@ def validate(val_loader, ood_loader, model, criterion, args):
                 
         # OOD validation
         end = time.time()
-        for idx, (OOD_images, OOD_labels) in enumerate(ood_loader):
-            OOD_images = OOD_images.float().cuda()
-            OOD_labels = OOD_labels.cuda()
+        for idx, (ood_images, ood_labels) in enumerate(ood_loader):
+            ood_images = ood_images.float().cuda()
+            ood_labels = ood_labels.cuda()
 
-            OOD_output = model(OOD_images)
+            ood_output = model(ood_images)
 
             # Log out-of-distribution confidence
-            OOD_probabilities = F.softmax(OOD_output, dim=1)
-            OOD_confidence = torch.max(OOD_probabilities, dim=1).values.mean().item()
-            OOD_confidences.update(OOD_confidence, 1)
+            ood_probabilities = F.softmax(ood_output, dim=1)
+            ood_confidence = torch.max(ood_probabilities, dim=1).values.mean().item()
+            ood_confidences.update(ood_confidence, 1)
             
             # Measure elapsed time
             batch_time.update(time.time() - end)
@@ -275,10 +276,10 @@ def validate(val_loader, ood_loader, model, criterion, args):
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                       'OOD confidence {conf.val:.4f} ({conf.avg:.4f})'.format(
                        idx, len(val_loader), batch_time=batch_time,
-                       conf=OOD_confidences))
+                       conf=ood_confidences))
 
     print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
-    return losses.avg, top1.avg, ID_confidences.avg, OOD_confidences.avg
+    return losses.avg, top1.avg, id_confidences.avg, ood_confidences.avg
 
 
 def main():
@@ -289,7 +290,7 @@ def main():
 
     train_loader = set_loader(args, split="train", aug_mode=args.aug_mode)
     val_loader = set_loader(args, split="val", aug_mode=None)
-    ood_loader = set_loader(args, split="val", aug_mode="negative_only")
+    ood_loader = set_loader(args, split="val", aug_mode="ood_only")
 
     print("Dataloaders ready.")
 
@@ -325,7 +326,7 @@ def main():
         start_time = time.time()
 
         avg_train_loss, avg_train_acc = train(train_loader, model, criterion, optimizer, epoch, args)
-        avg_val_loss, avg_val_acc, avg_ID_confidence, avg_OOD_confidence = validate(val_loader, ood_loader, model, criterion, args)
+        avg_val_loss, avg_val_acc, avg_id_confidence, avg_ood_confidence = validate(val_loader, ood_loader, model, criterion, args)
 
         end_time = time.time()
 
@@ -337,8 +338,8 @@ def main():
             "avg_val_loss": avg_val_loss,
             "avg_train_acc": avg_train_acc,
             "avg_val_acc": avg_val_acc,
-            "avg_ID_confidence": avg_ID_confidence,
-            "avg_OOD_confidence": avg_OOD_confidence,
+            "avg_ID_confidence": avg_id_confidence,
+            "avg_OOD_confidence": avg_ood_confidence,
         })
 
         if avg_val_acc > best_acc:

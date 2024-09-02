@@ -36,23 +36,23 @@ def parse_args():
     parser.add_argument('--aug_mode',
                         type=str,
                         default=None,
-                        choices=[None, 'positive', 'both'],
+                        choices=[None, 'with_id', 'with_both'],
                         help=("Augmentation mode for contrastive training. ",
                               "If None, no augmentations are used. ",
-                              "If 'positive', normal augmentations are used as additional positive examples. ",
-                              "If 'both', OOD augmentations are also added for hard-negative mining. "))
+                              "If 'with_id', normal augmentations are used as additional in-distribution examples. ",
+                              "If 'with_both', OOD augmentations are also added for hard-negative mining. "))
     parser.add_argument('--aug_output_name',
                         type=str,
                         default="mvip-v9-final",
                         help="DA-Fusion output name for the augmentations.")
-    parser.add_argument('--aug_name_positive',
+    parser.add_argument('--aug_name_id',
                         type=str,
                         default="aug=0.2_ex=16_num=4_g=15",
-                        help="Name of the subfolder containing the positive augmentations.")
-    parser.add_argument('--aug_name_negative',
+                        help="Name of the subfolder containing the in-distribution augmentations.")
+    parser.add_argument('--aug_name_ood',
                         type=str,
                         default="aug=0.5_ex=16_num=4_g=15",
-                        help="Name of the subfolder containing the negative augmentations.")
+                        help="Name of the subfolder containing the out-of-distribution augmentations.")
 
     # Training
     parser.add_argument('--model', type=str, default='resnet50')
@@ -89,24 +89,27 @@ def parse_args():
     if args.aug_mode is not None:
         assert args.aug_output_name is not None
 
-        if args.aug_mode == 'positive':
-            assert args.aug_name_positive is not None
-            args.aug_dir_positive = os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_positive}'
+        if args.aug_mode == 'with_id':
+            assert args.aug_name_id is not None
+
+            args.aug_dir_id = os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_id}'
             ))
-            args.aug_dir_negative = None
-        elif args.aug_mode == 'both':
-            assert args.aug_name_positive is not None \
-                and args.aug_name_negative is not None
-            args.aug_dir_positive = os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_positive}'
+            args.aug_dir_ood = None
+        
+        elif args.aug_mode == 'with_both':
+            assert args.aug_name_id is not None \
+                and args.aug_name_ood is not None
+            
+            args.aug_dir_id = os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_id}'
             ))
-            args.aug_dir_negative = os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_negative}'
+            args.aug_dir_ood = os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_ood}'
             ))
     else:
-        args.aug_dir_positive = None
-        args.aug_dir_negative = None
+        args.aug_dir_id = None
+        args.aug_dir_ood = None
 
     # Set-up learning rate
     iterations = args.lr_decay_epochs.split(',')
@@ -177,10 +180,10 @@ def set_loader(args, split="train", aug_mode=None):
     elif args.dataset == "mvip":
         dataset = MVIPDataset(split=split,
                               aug_mode=aug_mode,
-                              aug_dir_positive=args.aug_dir_positive,
-                              aug_dir_negative=args.aug_dir_negative,
-                              aug_ex_positive=-1,
-                              aug_ex_negative=8,
+                              aug_dir_id=args.aug_dir_id,
+                              aug_dir_ood=args.aug_dir_ood,
+                              aug_ex_id=-1,
+                              aug_ex_ood=8,
                               transform=TwoCropTransform(transform))
 
     # Build dataloader
@@ -236,8 +239,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
         elif args.method == 'SimCLR':
             loss = criterion(features)
         else:
-            raise ValueError('Contrastive method not supported: {}'.
-                             format(args.method))
+            raise ValueError('Contrastive method not supported: {}'.format(args.method))
 
         # Update metric & log
         losses.update(loss.item(), bsz)
