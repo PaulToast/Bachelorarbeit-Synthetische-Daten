@@ -1,21 +1,21 @@
 \chapter{Theoretische Grundlagen}
 
-Dieses Kapitel behandelt die theoretischen Grundlagen, die zum Verständnis der zu entwickelnden Methode am wichtigsten sind. Dazu werden zunächst Grundbegriffe und Konzepte des Maschinellen Lernens und der Bildklassifikation erklärt. Anschließend geht es um Stable Diffusion, die darauf basierende Methode DA-Fusion, sowie um Contrastive Learning.
+...
 
 \section{Maschinelles Lernen}
 
-Im Folgenden werden die Grundlagen des maschinellen Lernens erläutert, um ein Verständnis für die Methoden und Konzepte zu schaffen, die in dieser Arbeit verwendet werden. Dazu gehören Definitionen, die Unterscheidung zwischen überwachtem und unüberwachtem Lernen, sowie eine Einführung in Deep Learning und Convolutional Neural Networks.
+...
 
 \subsection{Definition und Ursprung}
 
-Maschinelles Lernen (ML) ist ein Teilbereich der künstlichen Intelligenz (KI), in dem Computern das Lernen anhand von Erfahrung ermöglicht wird. Die ersten Durchbrüche in der KI kamen im Bezug auf Aufgaben, die für Menschen intellektuell eine große Herausforderung darstellten, die aber von Computern relativ einfach zu lösen waren, da sie als Liste formaler, mathematischer Regeln beschrieben werden konnten \parencite{Goodfellow2016}. Die große Schwierigkeit lag aber in den Aufgaben, die für Menschen relativ einfach und intuitiv sind, welche sich aber nicht einfach formal beschreiben lassen. Die grundlegende Idee hinter maschinellem Lernen ist daher, Computer mit der Fähigkeit auszustatten, selbstständig Wissen aus Erfahrung zu generieren, indem Muster und Konzepte aus rohen Daten erlernt werden.
+Die ersten Durchbrüche in der Künstlichen Intelligenz (KI) kamen im Bezug auf Aufgaben, die für Menschen intellektuell eine große Herausforderung darstellten, die aber von Computern relativ einfach zu lösen waren, da sie als Liste formaler, mathematischer Regeln beschrieben werden konnten \parencite{Goodfellow2016}. Die große Schwierigkeit lag jedoch in den Aufgaben, die für Menschen relativ einfach und intuitiv sind, welche sich aber nicht einfach formal beschreiben lassen. Unter maschinellem Lernen (ML) versteht man den Lösungsansatz, Computer mit der Fähigkeit auszustatten, selbstständig Wissen aus Erfahrung zu generieren, indem Muster und Konzepte aus rohen Daten erlernt werden.
 
-Eine allgemeine Definition für maschinelles Lernen liefert \parencite{Mitchell1997}:
+Eine allgemeine Definition für maschinelles Lernen bietet \parencite{Mitchell1997}:
 \begin{quote}
 Ein Computerprogramm soll aus Erfahrung $E$ in Bezug auf eine Klasse von Aufgaben $T$ und Leistungsmaß $P$ lernen, wenn sich seine Leistung bei Aufgaben $T$, gemessen durch $P$, mit Erfahrung $E$ verbessert.
 \end{quote}
 
-Dabei kommen verschiedene Aufgaben $T$ in Frage, etwa die in dieser Arbeit thematisierte Bildklassifikation, oder aber auch Bilgsegmentierung, Anomaliedetektion, maschinelle Übersetzung, usw. Je nach Aufgabe können verschiedene Leistungsmaße $P$ herangezogen werden, wie etwa die \textit{Accuracy}, welche die Trefferrate richtiger Vorhersagen beschreibt. Auch die Erfahrung $E$ kann je nach Lernmethode variieren, wie im nachfolgenden Abschnitt genauer erklärt wird.
+Die Erfahrung $E$ besteht dabei aus einer Menge von Trainingsdaten, die aus Eingabe-Ausgabe-Paaren bestehen. Die Aufgaben $T$ können dabei sehr vielfältig sein, von einfachen Klassifikations- und Regressionsaufgaben bis hin zu komplexen Problemen wie Spracherkennung oder autonomen Fahren. Das Leistungsmaß $P$ gibt an, wie gut das Modell die Aufgaben $T$ löst, und kann z.B. die Genauigkeit einer Klassifikation oder die mittlere quadratische Abweichung bei einer Regression sein.
 
 \subsection{Überwachtes und unüberwachtes Lernen}
 
@@ -45,21 +45,18 @@ Ein Convolutional Neural Network (CNN) ist ein spezielles künstliches neuronale
 
 Die Architektur eines CNN besteht typischerweise aus mehreren Schichten, die in der folgenden Reihenfolge angeordnet sind:
 
-1. Eingabeschicht (Input Layer): Diese Schicht nimmt die Rohdaten auf, z.B. ein Bild in Form eines 2D-Arrays von Pixelwerten.
-
-2. Faltungsschicht (Convolutional Layer): Diese Schicht führt die eigentliche Faltung (Convolution) durch, indem sie einen Filter (Kernel) über das Eingabebild verschiebt und Punktoperationen durchführt. Das Ergebnis ist eine Feature-Map, die lokale Merkmale des Bildes extrahiert. Jeder Filter kann unterschiedliche Merkmale wie Kanten, Ecken oder Texturen erkennen.
-
-3. Aktivierungsschicht (Activation Layer): Nach jeder Faltungsschicht wird normalerweise eine Aktivierungsfunktion angewendet, um nichtlineare Eigenschaften des Netzwerks zu modellieren. Die häufig verwendete Aktivierungsfunktion ist die ReLU (Rectified Linear Unit), die alle negativen Werte auf Null setzt und positive Werte unverändert lässt.
-
-4.Pooling-Schicht (Pooling Layer): Diese Schicht reduziert die räumliche Dimension der Feature-Maps, was die Berechnungen effizienter macht und die Gefahr von Überanpassung (Overfitting) verringert. Die gängigsten Pooling-Methoden sind Max-Pooling (wählt den maximalen Wert in einem bestimmten Bereich) und Average-Pooling (berechnet den Durchschnittswert in einem bestimmten Bereich).
-
-5. Vollständig verbundene Schicht (Fully Connected Layer): Dies ist eine herkömmliche neuronale Netzwerkschicht, bei der jeder Neuron mit jedem Neuron der vorherigen Schicht verbunden ist. Sie kombiniert die extrahierten Merkmale, um das endgültige Ergebnis zu liefern, z.B. die Klassifikation des Bildes.
-
-6. Ausgabeschicht (Output Layer): In der letzten Schicht wird eine Aktivierungsfunktion wie Softmax verwendet, um die Wahrscheinlichkeitsverteilung der möglichen Klassen zu berechnen.
+\begin{enumerate}[]
+	\item Eingabeschicht (Input Layer): Diese Schicht nimmt die Rohdaten auf, z.B. ein Bild in Form eines 2D-Arrays von Pixelwerten.
+	\item Faltungsschicht (Convolutional Layer): Diese Schicht führt die eigentliche Faltung (Convolution) durch, indem sie einen Filter (Kernel) über das Eingabebild verschiebt und Punktoperationen durchführt. Das Ergebnis ist eine Feature-Map, die lokale Merkmale des Bildes extrahiert. Jeder Filter kann unterschiedliche Merkmale wie Kanten, Ecken oder Texturen erkennen.
+	\item Aktivierungsschicht (Activation Layer): Nach jeder Faltungsschicht wird normalerweise eine Aktivierungsfunktion angewendet, um nichtlineare Eigenschaften des Netzwerks zu modellieren. Die häufig verwendete Aktivierungsfunktion ist die ReLU (Rectified Linear Unit), die alle negativen Werte auf Null setzt und positive Werte unverändert lässt.
+	\item Pooling-Schicht (Pooling Layer): Diese Schicht reduziert die räumliche Dimension der Feature-Maps, was die Berechnungen effizienter macht und die Gefahr von Überanpassung (Overfitting) verringert. Die gängigsten Pooling-Methoden sind Max-Pooling (wählt den maximalen Wert in einem bestimmten Bereich) und Average-Pooling (berechnet den Durchschnittswert in einem bestimmten Bereich).
+	\item Vollständig verbundene Schicht (Fully Connected Layer): Dies ist eine herkömmliche neuronale Netzwerkschicht, bei der jeder Neuron mit jedem Neuron der vorherigen Schicht verbunden ist. Sie kombiniert die extrahierten Merkmale, um das endgültige Ergebnis zu liefern, z.B. die Klassifikation des Bildes.
+	\item Ausgabeschicht (Output Layer): In der letzten Schicht wird eine Aktivierungsfunktion wie Softmax verwendet, um die Wahrscheinlichkeitsverteilung der möglichen Klassen zu berechnen.
+\end{enumerate}
 
 \subsection{Datenaugmentation}
 
-...
+Datenaugmentation ist ein wichtiger Schritt im Training von neuronalen Netzen, insbesondere bei begrenzten Datensätzen. Sie bezieht sich auf die künstliche Erweiterung des Trainingsdatensatzes durch Anwenden von Transformationen auf die vorhandenen Daten. Diese Transformationen können z.B. Rotation, Skalierung, Verschiebung, Spiegelung, Helligkeitsanpassung oder Rauschen sein. Das Ziel der Datenaugmentation ist es, das Modell robuster gegenüber Variationen in den Eingabedaten zu machen und die Generalisierungsfähigkeit zu verbessern.
 
 \section{Synthetische Daten in der Bildklassifikation}
 
@@ -67,7 +64,7 @@ Die Architektur eines CNN besteht typischerweise aus mehreren Schichten, die in 
 
 \subsection{Definition und Notwendigkeit synthetischer Daten}
 
-...
+Während die Verfügbarkeit großer Datensätze für das Training von neuronalen Netzen ein entscheidender Faktor für den Erfolg von Deep Learning-Modellen ist, ist es oft schwierig, solche Datensätze zu sammeln, insbesondere in Domänen wie der Medizin oder der Robotik, wo die Daten rar und teuer sind. In solchen Fällen können synthetische Daten eine nützliche Alternative oder Ergänzung zu echten Daten sein. Synthetische Daten sind künstlich erzeugte Daten, welche die zugrundeliegenden Muster der realen Daten nachahmen. Sie können durch Simulation, Generierung oder Transformation von echten Daten erstellt werden.
 
 \subsection{Vorteile und Herausforderungen}
 
@@ -87,7 +84,12 @@ Die Architektur eines CNN besteht typischerweise aus mehreren Schichten, die in 
 
 \subsection{Einführung in Diffusion-Modelle}
 
+Unter Diffusion versteht man den Prozess der langsamen Vermischung von Partikeln oder Informationen über die Zeit. In der Physik beschreibt die Diffusionsgleichung die zeitliche Entwicklung der Dichte von Teilchen, die sich zufällig bewegen. Dieses Konzept fand erstmals im maschinellen Lernen Anwendung, als Jascha Sohl-Dickstein et al. 2015 das Konzept der Diffusion-Modelle einführten \parencite{}.
+
+Bei Diffusion-Modellen handelt es sich um eine Klasse von generativen Deep Learning-Modellen, die in den letzten Jahren erhebliche Fortschritte erzielt haben. Im Trainingsprozess wird schrittweise die Struktur der Eingabedaten durch Hinzufügen von Rauschen aufgelöst. Das Modell wird dann darauf trainiert, das ursprüngliche Bild aus dem verrauschten Bild zu rekonstruieren.
+
 ...
+
 
 \subsection{Stable Diffusion}
 

@@ -16,52 +16,52 @@
 \contentsline {subsection}{\numberline {2.1.5}Convolutional Neural Networks}{4}{subsection.2.1.5}%
 \contentsline {subsection}{\numberline {2.1.6}Datenaugmentation}{5}{subsection.2.1.6}%
 \contentsline {section}{\numberline {2.2}Synthetische Daten in der Bildklassifikation}{5}{section.2.2}%
-\contentsline {subsection}{\numberline {2.2.1}Definition und Notwendigkeit synthetischer Daten}{5}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.1}Definition und Notwendigkeit synthetischer Daten}{6}{subsection.2.2.1}%
 \contentsline {subsection}{\numberline {2.2.2}Vorteile und Herausforderungen}{6}{subsection.2.2.2}%
 \contentsline {subsection}{\numberline {2.2.3}Variational Autoencoder}{6}{subsection.2.2.3}%
 \contentsline {subsection}{\numberline {2.2.4}Generative Adversarial Networks}{6}{subsection.2.2.4}%
 \contentsline {section}{\numberline {2.3}Stable Diffusion und DA-Fusion}{6}{section.2.3}%
 \contentsline {subsection}{\numberline {2.3.1}Einführung in Diffusion-Modelle}{6}{subsection.2.3.1}%
-\contentsline {subsection}{\numberline {2.3.2}Stable Diffusion}{6}{subsection.2.3.2}%
-\contentsline {subsection}{\numberline {2.3.3}Datenaugmentation mit DA-Fusion}{6}{subsection.2.3.3}%
-\contentsline {section}{\numberline {2.4}Contrastive Learning}{6}{section.2.4}%
+\contentsline {subsection}{\numberline {2.3.2}Stable Diffusion}{7}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Datenaugmentation mit DA-Fusion}{7}{subsection.2.3.3}%
+\contentsline {section}{\numberline {2.4}Contrastive Learning}{7}{section.2.4}%
 \contentsline {subsection}{\numberline {2.4.1}Grundprinzipien des Contrastive Learning}{7}{subsection.2.4.1}%
 \contentsline {subsection}{\numberline {2.4.2}Supervised Contrastive Learning}{7}{subsection.2.4.2}%
 \contentsline {section}{\numberline {2.5}Integration von DA-Fusion und Supervised Contrastive Learning}{7}{section.2.5}%
 \contentsline {subsection}{\numberline {2.5.1}Motivation für die Kombination}{7}{subsection.2.5.1}%
-\contentsline {subsection}{\numberline {2.5.2}Potenzielle Vorteile und Herausforderungen}{7}{subsection.2.5.2}%
-\contentsline {chapter}{\numberline {3}Methodisches Vorgehen}{8}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Forschungsfragen und Hypothesen}{8}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Datensatz}{8}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}EIBA}{8}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}Teildatensatz}{9}{subsection.3.2.2}%
-\contentsline {subsection}{\numberline {3.2.3}Vorverarbeitung}{9}{subsection.3.2.3}%
-\contentsline {section}{\numberline {3.3}Implementierung}{9}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}DA-Fusion}{9}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}Supervised Contrastive Learning}{10}{subsection.3.3.2}%
-\contentsline {section}{\numberline {3.4}Synthetische Datengenerierung mit DA-Fusion}{10}{section.3.4}%
-\contentsline {section}{\numberline {3.5}Trainings- und Testdurchläufe mit Supervised Contrastive Learning}{10}{section.3.5}%
-\contentsline {section}{\numberline {3.6}Evaluationsmethoden und Metriken}{11}{section.3.6}%
-\contentsline {section}{\numberline {3.7}Analyse der Ergebnisse}{11}{section.3.7}%
-\contentsline {chapter}{\numberline {4}Ergebnisse}{12}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Implementierung}{12}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Synthetische Datengenerierung}{12}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}Supervised Contrastive Learning}{12}{subsection.4.1.2}%
-\contentsline {section}{\numberline {4.2}Die generierten synthetischen Daten}{12}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}Normale Augmentationen}{12}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}OOD-Augmentationen}{12}{subsection.4.2.2}%
-\contentsline {section}{\numberline {4.3}Trainings- und Testergebnisse}{13}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Vergleich der Performance mit und ohne normale Augmentationen}{13}{section.4.4}%
-\contentsline {section}{\numberline {4.5}Vergleich der Performance mit und ohne OOD-Augmentationen}{13}{section.4.5}%
-\contentsline {chapter}{\numberline {5}Diskussion}{14}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Interpretation der Ergebnisse}{14}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Bewertung der Eignung von DA-Fusion und Contrastive Learning}{14}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Stärken und Schwächen des Ansatzes}{14}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Auswirkungen auf die Generalisierungsfähigkeit und Robustheit der Modelle}{14}{section.5.4}%
-\contentsline {chapter}{\numberline {6}Fazit}{15}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Zusammenfassung der wichtigsten Erkenntnisse}{15}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Beantwortung der Forschungsfragen}{15}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Ausblick}{15}{section.6.3}%
-\contentsline {chapter}{\nonumberline Literatur}{16}{chapter*.6}%
-\contentsline {chapter}{\nonumberline Anhang}{17}{chapter*.7}%
+\contentsline {subsection}{\numberline {2.5.2}Potenzielle Vorteile und Herausforderungen}{8}{subsection.2.5.2}%
+\contentsline {chapter}{\numberline {3}Methodisches Vorgehen}{9}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Forschungsfragen und Hypothesen}{9}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Datensatz}{9}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}EIBA}{9}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Teildatensatz}{10}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Vorverarbeitung}{10}{subsection.3.2.3}%
+\contentsline {section}{\numberline {3.3}Implementierung}{10}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}DA-Fusion}{11}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Supervised Contrastive Learning}{11}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}Synthetische Datengenerierung mit DA-Fusion}{11}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Trainings- und Testdurchläufe mit Supervised Contrastive Learning}{12}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Evaluationsmethoden und Metriken}{12}{section.3.6}%
+\contentsline {section}{\numberline {3.7}Analyse der Ergebnisse}{12}{section.3.7}%
+\contentsline {chapter}{\numberline {4}Ergebnisse}{13}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Implementierung}{13}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Synthetische Datengenerierung}{13}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Supervised Contrastive Learning}{13}{subsection.4.1.2}%
+\contentsline {section}{\numberline {4.2}Die generierten synthetischen Daten}{13}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Normale Augmentationen}{13}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}OOD-Augmentationen}{13}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Trainings- und Testergebnisse}{14}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Vergleich der Performance mit und ohne normale Augmentationen}{14}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Vergleich der Performance mit und ohne OOD-Augmentationen}{14}{section.4.5}%
+\contentsline {chapter}{\numberline {5}Diskussion}{15}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Interpretation der Ergebnisse}{15}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Bewertung der Eignung von DA-Fusion und Contrastive Learning}{15}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Stärken und Schwächen des Ansatzes}{15}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Auswirkungen auf die Generalisierungsfähigkeit und Robustheit der Modelle}{15}{section.5.4}%
+\contentsline {chapter}{\numberline {6}Fazit}{16}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Zusammenfassung der wichtigsten Erkenntnisse}{16}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Beantwortung der Forschungsfragen}{16}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Ausblick}{16}{section.6.3}%
+\contentsline {chapter}{\nonumberline Literatur}{17}{chapter*.6}%
+\contentsline {chapter}{\nonumberline Anhang}{18}{chapter*.7}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
