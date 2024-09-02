@@ -1,0 +1,104 @@
+% In dieser Umgebung wird die Titelseite separat vom restlichen Text gesetzt
+\begin{titlepage}
+  % andere Seitenränder als im Rest der Arbeit
+  \newgeometry{lmargin=2cm,tmargin=7mm,rmargin=5mm,bmargin=1cm}
+  % die "Hausfarbe" der HAW; diese und die folgenden Einstellungen sind lokal
+  % und gelten nur innerhalb der Umgebung "titlepage"
+  \color{haw}
+  % Blocksatz für die Titelseite deaktivieren
+  \raggedright
+  % Logo rechtsbündig setzen
+  \hfill\includegraphics[width=7cm]{HAW_Marke_RGB_300dpi}\\
+
+  % vertikaler Abstand
+  \vspace{5cm}
+
+  % Wahl der "Hausschrift" Open Sans der HAW, die als Schrift auf Ihrem
+  % Rechner installiert sein muss
+  \setmainfont{Open Sans}
+  % etwas kleiner als üblich
+  \small
+  % fett und in Majuskeln
+  \textbf{BACHELORARBEIT}
+
+  % vertikaler Abstand
+  \vspace{8mm}
+
+  % der Titel der Arbeit als "Seite in der Seite"; natürlich müssen Sie hier
+  % Ihren Titel eintragen
+  \begin{minipage}{0.8\linewidth}
+    % Wahl der zweiten "Hausschrift" der HAW, die ebenfalls auf Ihrem Rechner
+    % bereits vorhanden sein muss
+    \setmainfont{Martel Heavy}
+    % ziemlich große Schrift
+    \LARGE
+    % [1mm] steht jeweils für einen etwas größeren Durchschuss
+    Contrastive Learning\\[1mm]
+    mit Stable Diffusion-basierter\\[1mm]
+    Datenaugmentation\\[1mm]
+    \setmainfont{Open Sans}
+    \Large
+    Verbesserung der Bildklassifikation\\[1mm]
+    durch synthetische Daten\\[1mm]
+    % am Ende noch ein waagerechter Strich, das CD will es so...
+    \,\rule{11mm}{1.2mm}
+  \end{minipage}
+
+  % vertikaler Abstand, überraschenderweise
+  \vspace{1cm}
+
+  % hier korrektes Datum und Ihren Namen eingeben
+  vorgelegt am 30. August 2024\\
+  Paul Hofmann
+
+  % letzter vertikaler Abstand für heute
+  \vspace{5cm}
+
+  % noch eine "Seite in der Seite", etwas nach rechts geschoben
+  \hspace*{37mm}
+  \begin{minipage}{0.5\linewidth}
+    % Namen und Titel der beiden Prüfer eintragen
+    \begin{tabular}{@{}ll}
+      Erstprüferin: & Prof. Dr. Larissa Putzar\\[-.3mm]
+      Zweitprüfer: & Prof. Dr. Jan Neuhöfer \\
+    \end{tabular}\\
+
+    % noch ein horizontaler Strich
+    \,\rule{9mm}{1mm}\\[1.5mm]
+
+    \textbf{HOCHSCHULE FÜR ANGEWANDTE}\\
+    \textbf{WISSENSCHAFTEN HAMBURG}\\
+    Department Medientechnik\\
+    Finkenau 35\\
+    22081 Hamburg
+  \end{minipage}
+\end{titlepage}
+% setzt die Geometrie wieder auf die Standardwerte zurück
+\restoregeometry
+
+% für die Seite mit dem Abstract keine Seitenzahl ausgeben
+\thispagestyle{empty}
+
+\section*{Zusammenfassung}
+
+% Hier ersetzen Sie bitte die vorhandenen Texte durch Ihre eigenen
+% Zusammenfassungen
+Der Arbeit beginnt mit einer kurzen Beschreibung ihrer zentralen Inhalte, in
+der die Thematik und die wesentlichen Resultate skizziert werden.  Diese
+Beschreibung muss sowohl in deutscher als auch in englischer Sprache vorliegen
+und sollte eine Länge von etwa 150 bis 250 Wörtern haben.  Beide Versionen
+zusammen sollten nicht mehr als eine Seite umfassen.  Die Zusammenfassung
+dient u.\,a.\ der inhaltlichen Verortung im Bibliothekskatalog.
+
+% Zum Wechseln der Sprache siehe den Kommentar in chap3.tex
+{
+  \begin{otherlanguage}{english}
+    \section*{Abstract}
+
+    The thesis begins with a brief summary of its main contents, outlining the
+    subject matter and the essential findings.  This summary must be provided
+    in German and in English and should range from 150 to 250 words in length.
+    Both versions combined should not comprise more than one page.  Among
+    other things, the abstract is used for library classification.
+  \end{otherlanguage}
+}

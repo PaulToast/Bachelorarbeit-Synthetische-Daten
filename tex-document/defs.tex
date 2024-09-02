@@ -1,0 +1,135 @@
+% Für diese Vorlage wurde die Klasse "scrreprt" von KOMA-Script gewählt,
+% die in etwa der Standardklasse "report" entspricht, allerdings wesentlich
+% mehr Möglichkeiten bietet und im gewissen "moderner" ist.
+%
+% Eine sehr ausführliche Dokumentation
+% zu KOMA-Script findet man unter der folgenden Adresse:
+% http://mirrors.ctan.org/macros/latex/contrib/koma-script/doc/scrguide.pdf
+
+\documentclass[
+  % die Schriftgröße - sollten Sie nicht ändern
+  fontsize=12pt,
+  % das Papierformat, also DIN A4
+  paper=A4,
+  % Literaturverzeichnis ins Inhaltsverzeichnis
+  bibliography=totoc,
+  % andere Verzeichnisse ebenfalls ins Inhaltsverzeichnis
+  listof=totoc,
+  % abgesetzte Formeln linksbündig
+  fleqn,
+  % für die Satzspiegelkonstruktion - siehe KOMA-Doku
+  DIV=12,
+  % Bindekorrektur (linker Rand) - evtl. anpassen
+  BCOR=1mm,
+  % die im Text verwendeten Sprachen (u.a. für das Paket babel); die
+  % letztgenannte (!) Sprache ist die Standardsprache; "n"german steht für die
+  % neue Rechtschreibung
+  english,ngerman,
+  % weil (s.u.) das Paket geometr verwendet wird
+  usegeometry,
+  % wie Absätze gesetzt werden: ohne Einzug, halbe Zeile Abstand
+  parskip=half-
+]{scrreprt}
+
+% Beschriftungen für Tabellen kommen linksbündig über die Tabelle
+\KOMAoption{captions}{tableheading,nooneline}
+\setcaptionalignment[figure]{c}
+\setcaptionalignment[table]{l}
+
+% wird für die Titelseite benötigt
+\usepackage{geometry}
+
+% Standardpaket für Lokalisation, siehe Option "ngerman" oben
+\usepackage{babel}
+% Laden von optimierten Trennmustern
+\babelprovide[hyphenrules=ngerman-x-latest]{ngerman}
+
+% Standardpaket für mathematische Zusatzfunktionen; wenn Sie keine
+% mathematischen Formeln brauchen, können Sie diese Zeile löschen
+\usepackage{amsmath}
+
+% die Hauptschrift Libertinus
+\usepackage{libertinus-otf}
+% die "Schreibmaschinenschrift" Anonymous Pro, angepasst
+\usepackage{AnonymousPro}
+\setmonofont{AnonymousPro}[Scale=MatchLowercase,FakeStretch=0.85]
+
+% etwas größerer Zeilenabstand als im Buchsatz
+\linespread{1.1}
+
+% Paket für Feinkorrekturen an der Typographie, das für ein ausgewogeneres
+% Schriftbild sorgt
+\usepackage{microtype}
+
+% Paket für kontextsensitive Anführungszeichen
+\usepackage{csquotes}
+% Shortcut, damit aus dem eigentlich falschen Zeichen " richtige
+% Anführungszeichen je nach Sprache werden
+\MakeOuterQuote{"}
+
+% Paket, das den Befehl \includegraphics ermöglicht
+\usepackage{graphicx}
+
+% komfortablere Aufzählungen als in Standard-LaTeX; ein Beispiel findet man in
+% chap3.tex
+\usepackage{enumitem}
+
+% Paket für mehr als die üblichen Standardfarben
+\usepackage[dvipsnames]{xcolor}
+% Definition der "Hausfarben" der HAW
+\definecolor{haw}{HTML}{003CA0}
+\definecolor{haw2}{HTML}{0096D2}
+\definecolor{haw3}{HTML}{A0BEDC}
+
+% typographisch anspruchsvolle Tabellen; siehe chap3.tex
+\usepackage{booktabs}
+
+% zum Erstellen des Literaturverzeichnisses; der gängige Stil APA ist hier
+% bereits eingestellt
+\usepackage[style=apa]{biblatex}
+% eine Beispieldatei für ein Literaturverzeichnis
+\addbibresource{library.bib}
+
+% für die Erzeugung der Grafiken in chap3.tex; wenn Sie PGF/TikZ nicht
+% verwenden wollen, können Sie diese Zeilen entfernen
+\usepackage{tikz}
+% Zusatzbibliotheken für TikZ, die in den genannten Beispielen verwendet
+% werden
+\usetikzlibrary{calc,intersections,angles,3d}
+
+% für die Erzeugung des Codeblocks in chap3.tex; wenn in Ihrer Arbeit keine
+% Codeblöcke vorkommen, können Sie diese Zeilen entfernen
+\usepackage{listings}
+% Anpassung des Erscheinungsbildes des Codeblocks; mehr dazu in der
+% Dokumentation des Pakets "listings"
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{gray!20},
+    keywordstyle=\color{haw2},
+    numberstyle=\footnotesize\color{haw},
+    basicstyle=\ttfamily\small,
+    captionpos=t,
+    frame=single,
+    framerule=0pt,
+    keepspaces=true,
+    numbers=left,
+    numbersep=6pt,
+    belowcaptionskip=1em,
+    aboveskip=\bigskipamount,
+}
+\lstset{style=mystyle}
+% damit es "Codeblock" und nicht "Listing" heißt
+\renewcommand{\lstlistingname}{Codeblock}
+
+% für die Verlinkung innerhalb des PDF-Dokuments, für PDF-Lesezeichen und
+% PDF-Metadaten; dieses Paket sollte üblicherweise immer als letztes geladen
+% werden
+\usepackage[colorlinks=true,allcolors=haw,hyperfootnotes=false,pageanchor=true,linktoc=all]{hyperref}
+
+% für die Druckversion können Sie die obige Zeile durch die folgende ersetzen,
+% damit Links nicht blau dargestellt werden:
+% \usepackage[draft]{hyperref}
+
+% Metadaten des PDF-Dokumentes; setzen Sie hier Ihren eigenen Namen sowie den
+% Titel Ihrer Arbeit ein
+\hypersetup{pdfauthor={Prof. Dr. Edmund Weitz}}
+\hypersetup{pdftitle={Handreichung zur Formatierung von Bachelorarbeiten}}

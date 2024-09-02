@@ -31,7 +31,7 @@ class MVIPDataset(Dataset):
         self.aug_ex_negative = aug_ex_negative
 
         # Define classes & collect dataset
-        self._init_classes(num_classes=20, super_class="CarComponent")
+        self._initialize_classes(num_classes=20, super_class="CarComponent")
         self._collect_dataset()
 
         # Set image transform
@@ -73,8 +73,10 @@ class MVIPDataset(Dataset):
 
         return self.transform(image), label
         
-    def _init_classes(self, num_classes, super_class):
-        """Define class names list; Limit dataset to 20 classes from the "CarComponent" super class."""
+    def _initialize_classes(self, num_classes, super_class):
+        """Define class names list & set-up class to label id mapping.
+        Limit dataset to specified num_classes from specified super_class."""
+        
         self.class_names = []
 
         for class_name in [f for f in os.listdir(self.data_root) if os.path.isdir(os.path.join(self.data_root, f))]:
@@ -92,6 +94,7 @@ class MVIPDataset(Dataset):
 
     def _collect_dataset(self):
         """Collect all images, labels, and masks from the dataset (including augmentations)."""
+
         self.all_images = []
         self.all_labels = []
         self.all_masks = []
@@ -102,15 +105,15 @@ class MVIPDataset(Dataset):
 
         # Collect all augmentations & OOD images
         if self.aug_mode in ["positive", "both", "positive_only"]:
-            positive_augs, positive_labels = self.parse_augs("positive")
+            positive_augs, positive_labels, positive_masks = self.parse_augs("positive")
             self.all_images += positive_augs
             self.all_labels += positive_labels
-            self.all_masks += [None] * len(positive_augs)
+            self.all_masks += positive_masks
         if self.aug_mode in ["both", "negative_only"]:
-            negative_augs, negative_labels = self.parse_augs("negative")
+            negative_augs, negative_labels, negative_masks = self.parse_augs("negative")
             self.all_images += negative_augs
             self.all_labels += negative_labels
-            self.all_masks += [None] * len(negative_augs)
+            self.all_masks += negative_masks
         
         self._length = len(self.all_images)
 
@@ -118,9 +121,10 @@ class MVIPDataset(Dataset):
         """
         Parse the dataset directory and return all real images, labels, and masks.
         
-        train:      /mnt/HDD/MVIP/sets/{class_name}/{split_dir}/{set}/{orientation}/{cam}/{file}
-        val & test: /mnt/HDD/MVIP/sets/{class_name}/{split_dir}/{set}/{cam}/{file}
+        train:      /mnt/HDD/MVIP/sets/{class_name}/{split}/{set}/{orientation}/{cam}/{file}
+        val & test: /mnt/HDD/MVIP/sets/{class_name}/{split}/{set}/{cam}/{file}
         """
+
         images = []
         labels = []
         masks = []
@@ -143,7 +147,7 @@ class MVIPDataset(Dataset):
                                     labels.append(self.class_to_label_id[class_name])
                                 elif file.endswith("rgb_mask_gen.png"):
                                     masks.append(os.path.join(root, set, orientation, cam, file))
-            else:
+            else: # val & test split have no orientation subfolder
                 for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
                     for cam in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
                         for file in os.listdir(os.path.join(root, set, cam)):
@@ -157,6 +161,7 @@ class MVIPDataset(Dataset):
     
     def parse_augs(self, aug_type):
         """Parse the augmentation directory and return all augmented images and labels."""
+
         if aug_type == "positive":
             aug_dir = self.aug_dir_positive
             examples_per_class = self.aug_ex_positive
@@ -164,7 +169,7 @@ class MVIPDataset(Dataset):
         else:
             aug_dir = self.aug_dir_negative
             examples_per_class = self.aug_ex_negative
-            label_sign = -1
+            label_sign = -1 # OOD augmentations receive negative labels
         
         augs = os.listdir(aug_dir)
 
@@ -182,8 +187,11 @@ class MVIPDataset(Dataset):
             for file in augs:
                 if class_name in file:
                     labels.append(self.class_to_label_id[class_name] * label_sign)
+
+        # Return masks as None
+        masks = [None for _ in range(len(augs))]
         
-        return augs, labels
+        return augs, labels, masks
     
     def get_mean_std(self):
         mean = torch.zeros(3)
@@ -202,6 +210,7 @@ class MVIPDataset(Dataset):
     
     def crop_object(self, image: Image, mask: Image):
         """Use object mask to create a square crop around object."""
+
         # Apply maximum filter to dilate mask
         mask = Image.fromarray(maximum_filter(np.array(mask), size=32))
         

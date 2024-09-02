@@ -311,7 +311,7 @@ def parse_args():
         help="Whether or not to use gradient checkpointing to save memory at the expense of slower backward pass.",
     )
     parser.add_argument(
-        "--learning_rate",
+        "--lr",
         type=float,
         default=1e-4,
         help="Initial learning rate (after the potential warmup period) to use.",
@@ -461,7 +461,6 @@ imagenet_templates_small = [
     #"a photo of a cool {}",
     #"a photo of a small {}",
 ]
-
 mvip_templates = [
     "a detailed photo of a {} on a steel table",
     "a photo of a {} in used condition on a table",
@@ -476,7 +475,6 @@ mvip_templates = [
     "a photo of an old {} on a steel table",
     "a photo of a broken {} on a lab table",
 ]
-
 imagenet_style_templates_small = [
     "a painting in the style of {}",
     "a rendering in the style of {}",
@@ -498,6 +496,7 @@ imagenet_style_templates_small = [
     "a weird painting in the style of {}",
     "a large painting in the style of {}",
 ]
+
 
 def log_validation(text_encoder, tokenizer, unet, vae, args, accelerator, weight_dtype, epoch):
     """Generate images with the validation prompt and log them."""
@@ -547,6 +546,7 @@ def log_validation(text_encoder, tokenizer, unet, vae, args, accelerator, weight
 
     del pipeline
     torch.cuda.empty_cache()
+
     return images
 
 
@@ -569,7 +569,7 @@ class TextualInversionDataset(Dataset):
         data_root,
         tokenizer,
         learnable_property="object",  # [object, style]
-        size=256,
+        size=512,
         repeats=100,
         interpolation="bicubic",
         flip_p=0.5,
@@ -605,7 +605,7 @@ class TextualInversionDataset(Dataset):
         if learnable_property == "style":
             self.templates = imagenet_style_templates_small
         elif args.dataset == "mvip":
-            self.templates = imagenet_templates_small #mvip_templates
+            self.templates = imagenet_templates_small # or mvip_templates
         else:
             self.templates = imagenet_templates_small
 
@@ -619,7 +619,8 @@ class TextualInversionDataset(Dataset):
         if not image.mode == "RGB":
             image = image.convert("RGB")
 
-        placeholder_string = self.placeholder_token #f"{self.placeholder_token} in a workshop" # ORIGINALLY: self.placeholder_token
+        # Select a random text prompt and insert the placeholder token
+        placeholder_string = self.placeholder_token
         text = random.choice(self.templates).format(placeholder_string)
 
         example["input_ids"] = self.tokenizer(
@@ -630,7 +631,7 @@ class TextualInversionDataset(Dataset):
             return_tensors="pt",
         ).input_ids[0]
 
-        # default to score-sde preprocessing
+        # Default to score-sde pre-processing
         if self.transform == None:
             img = np.array(image).astype(np.uint8)
 
@@ -667,6 +668,8 @@ class TextualInversionDataset(Dataset):
 
 
 def main(args):
+    """Main training loop (for one class)."""
+    
     # Set up accelerator
     logging_dir = os.path.join(args.output_dir, args.logging_dir)
     accelerator_project_config = ProjectConfiguration(project_dir=args.output_dir, logging_dir=logging_dir)
@@ -801,14 +804,14 @@ def main(args):
         torch.backends.cuda.matmul.allow_tf32 = True
 
     if args.scale_lr:
-        args.learning_rate = (
-            args.learning_rate * args.gradient_accumulation_steps * args.train_batch_size * accelerator.num_processes
+        args.lr = (
+            args.lr * args.gradient_accumulation_steps * args.train_batch_size * accelerator.num_processes
         )
 
     # Initialize the optimizer
     optimizer = torch.optim.AdamW(
         text_encoder.get_input_embeddings().parameters(),  # only optimize the embeddings
-        lr=args.learning_rate,
+        lr=args.lr,
         betas=(args.adam_beta1, args.adam_beta2),
         weight_decay=args.adam_weight_decay,
         eps=args.adam_epsilon,
@@ -1063,7 +1066,7 @@ def main(args):
 
 
 if __name__ == "__main__":
-
+    
     args = parse_args()
     output_dir = args.output_dir
 
@@ -1089,6 +1092,7 @@ if __name__ == "__main__":
 
     options = [options[idx] for idx in options_idx]
 
+    # Extract images from the dataset and run textual inversion training for each class
     for seed, examples_per_class, class_name in options:
 
         os.makedirs(os.path.join(output_dir, "extracted"), exist_ok=True)
@@ -1151,4 +1155,5 @@ if __name__ == "__main__":
 
         main(args)
 
+        # Remove the extracted dataset
         shutil.rmtree(args.train_data_dir)

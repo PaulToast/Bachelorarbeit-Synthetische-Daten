@@ -263,7 +263,7 @@ def parse_args():
         help="Whether or not to use gradient checkpointing to save memory at the expense of slower backward pass.",
     )
     parser.add_argument(
-        "--learning_rate",
+        "--lr",
         type=float,
         default=1e-4,
         help="Initial learning rate (after the potential warmup period) to use.",
@@ -485,6 +485,8 @@ class TextualInversionDataset(Dataset):
 
 
 def main(args):
+    """Main training loop (for one class)."""
+
     output_dir = args.output_dir
     logging_dir = os.path.join(output_dir, args.logging_dir)
 
@@ -589,14 +591,14 @@ def main(args):
         torch.backends.cuda.matmul.allow_tf32 = True
 
     if args.scale_lr:
-        args.learning_rate = (
-            args.learning_rate * args.gradient_accumulation_steps * args.train_batch_size * accelerator.num_processes
+        args.lr = (
+            args.lr * args.gradient_accumulation_steps * args.train_batch_size * accelerator.num_processes
         )
 
     # Initialize the optimizer
     optimizer = torch.optim.AdamW(
         text_encoder.get_input_embeddings().parameters(),  # only optimize the embeddings
-        lr=args.learning_rate,
+        lr=args.lr,
         betas=(args.adam_beta1, args.adam_beta2),
         weight_decay=args.adam_weight_decay,
         eps=args.adam_epsilon,
@@ -784,6 +786,7 @@ def main(args):
 
 
 if __name__ == "__main__":
+
     args = parse_args()
     output_dir = args.output_dir
 
@@ -799,6 +802,7 @@ if __name__ == "__main__":
     options = np.array(list(options))
     options = np.array_split(options, world_size)[rank]
 
+    # Extract images from the dataset and run textual inversion training for each class
     for seed, examples_per_class in options.tolist():
 
         os.makedirs(os.path.join(output_dir, "extracted"), exist_ok=True)

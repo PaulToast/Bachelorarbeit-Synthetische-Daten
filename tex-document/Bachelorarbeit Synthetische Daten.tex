@@ -1,0 +1,21 @@
+% Dies ist die Hauptdatei, von der aus das Gesamtdokument erzeugt wird
+
+% Aalle globalen LaTeX-spezifischen Einstellungen in defs.tex
+\input{defs}
+
+%\includeonly{title, toc}
+%\includeonly{chap3}
+
+% Hier beginnt das eigentliche Dokument
+\begin{document}
+\include{title}
+%\include{thanks} % Danksagung
+\include{toc}
+\include{chap1} % Einleitung
+\include{chap2} % Theoretische Grundlagen
+\include{chap3} % Methodisches Vorgehen
+\include{chap4} % Ergebnisse
+\include{chap5} % Diskussion
+\include{chap6} % Fazit
+\include{appendix}
+\end{document}
