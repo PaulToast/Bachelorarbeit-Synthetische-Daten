@@ -177,8 +177,8 @@ def set_loader(args, split="train", aug_mode=None):
     elif args.dataset == "mvip":
         dataset = MVIPDataset(split=split,
                               aug_mode=aug_mode,
-                              aug_dir_positive=args.aug_dir_positive,
-                              aug_dir_negative=args.aug_dir_negative,
+                              aug_dir_id=args.aug_dir_id,
+                              aug_dir_ood=args.aug_dir_ood,
                               transform=transform)
 
     sampler = None
