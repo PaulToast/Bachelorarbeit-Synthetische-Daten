@@ -154,6 +154,9 @@ class MVIPDataset(FewShotDataset):
         )
 
 def crop_object(image, mask):
+    """Use object mask to create a square crop around object."""
+
+    # Convert mask to binary
     mask = np.where(mask, 255, 0).astype(np.uint8)
     
     # Dilate mask with maximum filter
