@@ -179,6 +179,8 @@ def set_loader(args, split="train", aug_mode=None):
                               aug_mode=aug_mode,
                               aug_dir_positive=args.aug_dir_positive,
                               aug_dir_negative=args.aug_dir_negative,
+                              aug_ex_positive=-1,
+                              aug_ex_negative=8,
                               transform=TwoCropTransform(transform))
 
     # Build dataloader
