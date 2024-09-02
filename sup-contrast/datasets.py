@@ -35,7 +35,7 @@ class MVIPDataset(Dataset):
         self._collect_dataset()
 
         # Set image transform
-        if self.transform is not None:
+        if transform is not None:
             self.transform = transform
         else:
             self.transform = transforms.Compose([

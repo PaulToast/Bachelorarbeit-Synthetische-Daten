@@ -281,7 +281,7 @@ def validate(val_loader, ood_loader, model, classifier, criterion, args):
     model.eval()
     classifier.eval()
 
-    batch_time_acc = AverageMeter()
+    batch_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
     ID_confidences = AverageMeter()
@@ -290,18 +290,18 @@ def validate(val_loader, ood_loader, model, classifier, criterion, args):
     with torch.no_grad():
         # Loss & accuracy validation
         end = time.time()
-        for idx, (OOD_images, OOD_labels) in enumerate(val_loader):
-            OOD_images = OOD_images.float().cuda()
-            OOD_labels = OOD_labels.cuda()
-            bsz = OOD_labels.shape[0]
+        for idx, (images, labels) in enumerate(val_loader):
+            images = images.float().cuda()
+            labels = labels.cuda()
+            bsz = labels.shape[0]
 
             # Forward
-            output = classifier(model.encoder(OOD_images))
-            loss = criterion(output, OOD_labels)
+            output = classifier(model.encoder(images))
+            loss = criterion(output, labels)
 
             # Update metrics
             losses.update(loss.item(), bsz)
-            acc1, acc5 = accuracy(output, OOD_labels, topk=(1, 5))
+            acc1, acc5 = accuracy(output, labels, topk=(1, 5))
             top1.update(acc1[0], bsz)
 
             # Log in-distribution confidence
@@ -309,10 +309,8 @@ def validate(val_loader, ood_loader, model, classifier, criterion, args):
             ID_confidence = torch.max(ID_probabilities, dim=1).values.mean().item()
             ID_confidences.update(ID_confidence, 1)
 
-            # Log out-of-distribution confidence
-
             # Measure elapsed time
-            batch_time_acc.update(time.time() - end)
+            batch_time.update(time.time() - end)
             end = time.time()
 
             # Print info
@@ -321,7 +319,7 @@ def validate(val_loader, ood_loader, model, classifier, criterion, args):
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                       'Acc@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
-                       idx, len(val_loader), batch_time=batch_time_acc,
+                       idx, len(val_loader), batch_time=batch_time,
                        loss=losses, top1=top1))
         
         # OOD validation
@@ -331,16 +329,14 @@ def validate(val_loader, ood_loader, model, classifier, criterion, args):
             OOD_labels = OOD_labels.cuda()
 
             OOD_output = classifier(model.encoder(OOD_images))
-            OOD_probabilities = F.softmax(OOD_output, dim=1)
-            OOD_confidence = torch.max(OOD_probabilities, dim=1).values.mean().item()
-
-            OOD_confidences.update(OOD_confidence, 1)
 
             # Log out-of-distribution confidence
+            OOD_probabilities = F.softmax(OOD_output, dim=1)
+            OOD_confidence = torch.max(OOD_probabilities, dim=1).values.mean().item()
             OOD_confidences.update(OOD_confidence, 1)
             
             # Measure elapsed time
-            batch_time_acc.update(time.time() - end)
+            batch_time.update(time.time() - end)
             end = time.time()
 
             # Print info
@@ -348,7 +344,7 @@ def validate(val_loader, ood_loader, model, classifier, criterion, args):
                 print('OOD Detection Test: [{0}/{1}]\t'
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                       'OOD confidence {conf.val:.4f} ({conf.avg:.4f})'.format(
-                       idx, len(val_loader), batch_time=batch_time_acc,
+                       idx, len(val_loader), batch_time=batch_time,
                        conf=OOD_confidences))
 
     print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
@@ -362,7 +358,7 @@ def main():
     # Build dataloaders
     print("Preparing dataloaders...")
 
-    train_loader = set_loader(args, split="train", aug_mode=args.aug_method)
+    train_loader = set_loader(args, split="train", aug_mode=args.aug_mode)
     val_loader = set_loader(args, split="val", aug_mode=None)
     ood_loader = set_loader(args, split="val", aug_mode="negative_only")
 

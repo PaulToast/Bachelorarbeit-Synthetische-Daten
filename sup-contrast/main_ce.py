@@ -113,6 +113,22 @@ def parse_args():
         args.num_classes = 10
     elif args.dataset == 'cifar100':
         args.num_classes = 100
+    elif args.dataset == 'mvip':
+        args.num_classes = 20
+
+        if args.aug_name_positive is not None:
+            args.aug_dir_positive = os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_positive}'
+            ))
+        else:
+            args.aug_dir_positive = None
+
+        if args.aug_name_negative is not None:
+            args.aug_dir_negative = os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', f'da-fusion/output/{args.aug_output_name}/{args.aug_name_negative}'
+            ))
+        else:
+            args.aug_dir_negative = None
     else:
         raise ValueError('dataset not supported: {}'.format(args.dataset))
     
@@ -192,15 +208,18 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
     return losses.avg, top1.avg
 
 
-def validate(val_loader, model, criterion, args):
+def validate(val_loader, ood_loader, model, criterion, args):
     """One epoch validation"""
     model.eval()
 
     batch_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
+    ID_confidences = AverageMeter()
+    OOD_confidences = AverageMeter()
 
     with torch.no_grad():
+        # Loss & accuracy validation
         end = time.time()
         for idx, (images, labels) in enumerate(val_loader):
             images = images.float().cuda()
@@ -216,6 +235,11 @@ def validate(val_loader, model, criterion, args):
             acc1, acc5 = accuracy(output, labels, topk=(1, 5))
             top1.update(acc1[0], bsz)
 
+            # Log in-distribution confidence
+            ID_probabilities = F.softmax(output, dim=1)
+            ID_confidence = torch.max(ID_probabilities, dim=1).values.mean().item()
+            ID_confidences.update(ID_confidence, 1)
+
             # Measure elapsed time
             batch_time.update(time.time() - end)
             end = time.time()
@@ -227,9 +251,34 @@ def validate(val_loader, model, criterion, args):
                       'Acc@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
                        idx, len(val_loader), batch_time=batch_time,
                        loss=losses, top1=top1))
+                
+        # OOD validation
+        end = time.time()
+        for idx, (OOD_images, OOD_labels) in enumerate(ood_loader):
+            OOD_images = OOD_images.float().cuda()
+            OOD_labels = OOD_labels.cuda()
+
+            OOD_output = model(OOD_images)
+
+            # Log out-of-distribution confidence
+            OOD_probabilities = F.softmax(OOD_output, dim=1)
+            OOD_confidence = torch.max(OOD_probabilities, dim=1).values.mean().item()
+            OOD_confidences.update(OOD_confidence, 1)
+            
+            # Measure elapsed time
+            batch_time.update(time.time() - end)
+            end = time.time()
+
+            # Print info
+            if idx % args.print_freq == 0:
+                print('OOD Detection Test: [{0}/{1}]\t'
+                      'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                      'OOD confidence {conf.val:.4f} ({conf.avg:.4f})'.format(
+                       idx, len(val_loader), batch_time=batch_time,
+                       conf=OOD_confidences))
 
     print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
-    return losses.avg, top1.avg
+    return losses.avg, top1.avg, ID_confidences.avg, OOD_confidences.avg
 
 
 def main():
@@ -240,6 +289,7 @@ def main():
 
     train_loader = set_loader(args, split="train", aug_mode=args.aug_mode)
     val_loader = set_loader(args, split="val", aug_mode=None)
+    ood_loader = set_loader(args, split="val", aug_mode="negative_only")
 
     print("Dataloaders ready.")
 
@@ -275,7 +325,7 @@ def main():
         start_time = time.time()
 
         avg_train_loss, avg_train_acc = train(train_loader, model, criterion, optimizer, epoch, args)
-        avg_val_loss, avg_val_acc = validate(val_loader, model, criterion, args)
+        avg_val_loss, avg_val_acc, avg_ID_confidence, avg_OOD_confidence = validate(val_loader, ood_loader, model, criterion, args)
 
         end_time = time.time()
 
@@ -287,8 +337,8 @@ def main():
             "avg_val_loss": avg_val_loss,
             "avg_train_acc": avg_train_acc,
             "avg_val_acc": avg_val_acc,
-            #"avg_ID_confidence": avg_ID_confidence,
-            #"avg_OOD_confidence": avg_OOD_confidence,
+            "avg_ID_confidence": avg_ID_confidence,
+            "avg_OOD_confidence": avg_OOD_confidence,
         })
 
         if avg_val_acc > best_acc:
