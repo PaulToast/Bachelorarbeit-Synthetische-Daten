@@ -1,0 +1,122 @@
+\chapter{Theoretische Grundlagen}
+
+Dieses Kapitel behandelt die theoretischen Grundlagen, die zum Verständnis der zu entwickelnden Methode am wichtigsten sind. Dazu werden zunächst Grundbegriffe und Konzepte des Maschinellen Lernens und der Bildklassifikation erklärt. Anschließend geht es um Stable Diffusion, die darauf basierende Methode DA-Fusion, sowie um Contrastive Learning.
+
+\section{Maschinelles Lernen}
+
+Im Folgenden werden die Grundlagen des maschinellen Lernens erläutert, um ein Verständnis für die Methoden und Konzepte zu schaffen, die in dieser Arbeit verwendet werden. Dazu gehören Definitionen, die Unterscheidung zwischen überwachtem und unüberwachtem Lernen, sowie eine Einführung in Deep Learning und Convolutional Neural Networks.
+
+\subsection{Definition und Ursprung}
+
+Maschinelles Lernen (ML) ist ein Teilbereich der künstlichen Intelligenz (KI), in dem Computern das Lernen anhand von Erfahrung ermöglicht wird. Die ersten Durchbrüche in der KI kamen im Bezug auf Aufgaben, die für Menschen intellektuell eine große Herausforderung darstellten, die aber von Computern relativ einfach zu lösen waren, da sie als Liste formaler, mathematischer Regeln beschrieben werden konnten \parencite{Goodfellow2016}. Die große Schwierigkeit lag aber in den Aufgaben, die für Menschen relativ einfach und intuitiv sind, welche sich aber nicht einfach formal beschreiben lassen. Die grundlegende Idee hinter maschinellem Lernen ist daher, Computer mit der Fähigkeit auszustatten, selbstständig Wissen aus Erfahrung zu generieren, indem Muster und Konzepte aus rohen Daten erlernt werden.
+
+Eine allgemeine Definition für maschinelles Lernen liefert \parencite{Mitchell1997}:
+\begin{quote}
+Ein Computerprogramm soll aus Erfahrung $E$ in Bezug auf eine Klasse von Aufgaben $T$ und Leistungsmaß $P$ lernen, wenn sich seine Leistung bei Aufgaben $T$, gemessen durch $P$, mit Erfahrung $E$ verbessert.
+\end{quote}
+
+Dabei kommen verschiedene Aufgaben $T$ in Frage, etwa die in dieser Arbeit thematisierte Bildklassifikation, oder aber auch Bilgsegmentierung, Anomaliedetektion, maschinelle Übersetzung, usw. Je nach Aufgabe können verschiedene Leistungsmaße $P$ herangezogen werden, wie etwa die \textit{Accuracy}, welche die Trefferrate richtiger Vorhersagen beschreibt. Auch die Erfahrung $E$ kann je nach Lernmethode variieren, wie im nachfolgenden Abschnitt genauer erklärt wird.
+
+\subsection{Überwachtes und unüberwachtes Lernen}
+
+Wie genau Wissen aus Erfahrung bzw. aus Rohdaten generiert wird hängt vom gewählten Verfahren ab. Im Maschinellen Lernen gibt es dabei verschiedene Paradigmen, wobei die wichtigsten das überwachte und das unüberwachte Lernen sind.
+
+Beim überwachten Lernen wird das Modell mit einem vollständig annotierten Datensatz trainiert. Das heißt, jeder Datenpunkt ist mit einem Klassenlabel versehen, sodass Eingabe-Ausgabe-Paare entstehen. Das Ziel ist es, eine Funktion zu lernen, die Eingaben (Features) auf die entsprechenden Ausgaben (Labels) abbildet. Beispiele für überwachtes Lernen sind Klassifikations- und Regressionsaufgaben. Ein typisches Beispiel ist die Bilderkennung, bei der ein Modell darauf trainiert wird, Bilder von Katzen und Hunden zu unterscheiden.
+
+Im Gegensatz dazu arbeitet unüberwachtes Lernen mit unbeschrifteten Daten; es gibt also keine vorgegebenen Ausgaben. Stattdessen wird versucht, ein Modell zu befähigen, eigenständig Muster und Strukturen in den Daten zu erkennen und z.B. Cluster zu bilden, oder nützliche Repräsentationen der Eingangsdaten zu erstellen. Zu den häufigsten Methoden des unüberwachten Lernens gehören Clustering- und Assoziationsalgorithmen. Ein Beispiel ist die Segmentierung von Kunden in verschiedene Gruppen basierend auf ihrem Kaufverhalten.
+
+In der Praxis werden oft auch hybride Ansätze genutzt, wie das semi-überwachte Lernen, bei dem eine Kombination aus beschrifteten und unbeschrifteten Daten verwendet wird, oder das selbstüberwachte Lernen, bei dem das Modell sich selbst überwacht, indem es Teile der Daten als pseudo-beschriftet behandelt.
+
+\subsection{Deep Learning}
+
+Unter Deep Learning versteht man eine tiefe, hierarchische Vernetzung dieser Konzepte, sodass komplexere Konzepte auf simpleren Konzepten aufbauen können. Visuell veranschaulicht entsteht ein Graph mit vielen Ebenen (engl. \textit{deep layers}). Es ist damit eine spezialisierte Unterkategorie des maschinellen Lernens, die auf künstlichen neuronalen Netzen basiert. Diese Netzwerke bestehen aus mehreren Schichten, die eine hierarchische Repräsentation von Daten ermöglichen. Jede Schicht transformiert die Eingabedaten in eine etwas abstraktere Darstellung. Deep Learning hat in den letzten Jahren erhebliche Fortschritte gemacht und findet Anwendung in Bereichen wie Bild- und Spracherkennung, autonomen Fahrzeugen und vielen anderen.
+
+\subsection{Neuronale Netze}
+
+Das künstliche neuronales Netz (KNN) bildet die Grundlage der allermeisten Deep-Learning-Algorithmen. Es ist inspiriert von der Struktur und Funktionsweise des menschlichen Gehirns und besteht aus einer Vielzahl von miteinander verbundenen Knoten (Neuronen), die in Schichten organisiert sind. Die Struktur eines neuronalen Netzes besteht aus einer Eingabeschicht, einer oder mehreren versteckten Schichten (engl. \textit{hidden layers}) und einer Ausgabeschicht.
+
+Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Modellierung des biologischen Neurons, das erstmals 1943 von Warren McCulloh und Walter Pitts vorgestellt wurde \parencite{Zhou2021}. Jedes Neuron empfängt eine Reihe von Eingaben, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es ein zugehöriges Gewicht (engl. \textit{weight}), das die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingabe auf das Neuron bestimmt. Das Neuron berechnet dann die gewichtete Summe aller Eingabe und falls ein bestimmter Schwellenwert (engl. \textit{Threashold}) überschritten wurde, wird das Neuron aktiviert. Diese Aktivierung kann durch verschiedene Aktivierungsfunktionen angepasst werden. Häufig wird etwa die sogenannte Sigmoid-Funktion verwendet, welche im Gegensatz zur einfachen Step-Funktion differenzierbar ist und somit die Optimierung des Netzwerk vereinfacht.
+
+Die Optimierung des Netzwerks geschieht durch eine Rückwärtsausbreitung (engl. \textit{Backpropagation}), welche den berechneten Fehler rückwärts durch das Netz propagiert, um die Gewichte und Schwellenwerte um einen geringen Wert in die Richtung anzupassen, die den Fehler minimieren würde. ...
+
+\subsection{Convolutional Neural Networks}
+
+Ein Convolutional Neural Network (CNN) ist ein spezielles künstliches neuronales Netz, das hauptsächlich für die Bildklassifikation entwickelt wurde. Es verwendet Faltungsebenen, um ein Eingangsbild Schritt für Schritt in immer abstraktere “Feature Maps” zu verarbeiten.
+
+Die Architektur eines CNN besteht typischerweise aus mehreren Schichten, die in der folgenden Reihenfolge angeordnet sind:
+
+1. Eingabeschicht (Input Layer): Diese Schicht nimmt die Rohdaten auf, z.B. ein Bild in Form eines 2D-Arrays von Pixelwerten.
+
+2. Faltungsschicht (Convolutional Layer): Diese Schicht führt die eigentliche Faltung (Convolution) durch, indem sie einen Filter (Kernel) über das Eingabebild verschiebt und Punktoperationen durchführt. Das Ergebnis ist eine Feature-Map, die lokale Merkmale des Bildes extrahiert. Jeder Filter kann unterschiedliche Merkmale wie Kanten, Ecken oder Texturen erkennen.
+
+3. Aktivierungsschicht (Activation Layer): Nach jeder Faltungsschicht wird normalerweise eine Aktivierungsfunktion angewendet, um nichtlineare Eigenschaften des Netzwerks zu modellieren. Die häufig verwendete Aktivierungsfunktion ist die ReLU (Rectified Linear Unit), die alle negativen Werte auf Null setzt und positive Werte unverändert lässt.
+
+4.Pooling-Schicht (Pooling Layer): Diese Schicht reduziert die räumliche Dimension der Feature-Maps, was die Berechnungen effizienter macht und die Gefahr von Überanpassung (Overfitting) verringert. Die gängigsten Pooling-Methoden sind Max-Pooling (wählt den maximalen Wert in einem bestimmten Bereich) und Average-Pooling (berechnet den Durchschnittswert in einem bestimmten Bereich).
+
+5. Vollständig verbundene Schicht (Fully Connected Layer): Dies ist eine herkömmliche neuronale Netzwerkschicht, bei der jeder Neuron mit jedem Neuron der vorherigen Schicht verbunden ist. Sie kombiniert die extrahierten Merkmale, um das endgültige Ergebnis zu liefern, z.B. die Klassifikation des Bildes.
+
+6. Ausgabeschicht (Output Layer): In der letzten Schicht wird eine Aktivierungsfunktion wie Softmax verwendet, um die Wahrscheinlichkeitsverteilung der möglichen Klassen zu berechnen.
+
+\subsection{Datenaugmentation}
+
+...
+
+\section{Synthetische Daten in der Bildklassifikation}
+
+...
+
+\subsection{Definition und Notwendigkeit synthetischer Daten}
+
+...
+
+\subsection{Vorteile und Herausforderungen}
+
+...
+
+\subsection{Variational Autoencoder}
+
+...
+
+\subsection{Generative Adversarial Networks}
+
+...
+
+\section{Stable Diffusion und DA-Fusion}
+
+...
+
+\subsection{Einführung in Diffusion-Modelle}
+
+...
+
+\subsection{Stable Diffusion}
+
+...
+
+\subsection{Datenaugmentation mit DA-Fusion}
+
+...
+
+\section{Contrastive Learning}
+
+...
+
+\subsection{Grundprinzipien des Contrastive Learning}
+
+...
+
+\subsection{Supervised Contrastive Learning}
+
+...
+
+\section{Integration von DA-Fusion und Supervised Contrastive Learning}
+
+...
+
+\subsection{Motivation für die Kombination}
+
+...
+
+\subsection{Potenzielle Vorteile und Herausforderungen}
+
+...

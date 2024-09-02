@@ -1,0 +1,63 @@
+\babel@toc {english}{}\relax 
+\babel@toc {ngerman}{}\relax 
+\babel@toc {ngerman}{}\relax 
+\contentsline {chapter}{\nonumberline Abbildungsverzeichnis}{III}{chapter*.4}%
+\contentsline {chapter}{\nonumberline Tabellenverzeichnis}{IV}{chapter*.5}%
+\contentsline {chapter}{\numberline {1}Einleitung}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Motivation}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Zielsetzung}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Aufbau der Arbeit}{1}{section.1.3}%
+\contentsline {chapter}{\numberline {2}Theoretische Grundlagen}{2}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Maschinelles Lernen}{2}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Definition und Ursprung}{2}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Überwachtes und unüberwachtes Lernen}{3}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}Deep Learning}{3}{subsection.2.1.3}%
+\contentsline {subsection}{\numberline {2.1.4}Neuronale Netze}{4}{subsection.2.1.4}%
+\contentsline {subsection}{\numberline {2.1.5}Convolutional Neural Networks}{4}{subsection.2.1.5}%
+\contentsline {subsection}{\numberline {2.1.6}Datenaugmentation}{5}{subsection.2.1.6}%
+\contentsline {section}{\numberline {2.2}Synthetische Daten in der Bildklassifikation}{5}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Definition und Notwendigkeit synthetischer Daten}{5}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Vorteile und Herausforderungen}{5}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Variational Autoencoder}{6}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Generative Adversarial Networks}{6}{subsection.2.2.4}%
+\contentsline {section}{\numberline {2.3}Stable Diffusion und DA-Fusion}{6}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Einführung in Diffusion-Modelle}{6}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Stable Diffusion}{6}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Datenaugmentation mit DA-Fusion}{6}{subsection.2.3.3}%
+\contentsline {section}{\numberline {2.4}Contrastive Learning}{6}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Grundprinzipien des Contrastive Learning}{6}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Supervised Contrastive Learning}{7}{subsection.2.4.2}%
+\contentsline {section}{\numberline {2.5}Integration von DA-Fusion und Supervised Contrastive Learning}{7}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Motivation für die Kombination}{7}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Potenzielle Vorteile und Herausforderungen}{7}{subsection.2.5.2}%
+\contentsline {chapter}{\numberline {3}Methodisches Vorgehen}{8}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Datensatz}{8}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Implementierung}{8}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}DA-Fusion}{8}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Supervised Contrastive Learning}{8}{subsection.3.2.2}%
+\contentsline {section}{\numberline {3.3}Synthetische Datengenerierung mit DA-Fusion}{9}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Trainingsdurchläufe mit Contrastive Learning}{9}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Evaluationsmethoden und Metriken}{9}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Analyse der Ergebnisse}{9}{section.3.6}%
+\contentsline {chapter}{\numberline {4}Ergebnisse}{10}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Implementierung}{10}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Pipeline zur synthetischen Datengenerierung}{10}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Supervised Contrastive Learning-Klassifikator}{10}{subsection.4.1.2}%
+\contentsline {section}{\numberline {4.2}Die generierten synthetischen Daten}{10}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Positiv-Beispiele}{10}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Negativ-Beispiele}{10}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Trainings- und Testergebnisse}{11}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Vergleich der Performance mit und ohne synthetische Daten}{11}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Vergleich der Performance mit und ohne Negativ-Beispiele}{11}{section.4.5}%
+\contentsline {chapter}{\numberline {5}Diskussion}{12}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Interpretation der Ergebnisse}{12}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Bewertung der Eignung von DA-Fusion und Contrastive Learning}{12}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Stärken und Schwächen des Ansatzes}{12}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Auswirkungen auf die Generalisierungsfähigkeit und Robustheit der Modelle}{12}{section.5.4}%
+\contentsline {chapter}{\numberline {6}Fazit und Ausblick}{13}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Zusammenfassung der wichtigsten Erkenntnisse}{13}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Beantwortung der Forschungsfragen}{13}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Potenzielle Anwendungsfälle und zukünftige Forschungsrichtungen}{13}{section.6.3}%
+\contentsline {chapter}{\nonumberline Literatur}{14}{chapter*.6}%
+\contentsline {chapter}{\nonumberline Anhang}{15}{chapter*.7}%
+\providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

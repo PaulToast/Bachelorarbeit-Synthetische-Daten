@@ -1,0 +1,42 @@
+% -*- coding: utf-8 -*-
+
+% Ausgabe des Literaturverzeichnisses; ohne weitere Optionen werden nur die
+% Bücher und Artikel ausgegeben, die in der Arbeit auch zitiert werden.
+\printbibliography
+
+% markiert den Anfang des Anhangs
+\appendix
+
+% ein Kapitel, das nicht numeriert, aber trotzdem ins Inhaltsverzeichnis
+% aufgenommen wird
+\addchap{Anhang}
+
+Hier beginnt der Anhang.  Siehe die Anmerkungen zur Sinnhaftigkeit eines
+Anhangs in Abschnitt~\ref{sec-app} auf Seite~\pageref{sec-app}.
+
+Der Anhang kann wie das eigentliche Dokument in Kapitel und Abschnitte
+unterteilt werden.  Der Befehl \verb|\appendix| sorgt im Wesentlichen nur für
+eine andere Nummerierung.
+
+% neue Seite
+\clearpage
+
+% keine Seitenzahl
+\thispagestyle{empty}
+
+% keine Nummerierung, keine Aufnahme ins Inhaltsverzeichnis
+\section*{Eigenständigkeitserklärung}
+
+% Hier müssen Sie natürlich den Titel der Arbeit sowie Ort und Datum ersetzen:
+Hiermit versichere ich, dass ich die vorliegende Bachelorarbeit mit dem Titel
+\begin{center}
+  \textbf{Viele zufällige Zahlen}
+\end{center}
+selbstständig und nur mit den angegebenen Hilfsmitteln verfasst habe.  Alle
+Passagen, die ich wörtlich aus der Literatur oder aus anderen Quellen wie
+z.\,B. Internetseiten übernommen habe, habe ich deutlich als Zitat mit Angabe
+der Quelle kenntlich gemacht.
+
+\vspace{2cm}
+
+Hamburg, 21.\ Dezember 1940
