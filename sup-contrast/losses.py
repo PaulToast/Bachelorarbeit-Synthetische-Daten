@@ -76,7 +76,7 @@ class SupConLoss(nn.Module):
         else:
             mask = mask.float().to(device)
         # Update mask, so that self-contrast cases aren't considered as positive pairs
-        self_contrast_mask = torch.eye(batch_size, dtype=torch.float32).to(device)
+        self_contrast_mask = 1 - torch.eye(batch_size, dtype=torch.float32).to(device)
         mask *= self_contrast_mask
         # Also make sure there are no positive pairs with any OOD samples (negative labels)
         ood_mask = (labels < 0).float().to(device).detach()
