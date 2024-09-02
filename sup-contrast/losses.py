@@ -63,7 +63,7 @@ class SupConLoss(nn.Module):
         batch_size = features.shape[0]
 
         # Get/calculate contrastive mask for this batch (shape=[bsz, bsz])
-        # mask_{i,j}=1 if sample j has the same class as sample i, otherwise 0
+        # mask[i][j]=1 if sample j has the same class as sample i, otherwise 0
         if labels is not None and mask is not None:
             raise ValueError('Cannot define both `labels` and `mask`')
         elif labels is None and mask is None:
@@ -75,17 +75,9 @@ class SupConLoss(nn.Module):
             mask = torch.eq(labels, labels.T).float().to(device)
         else:
             mask = mask.float().to(device)
-        
         # Update mask, so that self-contrast cases aren't considered as positive pairs
-        mask = mask.repeat(anchor_count, contrast_count) # Repeat mask to match the dimensions of the logits
-        self_contrast_mask = torch.scatter(
-            torch.ones_like(mask),
-            1,
-            torch.arange(batch_size * anchor_count).view(-1, 1).to(device),
-            0
-        )
+        self_contrast_mask = torch.eye(batch_size, dtype=torch.float32).to(device)
         mask *= self_contrast_mask
-        
         # Also make sure there are no positive pairs with any OOD samples (negative labels)
         ood_mask = (labels < 0).float().to(device).detach()
         mask *= (1 - ood_mask @ ood_mask.T)
@@ -109,6 +101,10 @@ class SupConLoss(nn.Module):
         # For numerical stability
         logits_max, _ = torch.max(anchor_dot_contrast, dim=1, keepdim=True)
         logits = anchor_dot_contrast - logits_max.detach()
+
+        # Repeat masks to match the dimensions of the logits
+        mask = mask.repeat(anchor_count, contrast_count)
+        self_contrast_mask = self_contrast_mask.repeat(anchor_count, contrast_count)
 
         # Ignore logits for OOD samples where OOD label is not the negative anchor label (hard-negative mining)
         non_ood_mask = 1 - ood_mask
@@ -134,6 +130,6 @@ class SupConLoss(nn.Module):
         """# Scale loss depending on batch size reduction
         loss *= original_batch_size / new_batch_size"""
 
-        del ood_mask, non_ood_mask, valid_ood_mask
+        del self_contrast_mask, ood_mask, non_ood_mask, valid_ood_mask
 
         return loss
