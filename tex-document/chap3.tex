@@ -25,7 +25,7 @@ Der Datensatz ist multimodal, d.h. er besteht aus verschiedenen Datenquellen, di
 
 \subsection{Teildatensatz}
 
-Um die Rechenzeit zu reduzieren und die Experimente auf eine bestimmte Objektkategorie zu beschränken, wurde ein Teildatensatz des EIBA-Datensatzes verwendet. Dabei wurden zufällig 20 Klassen aus der `super_class` "CarComponent" ausgewählt. Es wurden außerdem nur die RGB-Bilder verwendet, allerdings kommen auch die Objektmasken im Pre-Processing der Daten zum Einsatz. ...
+Um die Rechenzeit zu reduzieren und die Experimente auf eine bestimmte Objektkategorie zu beschränken, wurde ein Teildatensatz des EIBA-Datensatzes verwendet. Dabei wurden zufällig 20 Klassen aus der super class "CarComponent" ausgewählt. Es wurden außerdem nur die RGB-Bilder verwendet, allerdings kommen auch die Objektmasken im Pre-Processing der Daten zum Einsatz. ...
 
 Jede Klasse enthält mindestens ... Bilder. ...
 
@@ -35,7 +35,7 @@ Jede Klasse enthält mindestens ... Bilder. ...
 
 \section{Implementierung}
 
-Für die Vorbereitung der in dieser Arbeit durchgeführten Experimente konnte sich größtenteils auf die Implementierung von DA-Fusion und Supervised Contrastive Learning aus den Quellen \cite{...} und \cite{...} gestützt werden. Beide Implementierungen sind in Python geschrieben und verwenden die Bibliothek PyTorch. ...
+Für die Vorbereitung der in dieser Arbeit durchgeführten Experimente konnte sich größtenteils auf die Implementierung von DA-Fusion und Supervised Contrastive Learning aus den Quellen ... und ... gestützt werden. Beide Implementierungen sind in Python geschrieben und verwenden die Bibliothek PyTorch. ...
 
 Dennoch mussten einige Anpassungen vorgenommen werden, um die Modelle auf den EIBA-Teildatensatz anzuwenden, und um die synthetischen Augmentationen aus DA-Fusion im Supervised Contrastive Learning zu verwenden.
 
@@ -59,9 +59,10 @@ Metriken ...
 
 \section{Synthetische Datengenerierung mit DA-Fusion}
 
-...Trial & Error, um Parameter zu bestimmen
+...einmal normale Augmentationen, einmal OOD-Augmentationen
+...Trial and Error, um Parameter zu bestimmen
 
-\section{Trainingsdurchläufe mit Contrastive Learning}
+\section{Trainings- und Testdurchläufe mit Supervised Contrastive Learning}
 
 ...
 
