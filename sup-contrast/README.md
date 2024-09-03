@@ -34,35 +34,39 @@ loss = criterion(features)
 ```
 
 ## Running
-You might use `CUDA_VISIBLE_DEVICES` to set proper number of GPUs, and/or switch to CIFAR100 by `--dataset cifar100`.  
+
+You might use `CUDA_VISIBLE_DEVICES` to set proper number of GPUs, and/or switch to CIFAR100 by `--dataset cifar100`.
+
 **(1) Standard Cross-Entropy**
+
+```bash
+python main_ce.py --dataset=mvip --output_name="mvip-test-supcon-ce" \
+--aug_mode="with_id" --aug_output_name="mvip-test-dafusion" --aug_name_id="augs-id" \
+--model="resnet-50" --method="SupCon" --image_size=224 --epochs=110 --batch_size=16 \
+--num_workers=4 --lr=0.001 --lr_cosine
 ```
-python main_ce.py --batch_size 1024 \
-  --learning_rate 0.8 \
-  --cosine --syncBN \
-```
+
 **(2) Supervised Contrastive Learning**  
+
 Pretraining stage:
+```bash
+python main_supcon.py --dataset=mvip --output_name="mvip-test-supcon-pre" \
+--aug_mode="with_both" --aug_output_name="mvip-test-dafusion" --aug_name_id="augs-id" \
+--aug_name_ood="augs-ood" --model="resnet-50" --method="SupCon" --image_size=224 \
+--epochs=110 --batch_size=16 --num_workers=4 --lr=0.001 --lr_cosine
 ```
-python main_supcon.py --batch_size 1024 \
-  --learning_rate 0.5 \
-  --temp 0.1 \
-  --cosine
-```
-
-<s>You can also specify `--syncBN` but I found it not crucial for SupContrast (`syncBN` 95.9% v.s. `BN` 96.0%). </s>
-
-WARN: Currently, `--syncBN` has no effect since the code is using `DataParallel` instead of `DistributedDataParaleel`
-
 Linear evaluation stage:
+```bash
+python main_linear.py --dataset=mvip --output_name="mvip-test-supcon-lin" \
+--aug_mode="with_id" --aug_output_name="mvip-test-dafusion" --aug_name_id="augs-id" \
+--model="resnet-50" --ckpt="output/mvip-test-supcon-pre/trial=0/last.ckpt" \
+--image_size=224 --epochs=50 --batch_size=16 --num_workers=4 --lr=0.001 --lr_cosine
 ```
-python main_linear.py --batch_size 512 \
-  --learning_rate 5 \
-  --ckpt /path/to/model.pth
-```
+
 **(3) SimCLR**  
+
 Pretraining stage:
-```
+```bash
 python main_supcon.py --batch_size 1024 \
   --learning_rate 0.5 \
   --temp 0.5 \
@@ -71,40 +75,8 @@ python main_supcon.py --batch_size 1024 \
 ```
 The `--method SimCLR` flag simply stops `labels` from being passed to `SupConLoss` criterion.
 Linear evaluation stage:
-```
+```bash
 python main_linear.py --batch_size 512 \
   --learning_rate 1 \
   --ckpt /path/to/model.pth
 ```
-
-On custom dataset:
-```
-python main_supcon.py --batch_size 1024 \
-  --learning_rate 0.5  \ 
-  --temp 0.1 --cosine \
-  --dataset path \
-  --data_folder ./path \
-  --mean "(0.4914, 0.4822, 0.4465)" \
-  --std "(0.2675, 0.2565, 0.2761)" \
-  --method SimCLR
-```
-
-The `--data_folder` must be of form ./path/label/xxx.png folowing https://pytorch.org/docs/stable/torchvision/datasets.html#torchvision.datasets.ImageFolder convension.
-
-and 
-## t-SNE Visualization
-
-**(1) Standard Cross-Entropy**
-<p align="center">
-  <img src="figures/SupCE.jpg" width="400">
-</p>
-
-**(2) Supervised Contrastive Learning**
-<p align="center">
-  <img src="figures/SupContrast.jpg" width="800">
-</p>
-
-**(3) SimCLR**
-<p align="center">
-  <img src="figures/SimCLR.jpg" width="800">
-</p>

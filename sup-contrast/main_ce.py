@@ -33,6 +33,7 @@ def parse_args():
     parser = argparse.ArgumentParser('Arguments for training')
 
     parser.add_argument('--output_name', type=str, default=None, help='Output directory name for run.')
+    parser.add_argument('--trial', type=str, default='0', help='id for recording multiple runs.')
 
     # Data
     parser.add_argument('--dataset', type=str, default='mvip', choices=['cifar10', 'cifar100', 'mvip'])
@@ -84,7 +85,7 @@ def parse_args():
     
     args = parser.parse_args()
 
-    args.model_name = 'SupCE_{}_{}_lr_{}_decay_{}_bsz_{}'.\
+    args.model_name = 'SupCE_{}_{}_trial={}_lr={}_decay={}_bsz={}'.\
         format(args.dataset, args.model, args.lr, args.weight_decay, args.batch_size)
 
     # Set-up learning rate
@@ -134,7 +135,7 @@ def parse_args():
         raise ValueError('dataset not supported: {}'.format(args.dataset))
     
     # Set-up output directory
-    args.save_dir = f'./output/{args.output_name}/{args.model_name}'
+    args.save_dir = f'./output/{args.output_name}/trial={args.trial}'
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
 
