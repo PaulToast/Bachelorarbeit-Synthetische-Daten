@@ -84,8 +84,8 @@ def parse_args():
     
     args = parser.parse_args()
 
-    args.model_name = 'SupCE_{}_{}_lr_{}_decay_{}_bsz_{}_trial_{}'.\
-        format(args.dataset, args.model, args.lr, args.weight_decay, args.batch_size, args.trial)
+    args.model_name = 'SupCE_{}_{}_lr_{}_decay_{}_bsz_{}'.\
+        format(args.dataset, args.model, args.lr, args.weight_decay, args.batch_size)
 
     # Set-up learning rate
     iterations = args.lr_decay_epochs.split(',')
@@ -302,7 +302,7 @@ def main():
 
     # Init W&B logging
     run = wandb.init(
-        project=args.experiment_name,
+        project=args.output_name,
         config={
             "dataset" : args.dataset,
             "model_name": args.model_name,
