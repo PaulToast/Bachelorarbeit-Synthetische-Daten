@@ -35,12 +35,12 @@ We perform [Textual Inversion](https://arxiv.org/abs/2208.01618) to adapt Stable
 The `fine_tune_upstream.py` script seems to be an updated version of the script with a couple of modifications and more parameters. Here is an example for executing the script on the MVIP dataset, as it was used for the thesis:
 
 ```bash
-python fine_tune_upstream.py --dataset=mvip --experiment_name=mvip-test \
+python fine_tune_upstream.py --dataset=mvip --output_name="mvip-test" \
 --pretrained_model_name_or_path="CompVis/stable-diffusion-v1-4" \
---initializer_token="motor" --validation_prompt="a photo of a *" \
---num_vectors=16 --resolution=512 --train_batch_size=16 \
---lr_warmup_steps=150 --gradient_accumulation_steps=1 --max_train_steps=1000 \
---learning_rate=5.0e-04 --lr_scheduler="constant_with_warmup" \
+--initializer_token="motor" --num_vectors=16 --validation_prompt="a photo of a {}" \
+--resolution=512 --crop_object --train_batch_size=16 \
+--lr=5.0e-04 --lr_warmup_steps=150 --lr_scheduler="constant_with_warmup" \
+--gradient_accumulation_steps=1 --max_train_steps=1000 \
 --mixed_precision=fp16 --revision=fp16 --gradient_checkpointing \
 --num_trials=1 --examples_per_class=32
 ```
@@ -52,7 +52,7 @@ The trained token weights will be saved under `output/{experiment_name}/fine-tun
 Before generating augmentations, we call the script `aggregate_embeddings.py`, which merges all of the learned tokens together into a single directory, creating a class-agnostic template to use for the next steps:
 
 ```bash
-python aggregate_embeddings.py --experiment_name=mvip-test \
+python aggregate_embeddings.py --output_name="mvip-test" \
 --num_trials=1 --examples_per_class=32
 ```
 
@@ -74,9 +74,9 @@ You will be prompted for your HuggingFace account credentials, and for an access
 Afterwards, we can call the `generate_augmentations.py` script with the according parameters, for example:
 
 ```bash
-python generate_augmentations.py --dataset=mvip --experiment_name=mvip-test \
---model_path="CompVis/stable-diffusion-v1-4" \
---examples_per_class=1 --num_synthetic=4 --strength=0.5
+python generate_augmentations.py --dataset=mvip --output_name="mvip-test" \
+--aug_name="augs" --model_path="CompVis/stable-diffusion-v1-4" \
+--examples_per_class=16 --num_synthetic=4 --strength=0.2 --guidance_scale=15
 ```
 
 The images will be saved under `output/{experiment_name}/aug`

@@ -65,7 +65,7 @@ def parse_args():
     parser.add_argument('--batch_size', type=int, default=16) #256
     parser.add_argument('--num_workers', type=int, default=4) #16
 
-    parser.add_argument('--lr', type=float, default=0.002) #0.05
+    parser.add_argument('--lr', type=float, default=0.001) #0.05
     parser.add_argument('--lr_warmup', action='store_true', help='Learning rate warm-up for large batch training.')
     parser.add_argument('--lr_decay_epochs', type=str, default='700,800,900', help='When to decay lr, as string separated by comma')
     parser.add_argument('--lr_decay_rate', type=float, default=0.1)
@@ -134,7 +134,7 @@ def parse_args():
             args.lr_warmup_to = args.lr
     
     # Set-up output directory
-    args.save_dir = os.path.abspath(f'output/{args.output_name}/{args.model_name}')
+    args.save_dir = os.path.abspath(f'output/{args.output_name}/trial={args.trial}')
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
 
@@ -335,6 +335,7 @@ def main():
         project=args.output_name,
         config={
             "dataset" : args.dataset,
+            "aug_mode" : args.aug_mode,
             "model_name": args.model_name,
             "image_size" : args.image_size,
             "epochs" : args.epochs,

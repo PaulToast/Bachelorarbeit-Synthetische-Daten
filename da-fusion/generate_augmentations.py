@@ -70,10 +70,10 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument(
-        "--output_dir",
+        "--aug_name",
         type=str,
-        default=None,
-        help="Will default to 'output/{output_name}/aug/'."
+        default="augs",
+        help="Subfolder name for augmentations output. Will default to 'augs'."
     )
     parser.add_argument(
         "--model_path",
@@ -114,8 +114,8 @@ if __name__ == "__main__":
 
     if args.embed_path == None:
         args.embed_path = os.path.abspath(f"output/{args.output_name}/fine-tuned-merged/seed=0_ex=32.pt")
-    if args.output_dir == None:
-        args.output_dir = os.path.abspath(f"output/{args.output_name}/aug/")
+
+    args.output_dir = os.path.abspath(f"output/{args.output_name}/{args.aug_name}/")
 
     os.makedirs(args.output_dir, exist_ok=True)
 

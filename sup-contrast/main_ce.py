@@ -65,9 +65,9 @@ def parse_args():
 
     parser.add_argument('--image_size', type=int, default=224, help='Size for RandomResizedCrop.') #32
 
-    parser.add_argument('--epochs', type=int, default=50) #100
+    parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--batch_size', type=int, default=16) #256
-    parser.add_argument('--num_workers', type=int, default=16)
+    parser.add_argument('--num_workers', type=int, default=4) #16
 
     parser.add_argument('--lr', type=float, default=0.001) #0.1
     parser.add_argument('--lr_warmup', action='store_true', help='Learning rate warm-up for large batch training.')
@@ -100,8 +100,8 @@ def parse_args():
         args.lr_warmup = True
     if args.lr_warmup:
         args.model_name = '{}_warmup'.format(args.model_name)
-        args.lr_warmup_from = 0.01
-        args.lr_warmup_epochs = 10
+        args.lr_warmup_from = 0.0001
+        args.lr_warmup_epochs = 5
         if args.lr_cosine:
             eta_min = args.lr * (args.lr_decay_rate ** 3)
             args.lr_warmup_to = eta_min + (args.lr - eta_min) * (

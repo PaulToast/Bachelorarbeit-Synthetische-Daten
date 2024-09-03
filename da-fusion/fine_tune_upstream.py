@@ -229,8 +229,7 @@ def parse_args():
     )
     parser.add_argument(
         "--crop_object",
-        type=bool,
-        default=False,
+        action="store_true",
         help="Crop object from image before resizing to resolution (for MVIP dataset).",
     )
     parser.add_argument(
@@ -500,7 +499,7 @@ imagenet_style_templates_small = [
 
 def log_validation(text_encoder, tokenizer, unet, vae, args, accelerator, weight_dtype, epoch):
     """Generate images with the validation prompt and log them."""
-    formatted_prompt = args.validation_prompt.replace("*", args.placeholder_token)
+    formatted_prompt = args.validation_prompt.format(args.placeholder_token)
     
     logger.info(
         f"Running validation... \n Generating {args.num_validation_images} images with prompt:"
@@ -1108,7 +1107,7 @@ if __name__ == "__main__":
             metadata = train_dataset.get_metadata_by_idx(idx)
 
             # Crop the image using object mask
-            if args.crop_object:
+            if args.crop_object == True:
                 image, metadata["mask"] = crop_object(image, metadata["mask"])
 
             if metadata["name"] == class_name:
