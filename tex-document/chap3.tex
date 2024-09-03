@@ -4,7 +4,7 @@ In diesem Kapitel wird das methodische Vorgehen der Arbeit beschrieben. Es wird 
 
 \section{Forschungsfragen und Hypothesen}
 
-...
+XXX Die Forschungsarbeit beschäftigt sich mit der Frage, ob synthetische Daten, die mit dem Modell DA-Fusion generiert wurden, die Generalisierung und Robustheit von Modellen verbessern können, die mit Supervised Contrastive Learning trainiert wurden. Dazu werden die synthetischen Daten in das Training des Modells integriert und die Auswirkungen auf die Performance des Modells untersucht. Insbesondere wird die Möglichkeit untersucht, starke Augmentationen als Out-of-Distribution-Beispiele im Training zu verwenden, indem sie ausschließlich als negative Beispiele für das Contrastive Learning dienen.
 
 \begin{itemize}[]
 	\item Kann DA-Fusion für den Datensatz des Fraunhofer-IPK überzeugende synthetische Daten generieren?
@@ -45,6 +45,23 @@ Um die Rechenzeit zu reduzieren und die Experimente auf eine bestimmte Objektkat
 
 \section{Implementierung}
 
+- Arbeitsumgebung, Rechner-Zugang, etc.
+- Programmiersprache, Bibliotheken, etc.
+- DA-Fusion
+	- Bestehende Implementierung verstehen
+	- Klasse zum Laden des EIBA-Teildatensatzes
+		- Masken-cropping
+		- Masken für Augmentation
+	- Workflow-Anpassungen für Input/Output
+- Supervised Contrastive Learning
+	- Klasse zum Laden des EIBA-Teildatensatzes und der Augmentationen
+	- Workflow-Anpassungen für Input/Output (wie DA-Fusion)
+	- Parameter für Konfiguration der Verwendung der Augmentationen
+	- Integration von OOD-Augmentationen im Contrastive Learning
+	- Metriken für Evaluation
+		- Accuracy
+		- ID- und OOD-Confidence
+
 Für die Vorbereitung der in dieser Arbeit durchgeführten Experimente konnte sich größtenteils auf die Implementierung von DA-Fusion und Supervised Contrastive Learning aus den Quellen ... und ... gestützt werden. Beide Implementierungen sind in Python geschrieben und verwenden die Bibliothek PyTorch. ...
 
 Dennoch mussten einige Anpassungen vorgenommen werden, um die Modelle auf den EIBA-Teildatensatz anzuwenden, und um die synthetischen Augmentationen aus DA-Fusion im Supervised Contrastive Learning zu verwenden.
@@ -69,17 +86,24 @@ Metriken ...
 
 \section{Synthetische Datengenerierung mit DA-Fusion}
 
-- einmal ID-Augmentationen, einmal OOD-Augmentationen
-- Trial and Error, um Parameter zu bestimmen
-	- Validierung ist schwierig
+- Synthetische Datengenerierung mit DA-Fusion
+	- ID-Augmentationen, OOD-Augmentationen
+	- Trial and Error, um Parameter zu bestimmen, Validierung ist schwierig
 
 \section{Trainings- und Testdurchläufe mit Supervised Contrastive Learning}
 
-- es soll einerseits der Effekt der "normalen" ID-Augmentationen aufs Training untersucht werden, und andererseits der Effekt der OOD-Augmentationen im Contrastive Pre-Training als Spezialfall
+- Trainings- und Testdurchläufe mit Supervised Contrastive Learning
+	- Nur reale Daten
+	- Mit ID-Augmentationen
+	- Mit ID-Augmentationen (und Contrastive Pre-Training mit OOD-Augmentationen)
+- Evtl. klassischer Klassifikator mit Cross-Entropy Loss
 
 \section{Evaluationsmethoden und Metriken}
 
-...
+- Synthetische Daten
+- Klassifikation
+	- Accuracy
+	- ID- und OOD-Confidence
 
 \section{Analyse der Ergebnisse}
 

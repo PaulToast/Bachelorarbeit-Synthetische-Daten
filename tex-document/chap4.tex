@@ -1,44 +1,41 @@
 \chapter{Ergebnisse}
 
-...
-
-\section{Implementierung}
-
-...
-
-\subsection{Synthetische Datengenerierung}
-
-...Datensatz-Klasse
-...Train-Prompts
-...Aug-Prompts
-...Aug-Masken
-
-\subsection{Supervised Contrastive Learning}
-
-...
+Dieses Kapitel präsentiert die Ergebnisse der Arbeit. Es wird auf die generierten synthetischen Daten eingegangen und die Trainings- und Testergebnisse der Modelle beschrieben. Anschließend wird die Klassifikations-Performance der Modelle verglichen und die Out-of-Distribution-Detektion analysiert.
 
 \section{Die generierten synthetischen Daten}
 
 ...
 
-\subsection{Normale Augmentationen}
+\subsection{In-Distribution-Augmentationen}
 
-...
+- Parameter
+- Beispiele
+- Schwierigkeiten bei der Validierung
 
-\subsection{OOD-Augmentationen}
+\subsection{Out-of-Distribution-Augmentationen}
 
-...Versuch 1: ...
-...Versuch 2: ...
-...
+- Parameter
+- Beispiele
+- Schwierigkeiten bei der Validierung
 
 \section{Trainings- und Testergebnisse}
 
+- Contrastive Pre-Training
+    - Nur reale Daten
+    - Mit ID-Augmentationen
+    - Mit ID-Augmentationen und OOD-Augmentationen für hard-negative mining
+- Lineare Klassifikation
+    - Nur reale Daten
+    - Mit ID-Augmentationen
+    - Mit ID-Augmentationen und Contrastive Pre-Training mit OOD-Augmentationen
+(- Klassischer Klassifikator mit Cross-Entropy Loss)
+    - Nur reale Daten
+    - Mit ID-Augmentationen
+
+\section{Vergleich der Klassifikations-Performance}
+
 ...
 
-\section{Vergleich der Performance mit und ohne normale Augmentationen}
-
-...
-
-\section{Vergleich der Performance mit und ohne OOD-Augmentationen}
+\section{Vergleich der Out-of-Distribution-Detektion}
 
 ...
