@@ -1,22 +1,22 @@
 [0] Config.pm:308> INFO - This is Biber 2.20
 [0] Config.pm:311> INFO - Logfile is 'Bachelorarbeit Synthetische Daten.blg'
-[308] biber-MSWIN64:340> INFO - === 
-[381] Biber.pm:420> INFO - Reading 'Bachelorarbeit Synthetische Daten.bcf'
-[606] Biber.pm:994> INFO - Found 5 citekeys in bib section 0
-[643] Biber.pm:4463> INFO - Processing section 0
-[658] Biber.pm:4654> INFO - Looking for bibtex file 'library.bib' for section 0
-[728] bibtex.pm:1713> INFO - LaTeX decoding ...
-[771] bibtex.pm:1519> INFO - Found BibTeX data source 'library.bib'
-[922] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[922] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'variable = shifted' with 'variable = non-ignorable'
-[922] Biber.pm:4283> INFO - Sorting list 'apa/apasortcite//global/global/global' of type 'entry' with template 'apa' and locale 'de-DE'
-[922] Biber.pm:4289> INFO - No sort tailoring available for locale 'de-DE'
-[944] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[944] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'variable = shifted' with 'variable = non-ignorable'
-[944] Biber.pm:4283> INFO - Sorting list 'apa/global//global/global/global' of type 'entry' with template 'apa' and locale 'de-DE'
-[944] Biber.pm:4289> INFO - No sort tailoring available for locale 'de-DE'
-[950] bbl.pm:676> INFO - Writing 'Bachelorarbeit Synthetische Daten.bbl' with encoding 'UTF-8'
-[959] bbl.pm:779> INFO - Output to Bachelorarbeit Synthetische Daten.bbl
-[959] Biber.pm:131> WARN - I didn't find a database entry for 'voss' (section 0)
-[959] Biber.pm:131> WARN - I didn't find a database entry for 'schlosser' (section 0)
-[960] Biber.pm:133> INFO - WARNINGS: 2
+[222] biber-MSWIN64:340> INFO - === 
+[277] Biber.pm:420> INFO - Reading 'Bachelorarbeit Synthetische Daten.bcf'
+[451] Biber.pm:994> INFO - Found 5 citekeys in bib section 0
+[489] Biber.pm:4463> INFO - Processing section 0
+[505] Biber.pm:4654> INFO - Looking for bibtex file 'library.bib' for section 0
+[581] bibtex.pm:1713> INFO - LaTeX decoding ...
+[623] bibtex.pm:1519> INFO - Found BibTeX data source 'library.bib'
+[733] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[733] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'variable = shifted' with 'variable = non-ignorable'
+[733] Biber.pm:4283> INFO - Sorting list 'apa/apasortcite//global/global/global' of type 'entry' with template 'apa' and locale 'de-DE'
+[733] Biber.pm:4289> INFO - No sort tailoring available for locale 'de-DE'
+[752] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'variable = shifted' with 'variable = non-ignorable'
+[752] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[752] Biber.pm:4283> INFO - Sorting list 'apa/global//global/global/global' of type 'entry' with template 'apa' and locale 'de-DE'
+[752] Biber.pm:4289> INFO - No sort tailoring available for locale 'de-DE'
+[756] bbl.pm:676> INFO - Writing 'Bachelorarbeit Synthetische Daten.bbl' with encoding 'UTF-8'
+[761] bbl.pm:779> INFO - Output to Bachelorarbeit Synthetische Daten.bbl
+[762] Biber.pm:131> WARN - I didn't find a database entry for 'voss' (section 0)
+[762] Biber.pm:131> WARN - I didn't find a database entry for 'schlosser' (section 0)
+[762] Biber.pm:133> INFO - WARNINGS: 2

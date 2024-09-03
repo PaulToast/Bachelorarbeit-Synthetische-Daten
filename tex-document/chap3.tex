@@ -1,6 +1,6 @@
 \chapter{Methodisches Vorgehen}
 
-Dieses Kapitel behandelt die Methoden und Herangehensweisen, die in dieser Arbeit zur Beantwortung der Forschungsfragen angewendet wurden.
+In diesem Kapitel wird das methodische Vorgehen der Arbeit beschrieben. Es wird auf die Forschungsfragen und Hypothesen eingegangen, der verwendete Datensatz vorgestellt und die Implementierung der Modelle DA-Fusion und Supervised Contrastive Learning erläutert. Anschließend wird die synthetische Datengenerierung mit DA-Fusion und die Trainings- und Testdurchläufe mit Supervised Contrastive Learning beschrieben. Abschließend werden die Evaluationsmethoden und Metriken vorgestellt, die zur Analyse der Ergebnisse verwendet werden.
 
 \section{Forschungsfragen und Hypothesen}
 
@@ -18,21 +18,30 @@ Dieses Kapitel behandelt die Methoden und Herangehensweisen, die in dieser Arbei
 
 \subsection{EIBA}
 
-Grundlage der Forschungsarbeit ist ein am Fraunhofer-IPK entstandener Datensatz von Gebrauchsgegenständen, darunter hauptsächlich Autoteile und Komponenten. Er wurde im Rahmen des Projekts “Sensorische Erfassung, automatisierte Identifikation und Bewertung von Altteilen anhand von Produktdaten sowie Informationen über bisherige Lieferungen” (EIBA) erstellt, das von 2019 bis 2023 lief und von der Circular Economy Solutions GmbH koordiniert und in Kooperation mit der Technischen Universität Berlin und der deutschen Akademie der Technikwissenschaften durchgeführt wurde.
+Grundlage der Forschungsarbeit ist ein am Fraunhofer-IPK entstandener Datensatz von Gebrauchsgegenständen, darunter hauptsächlich Autoteile und Komponenten. Er wurde im Rahmen des Projekts “Sensorische Erfassung, automatisierte Identifikation und Bewertung von Altteilen anhand von Produktdaten sowie Informationen über bisherige Lieferungen” (EIBA) erstellt, das von 2019 bis 2023 lief und von der Circular Economy Solutions GmbH koordiniert und in Kooperation mit der Technischen Universität Berlin und der deutschen Akademie der Technikwissenschaften durchgeführt wurde. \cite{}
 
-Der Datensatz ist multimodal, d.h. er besteht aus verschiedenen Datenquellen, die unterschiedliche Informationen über die Gegenstände enthalten. Neben herkömmlichen RGB-Bildern aus verschiedenen Perpektiven und weiteren Bilddaten, wie z.B. Objektmasken, gibt es auch Metadaten, etwa das Gewicht, oder Beschreibungen der Objekte in natürlicher Sprache durch verschiedene Stichwörter ("CarComponent", "cylinder", "rusty", ...).
+Der Datensatz ist multimodal, d.h. er besteht aus verschiedenen Datenquellen, die unterschiedliche Informationen über die Gegenstände enthalten. Neben herkömmlichen RGB-Bildern aus verschiedenen Perpektiven und weiteren Bilddaten, wie z.B. Objektmasken, gibt es auch Metadaten, etwa das Gewicht, oder Beschreibungen der Objekte in natürlicher Sprache durch verschiedene Stichwörter ("CarComponent", "cylinder", "rusty", usw.).
 
-...
+- Klassen und Anzahl der Bilder insgesamt
+- Verteilung der Klassen
+- Beispielbilder, -masken, -metadaten
 
 \subsection{Teildatensatz}
 
 Um die Rechenzeit zu reduzieren und die Experimente auf eine bestimmte Objektkategorie zu beschränken, wurde ein Teildatensatz des EIBA-Datensatzes verwendet. Dabei wurden zufällig 20 Klassen aus der super class "CarComponent" ausgewählt. Es wurden außerdem nur die RGB-Bilder verwendet, allerdings kommen auch die Objektmasken im Pre-Processing der Daten zum Einsatz. ...
 
-Jede Klasse enthält mindestens ... Bilder. ...
+- Klassen und Anzahl der Bilder in Teildatensatz
 
 \subsection{Vorverarbeitung}
 
-...
+- Verwendung der Objektmasken, um die Bilder zu croppen
+	- Bounding Box
+	- Quadratischer Output
+	- Weniger Aufmerksamkeit auf gleichbleibenden Hintergrund
+- Verschiedene "klassische" Augmentationen
+	- Rotation
+	- ColorJitter
+- Normalisierung der Bilder
 
 \section{Implementierung}
 
@@ -60,12 +69,13 @@ Metriken ...
 
 \section{Synthetische Datengenerierung mit DA-Fusion}
 
-...einmal normale Augmentationen, einmal OOD-Augmentationen
-...Trial and Error, um Parameter zu bestimmen
+- einmal ID-Augmentationen, einmal OOD-Augmentationen
+- Trial and Error, um Parameter zu bestimmen
+	- Validierung ist schwierig
 
 \section{Trainings- und Testdurchläufe mit Supervised Contrastive Learning}
 
-...
+- es soll einerseits der Effekt der "normalen" ID-Augmentationen aufs Training untersucht werden, und andererseits der Effekt der OOD-Augmentationen im Contrastive Pre-Training als Spezialfall
 
 \section{Evaluationsmethoden und Metriken}
 
