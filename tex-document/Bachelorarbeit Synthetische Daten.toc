@@ -36,7 +36,7 @@
 \contentsline {subsection}{\numberline {3.2.1}EIBA}{10}{subsection.3.2.1}%
 \contentsline {subsection}{\numberline {3.2.2}Teildatensatz}{10}{subsection.3.2.2}%
 \contentsline {subsection}{\numberline {3.2.3}Vorverarbeitung}{10}{subsection.3.2.3}%
-\contentsline {section}{\numberline {3.3}Implementierung}{11}{section.3.3}%
+\contentsline {section}{\numberline {3.3}Implementierung}{10}{section.3.3}%
 \contentsline {subsection}{\numberline {3.3.1}DA-Fusion}{11}{subsection.3.3.1}%
 \contentsline {subsection}{\numberline {3.3.2}Supervised Contrastive Learning}{11}{subsection.3.3.2}%
 \contentsline {section}{\numberline {3.4}Synthetische Datengenerierung mit DA-Fusion}{12}{section.3.4}%
@@ -48,17 +48,17 @@
 \contentsline {subsection}{\numberline {4.1.1}In-Distribution-Augmentationen}{13}{subsection.4.1.1}%
 \contentsline {subsection}{\numberline {4.1.2}Out-of-Distribution-Augmentationen}{13}{subsection.4.1.2}%
 \contentsline {section}{\numberline {4.2}Trainings- und Testergebnisse}{13}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Vergleich der Klassifikations-Performance}{14}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Vergleich der Out-of-Distribution-Detektion}{14}{section.4.4}%
+\contentsline {section}{\numberline {4.3}Vergleich der Ergebnisse mit und ohne In-Distribution-Augmentationen}{13}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Vergleich der Ergebnisse mit und ohne Out-of-Distribution-Augmentationen}{14}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Vergleich der Ergebnisse mit und ohne Contrastive Learning}{14}{section.4.5}%
 \contentsline {chapter}{\numberline {5}Diskussion}{15}{chapter.5}%
 \contentsline {section}{\numberline {5.1}Interpretation der Ergebnisse}{15}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Bewertung der Eignung von DA-Fusion und Contrastive Learning}{15}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Stärken und Schwächen des Ansatzes}{15}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Auswirkungen auf die Generalisierungsfähigkeit und Robustheit der Modelle}{15}{section.5.4}%
+\contentsline {section}{\numberline {5.2}Bewertung der Eignung von DA-Fusion für die synthetische Datengenerierung}{15}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Bewertung der Wirksamkeit von Out-of-Distribution-Augmentationen im Supervised Contrastive Learning}{15}{section.5.3}%
 \contentsline {chapter}{\numberline {6}Fazit}{16}{chapter.6}%
 \contentsline {section}{\numberline {6.1}Zusammenfassung der wichtigsten Erkenntnisse}{16}{section.6.1}%
 \contentsline {section}{\numberline {6.2}Beantwortung der Forschungsfragen}{16}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Ausblick}{16}{section.6.3}%
+\contentsline {section}{\numberline {6.3}Ausblick und potenzielle Weiterentwicklungen}{16}{section.6.3}%
 \contentsline {chapter}{\nonumberline Literatur}{17}{chapter*.6}%
 \contentsline {chapter}{\nonumberline Anhang}{18}{chapter*.7}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

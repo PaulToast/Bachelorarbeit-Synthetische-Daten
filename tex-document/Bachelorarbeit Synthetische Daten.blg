@@ -1,19 +1,19 @@
 [0] Config.pm:308> INFO - This is Biber 2.20
-[23] Config.pm:311> INFO - Logfile is 'Bachelorarbeit Synthetische Daten.blg'
-[760] biber-MSWIN64:340> INFO - === 
-[1022] Biber.pm:420> INFO - Reading 'Bachelorarbeit Synthetische Daten.bcf'
-[1349] Biber.pm:994> INFO - Found 3 citekeys in bib section 0
-[1446] Biber.pm:4463> INFO - Processing section 0
-[1522] Biber.pm:4654> INFO - Looking for bibtex file 'library.bib' for section 0
-[1650] bibtex.pm:1713> INFO - LaTeX decoding ...
-[1709] bibtex.pm:1519> INFO - Found BibTeX data source 'library.bib'
-[2122] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'variable = shifted' with 'variable = non-ignorable'
-[2122] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[2122] Biber.pm:4283> INFO - Sorting list 'apa/apasortcite//global/global/global' of type 'entry' with template 'apa' and locale 'de-DE'
-[2123] Biber.pm:4289> INFO - No sort tailoring available for locale 'de-DE'
-[2150] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'variable = shifted' with 'variable = non-ignorable'
-[2150] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[2151] Biber.pm:4283> INFO - Sorting list 'apa/global//global/global/global' of type 'entry' with template 'apa' and locale 'de-DE'
-[2151] Biber.pm:4289> INFO - No sort tailoring available for locale 'de-DE'
-[2156] bbl.pm:676> INFO - Writing 'Bachelorarbeit Synthetische Daten.bbl' with encoding 'UTF-8'
-[2163] bbl.pm:779> INFO - Output to Bachelorarbeit Synthetische Daten.bbl
+[1] Config.pm:311> INFO - Logfile is 'Bachelorarbeit Synthetische Daten.blg'
+[312] biber-MSWIN64:340> INFO - === 
+[427] Biber.pm:420> INFO - Reading 'Bachelorarbeit Synthetische Daten.bcf'
+[601] Biber.pm:994> INFO - Found 3 citekeys in bib section 0
+[630] Biber.pm:4463> INFO - Processing section 0
+[672] Biber.pm:4654> INFO - Looking for bibtex file 'library.bib' for section 0
+[733] bibtex.pm:1713> INFO - LaTeX decoding ...
+[767] bibtex.pm:1519> INFO - Found BibTeX data source 'library.bib'
+[962] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[962] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'variable = shifted' with 'variable = non-ignorable'
+[962] Biber.pm:4283> INFO - Sorting list 'apa/apasortcite//global/global/global' of type 'entry' with template 'apa' and locale 'de-DE'
+[962] Biber.pm:4289> INFO - No sort tailoring available for locale 'de-DE'
+[981] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'variable = shifted' with 'variable = non-ignorable'
+[981] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[981] Biber.pm:4283> INFO - Sorting list 'apa/global//global/global/global' of type 'entry' with template 'apa' and locale 'de-DE'
+[981] Biber.pm:4289> INFO - No sort tailoring available for locale 'de-DE'
+[985] bbl.pm:676> INFO - Writing 'Bachelorarbeit Synthetische Daten.bbl' with encoding 'UTF-8'
+[990] bbl.pm:779> INFO - Output to Bachelorarbeit Synthetische Daten.bbl
