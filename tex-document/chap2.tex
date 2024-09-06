@@ -5,12 +5,11 @@ Im folgenden Kapitel werden die theoretischen Grundlagen des maschinellen Lernen
 \section{Maschinelles Lernen}
 
 % Ursprung ML; Problemstellung, die es löst
-% Definition ML (Mitchell), ausgeführt
-
 Die ersten großen Durchbrüche in der künstlichen Intelligenz (KI) kamen im Bezug auf Aufgaben, die für Menschen intellektuell eine große Herausforderung darstellten, die aber von Computern relativ einfach zu lösen waren, da sie als Liste formaler, mathematischer Regeln beschrieben werden konnten. Die große Schwierigkeit lag hingegen in den Aufgaben, die für Menschen relativ einfach und intuitiv sind, welche sich aber nur schwer formal beschreiben lassen. Hierunter fallen z.B. die Spracherkennung, oder Objekterkennung. \parencite{Goodfellow2016}
 
 Maschinelles Lernen (ML) beschreibt den Ansatz, Computer mit der Fähigkeit auszustatten, selbstständig Wissen aus Erfahrung zu generieren, indem Muster und Konzepte aus rohen Daten erlernt werden. So kann ein Computerprogramm auf Basis von Beispielen lernen, wie es eine bestimmte Aufgabe lösen soll, ohne dass ihm explizit Regeln oder Algorithmen vorgegeben werden.
 
+% Definition ML (Mitchell), weiter ausgeführt
 Eine allgemeine Definition für maschinelles Lernen bietet \parencite{Mitchell1997}:
 
 \begin{quote}
@@ -21,32 +20,43 @@ Die Erfahrung $E$ besteht dabei aus einer Menge von Trainingsdaten, die etwa aus
 
 \subsection{Überwachtes und unüberwachtes Lernen}
 
+% Supervised & Unsupervised als die zwei wichtigsten Lernparadigmen im ML
 Wie genau Wissen aus Erfahrung bzw. aus Rohdaten generiert wird hängt vom gewählten Verfahren ab. Im Maschinellen Lernen gibt es dabei verschiedene Paradigmen, wobei die wichtigsten das überwachte (engl. \textit{supervised}) und das unüberwachte (engl. \textit{unsupervised}) Lernen sind.
 
+% Supervised
 Beim überwachten Lernen wird das Modell mit einem vollständig annotierten Datensatz trainiert. Das heißt, jeder Datenpunkt ist mit einem Klassenlabel versehen, sodass Eingabe-Ausgabe-Paare entstehen. Das Ziel ist es, eine Funktion zu lernen, die Eingaben (Features) auf die entsprechenden Ausgaben (Labels) abbildet. Beispiele für überwachtes Lernen sind Klassifikations- und Regressionsaufgaben. Ein typisches Beispiel ist die Bilderkennung, bei der ein Modell darauf trainiert wird, Bilder von Katzen und Hunden zu unterscheiden.
 
+% Unsupervised
 Im Gegensatz dazu arbeitet unüberwachtes Lernen mit unbeschrifteten Daten; es gibt also keine vorgegebenen Ausgaben. Stattdessen wird versucht, ein Modell zu befähigen, eigenständig Muster und Strukturen in den Daten zu erkennen und z.B. Cluster zu bilden, oder nützliche Repräsentationen der Eingangsdaten zu erstellen. Zu den häufigsten Methoden des unüberwachten Lernens gehören Clustering- und Assoziationsalgorithmen. Ein Beispiel ist die Segmentierung von Kunden in verschiedene Gruppen basierend auf ihrem Kaufverhalten. \parencite{}
 
+% Andere
 In der Praxis werden oft auch hybride Ansätze genutzt, wie das semi-überwachte Lernen, bei dem eine Kombination aus beschrifteten und unbeschrifteten Daten verwendet wird, oder das selbstüberwachte Lernen, bei dem das Modell sich selbst überwacht, indem es Teile der Daten als pseudo-beschriftet behandelt.
 
 \subsection{Deep Learning}
 
+% Deep Learning als Hierarchie von Konzepten/Merkmalen
 Das Wissen, das ein Modell aus den Trainingsdaten lernt, wird in Form von Merkmalen (engl. \textit{features}) repräsentiert. Diese Merkmale können einfache Konzepte wie Kanten oder Farben sein, oder komplexere Konzepte wie Gesichter oder Objekte. Unter Deep Learning versteht man eine tiefe, hierarchische Vernetzung dieser Konzepte, sodass komplexere Konzepte auf simpleren Konzepten aufbauen können. Visuell veranschaulicht entsteht ein Graph mit vielen Ebenen (engl. \textit{deep layers}). Damit ist Deep Learning eine spezialisierte Unterkategorie des maschinellen Lernens, die auf künstlichen neuronalen Netzen basiert. Diese Netzwerke bestehen aus mehreren Schichten, die eine hierarchische Repräsentation von Daten ermöglichen. Jede Schicht transformiert die Eingabedaten in eine etwas abstraktere Darstellung.
 
+% Fortschritte im Deep Learning
 Deep Learning hat in den letzten Jahren erhebliche Fortschritte gemacht und findet Anwendung in Bereichen wie Bild- und Spracherkennung, autonomen Fahrzeugen und vielen anderen. Die Popularität von Deep Learning ist auf mehrere Faktoren zurückzuführen, darunter die Verfügbarkeit großer Datensätze, die Leistungsfähigkeit moderner Hardware und die Entwicklung effizienter Algorithmen.
 
 \subsection{Neuronale Netze}
 
+% Einleitung und grundlegender Aufbau
 Das künstliche neuronale Netz (KNN) bildet die Grundlage der allermeisten Deep-Learning-Algorithmen. Es ist inspiriert von der Struktur und Funktionsweise des menschlichen Gehirns und besteht aus einer Vielzahl von miteinander verbundenen Knoten (Neuronen), die in Schichten organisiert sind. Die Struktur eines neuronalen Netzes besteht aus einer Eingabeschicht, einer oder mehreren versteckten Schichten (engl. \textit{hidden layers}) und einer Ausgabeschicht.
 
+% Einzelnes Neuron im Detail
 Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Modellierung des biologischen Neurons, das erstmals 1943 von Warren McCulloh und Walter Pitts vorgestellt wurde \parencite{Zhou2021}. Jedes Neuron empfängt eine Reihe von Eingaben, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es ein zugehöriges Gewicht (engl. \textit{weight}), das die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingabe auf das Neuron bestimmt. Das Neuron berechnet dann die gewichtete Summe aller Eingabe und falls ein bestimmter Schwellenwert (engl. \textit{bias}) überschritten wurde, wird das Neuron aktiviert. Diese Aktivierung kann durch verschiedene Aktivierungsfunktionen angepasst werden. Häufig wird etwa die sogenannte Sigmoid-Funktion verwendet, welche im Gegensatz zur einfachen Step-Funktion differenzierbar ist und somit die Optimierung des Netzwerk vereinfacht.
 
+% Wie neuronale Netze lernen
 Die Optimierung des Netzwerks geschieht durch eine Rückwärtsausbreitung (engl. \textit{backpropagation}), welche den berechneten Fehler rückwärts durch das Netz propagiert, um die Gewichte und Schwellenwerte um einen geringen Wert in die Richtung anzupassen, die den Fehler minimieren würde. ...
 
 \subsection{Convolutional Neural Networks}
 
+% Kurze Definition
 Ein Convolutional Neural Network (CNN) ist ein spezielles künstliches neuronales Netz, das hauptsächlich für die Bildklassifikation entwickelt wurde. Es verwendet Faltungsebenen, um ein Eingangsbild Schritt für Schritt in immer abstraktere “Feature Maps” zu verarbeiten.
 
+% Architektur eines CNN
 Die Architektur eines CNN besteht typischerweise aus mehreren Schichten, die in der folgenden Reihenfolge angeordnet sind:
 
 \begin{enumerate}[]
@@ -60,16 +70,22 @@ Die Architektur eines CNN besteht typischerweise aus mehreren Schichten, die in 
 
 \subsection{Datenaugmentation}
 
+% Definition und Zweck
 Datenaugmentation ist ein wichtiger Schritt im Training von neuronalen Netzen, insbesondere bei begrenzten Datensätzen. Sie bezieht sich auf die künstliche Erweiterung des Trainingsdatensatzes durch Anwenden von Transformationen auf die vorhandenen Daten. Diese Transformationen können z.B. Rotation, Skalierung, Verschiebung, Spiegelung, Helligkeitsanpassung oder Rauschen sein. Das Ziel der Datenaugmentation ist es, das Modell robuster gegenüber Variationen in den Eingabedaten zu machen und die Generalisierungsfähigkeit zu verbessern.
 
-\section{Synthetische Daten in der Bildklassifikation}
+% Beispiele
+...
 
-% Definition synthetischer Daten
-% Notwendigkeit von synthetischen Daten
+\section{Synthetische Daten}
 
-Während die Verfügbarkeit großer Datensätze für das Training von neuronalen Netzen ein entscheidender Faktor für den Erfolg von Deep Learning-Modellen ist, ist es oft schwierig, solche Datensätze zu sammeln, insbesondere in Domänen wie der Medizin oder der Robotik, wo die Daten rar und teuer sind. In solchen Fällen können synthetische Daten eine nützliche Alternative oder Ergänzung zu echten Daten sein. Synthetische Daten sind künstlich erzeugte Daten, welche die zugrundeliegenden Muster der realen Daten nachahmen. Sie können durch Simulation, Generierung oder Transformation von echten Daten erstellt werden.
+% Anschließend an Datenaugmentation; Problematik der Datensammlung
+% Abgrenzung synthetischer Datengenerierung zu Datenaugmentation
+% Vorteile und Herausforderungen synthetischer Daten
+% Fortschritte generativer Modellierung, Einleitung folgender Abschnitte
 
-\subsection{Vorteile und Herausforderungen}
+Während die Verfügbarkeit großer Datensätze für das Training von neuronalen Netzen ein entscheidender Faktor für den Erfolg von Deep Learning-Modellen ist, ist es oft schwierig, solche Datensätze zu sammeln, insbesondere in Domänen wie der Medizin oder der Robotik, wo die Daten rar und teuer sind \cite{}. In solchen Fällen können synthetische Daten eine nützliche Alternative oder Ergänzung zu echten Daten sein.
+
+Synthetische Daten sind künstlich erzeugte Daten, welche die zugrundeliegenden Muster der realen Daten nachahmen. Sie können durch Simulation, Generierung oder Transformation von echten Daten erstellt werden.
 
 ...
 
@@ -81,11 +97,7 @@ Während die Verfügbarkeit großer Datensätze für das Training von neuronalen
 
 ...
 
-\section{Stable Diffusion und DA-Fusion}
-
-...
-
-\subsection{Einführung in Diffusion-Modelle}
+\subsection{Stable Diffusion}
 
 Unter Diffusion versteht man den Prozess der langsamen Vermischung von Partikeln oder Informationen über die Zeit. In der Physik beschreibt die Diffusionsgleichung die zeitliche Entwicklung der Dichte von Teilchen, die sich zufällig bewegen. Dieses Konzept fand erstmals im maschinellen Lernen Anwendung, als Jascha Sohl-Dickstein et al. 2015 das Konzept der Diffusion-Modelle einführten \parencite{}.
 
@@ -93,39 +105,79 @@ Bei Diffusion-Modellen handelt es sich um eine Klasse von generativen Deep Learn
 
 ...
 
-
-\subsection{Stable Diffusion}
-
-...
-
-\subsection{Datenaugmentation mit DA-Fusion}
+\subsection{DA-Fusion}
 
 ...
 
 \section{Contrastive Learning}
 
+% Ursprung Contrastive Learning
+% Einführung in die Grundprinzipien
+% Unterscheidung zwischen Self-Supervised *Instance* Discrimination, Supervised *Class* Discrimination (Keshtmand2022)
+
 ...
 
-\subsection{Grundprinzipien des Contrastive Learning}
+\subsection{Unsupervised Contrastive Learning}
+
+% Annotation von Daten ist sehr aufwendig
+% Contrastive Learning als Unsupervised Alternative
+	% Kann auch als Self-Supervised betrachtet werden, da durch die Kontrastierung der Daten eine Art von Supervision entsteht
+% Vor allem deshalb so vielversprechend, weil die erlernten Repräsentationen eine bessere Generalisierung und Robustheit gegenüber Adversarial Attacks aufweisen (Liu2021)
+% SimCLR (Chen2020) als prominentes Beispiel
+	% Einführung eines Projection Heads, welcher die Repräsentationen der Eingabedaten in einen höherdimensionalen Raum projiziert
+	% Verwendung von Data Augmentation, um die Robustheit der Repräsentationen zu verbessern
+	% Größere Batch Sizes und längere Trainingszeiten begünstigen die Lernfähigkeit des Modells
+	% Zudem ist besonders die Wahl von hard negatives entscheidend für den Erfolg des Modells
+% Eine neuere Variante: StableRep (Tian2023)
+	% Verwendung von synthetischen Daten aus T2I-Modellen, insbesondere Stable Diffusion
+	% Verwendet Bilder, die aus dem selben Prompt generiert wurden, als positive Beispiele voneinander
+	% Kann mit den richtigen Einstellungen auch mit Training nur auf synthetischen Daten die Leistung von SimCLR übertreffen
+	% Noch bessere Ergebnisse bei Einbeziehung von Textsupervision
 
 ...
 
 \subsection{Supervised Contrastive Learning}
 
+% Erweiterung der Contrastive Learning-Methode durch Verwendung von Label-Informationen
+% SupCon (Khosla2020)
+	% Weiterentwicklung der Loss-Funktion, die mehrere positiv-Beispiele pro Anchor-Sample berücksichtigt und das Contrastive Learning auf das Supervised Setting anpasst
+	% Eine rein naive Anpassung wird aber um einige wünschenswerte Anpassungen erweitert
+		% Es wird nicht ein Anchor, ein positiv-Beispiel und viele negativ-Beispiele verwendet; stattdessen kommen im Supervised Contrastive Learning auch viele positiv-Beispiele pro Batch zum Einsatz
+		% Die *vielen* positiv-Beispiele werden zudem nicht mehr als Augmentationen des Anchor-Samples generiert, sondern als Samples der gleichen Klasse herangezogen
+		% So soll auch die Notwendigkeit des Hard-Negative Minings reduziert werden
+		% Trotzdem wird gezeigt, dass der resultierende Loss sowohl von hard-negatives wie auch hard-positives profitiert
+		% Verwendung des Mittelwertes der positiven Repräsentationen stabilisiert das Training und führt zu einer verbesserten Leistung
+% Generalized SCL (Kim2022)
+	% Label als Distribution
+% Supervised Contrastive Learning with Hard Negatives (Jiang2022)
+	% Zusätzliche Einschränkung des Negative Samplings für Auswahl von Hard Negatives (Nähe im Repräsentationsraums)
+
 ...
 
 \section{Integration von DA-Fusion und Supervised Contrastive Learning}
 
+% Eigene Strategie zum Negative Sampling: Near OOD-Negatives
+
 ...
 
-\subsection{Forschungslücke}
+\subsection{Starke Augmentationen als Near OOD-Negatives}
+
+% Warum near OOD-Negatives?
+	% Bessere Generalisierung
+		% SimCLR profitierte besonders von hard negatives, um gute Repräsentationen zu lernen
+		% OOD-Augmentationen müssen an sich keine spezifischen Klassen akkurat repräsentieren, sind aber dennoch nah genug an den echten Daten, um dessen Repräsentationen zu verbessern
+	% Bessere OOD-Detektion
+		% OOD-Detection profitiert von einer guten Repräsentation der Daten, um die Distanz zwischen In-Distribution und OOD-Daten zu maximieren
+		% Near OOD-Negatives sind nah genug an den echten Daten, um die Repräsentationen zu verbessern, aber dennoch OOD genug, um die Distanz zu maximieren
+% Wie werden die Augmentationen generiert?
+	% Einfach den strength-Parameter der DA-Fusion-Augmentationen erhöhen
+	% Bei der Generierung die Maske verwenden, damit die Hintergründe gleich bleiben
 
 ...
 
 \subsection{Motivation für die Kombination}
 
-% Hard-Negative Mining
-% Aufwand Datenbeschaffung
+% ...
 
 ...
 
