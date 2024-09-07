@@ -18,7 +18,7 @@ class MVIPDataset(Dataset):
         aug_dir_ood=None,
         aug_ex_id=-1, # -1 for all
         aug_ex_ood=-1, # -1 for all
-        image_size=512,
+        image_size=224,
         transform=None,
     ):
         self.data_root = "/mnt/HDD/MVIP/sets"

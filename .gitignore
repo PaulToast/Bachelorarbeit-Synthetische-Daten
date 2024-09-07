@@ -163,9 +163,9 @@ cython_debug/
 
 # DA-Fusion & SupCon outputs
 output/
-
-# Logging with weights & biases
 wandb/
+da-fusion/datasets/
+sup-contrast/datasets/
 
 # TeX files
 tex-document/*.aux
