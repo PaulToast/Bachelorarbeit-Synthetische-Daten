@@ -109,25 +109,19 @@ Auch hier muss eine eigene Klasse für den EIBA-Teildatensatz erstellt werden, d
 
 % ID-Augmentationen, OOD-Augmentationen
 % Trial and Error, um Parameter zu bestimmen, Validierung ist schwierig
-
 ...
 
 \section{Trainings- und Testdurchläufe mit Supervised Contrastive Learning}
 
-% Nur reale Daten
-% Mit ID-Augmentationen
-% Mit ID-Augmentationen (und Contrastive Pre-Training mit OOD-Augmentationen)
-% (Evtl. klassischer Klassifikator mit Cross-Entropy Loss)
-
+% Training ist aufgeteilt in Pre-Training und Lineare Klassifikation
+% Drei Versuche
+	% Versuch 1: - Nur reale Daten; sowohl Pre-Training als auch Klassifikation
+	% Versuch 2: - Mit ID-Augmentationen; sowohl Pre-Training als auch Klassifikation
+	% Versuch 3: - Wie 2., aber Contrastive Pre-Training Near OOD-Augmentationen als Hard Negatives
 ...
 
 \section{Evaluationsmethoden und Metriken}
 
 % Menschliche Evaluierung der Augmentationen selbst
 % Accuracy, ID- und OOD-Confidence des SCL Klassifikators
-
-...
-
-\section{Analyse der Ergebnisse}
-
 ...
