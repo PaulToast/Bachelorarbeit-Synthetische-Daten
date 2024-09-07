@@ -23,8 +23,8 @@
 \contentsline {subsection}{\numberline {2.3.1}Unsupervised Contrastive Learning}{7}{subsection.2.3.1}%
 \contentsline {subsection}{\numberline {2.3.2}Supervised Contrastive Learning}{7}{subsection.2.3.2}%
 \contentsline {section}{\numberline {2.4}Integration von DA-Fusion und Supervised Contrastive Learning}{7}{section.2.4}%
-\contentsline {subsection}{\numberline {2.4.1}Starke Augmentationen als Near OOD-Negatives}{7}{subsection.2.4.1}%
-\contentsline {subsection}{\numberline {2.4.2}Motivation für die Kombination}{8}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.1}Forschungslücke}{8}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Near OOD-Daten als Hard Negatives im Supervised Contrastive Learning}{8}{subsection.2.4.2}%
 \contentsline {subsection}{\numberline {2.4.3}Potenzielle Vorteile und Herausforderungen}{8}{subsection.2.4.3}%
 \contentsline {chapter}{\numberline {3}Methodisches Vorgehen}{9}{chapter.3}%
 \contentsline {section}{\numberline {3.1}Forschungsfragen und Hypothesen}{9}{section.3.1}%

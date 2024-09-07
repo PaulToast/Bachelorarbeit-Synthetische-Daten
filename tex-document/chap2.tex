@@ -80,7 +80,7 @@ Datenaugmentation ist ein wichtiger Schritt im Training von neuronalen Netzen, i
 
 % Anschließend an Datenaugmentation; Problematik der Datensammlung
 % Abgrenzung synthetischer Datengenerierung zu Datenaugmentation
-% Vorteile und Herausforderungen synthetischer Daten
+% (Vorteile und Herausforderungen synthetischer Daten)
 % Fortschritte generativer Modellierung, Einleitung folgender Abschnitte
 
 Während die Verfügbarkeit großer Datensätze für das Training von neuronalen Netzen ein entscheidender Faktor für den Erfolg von Deep Learning-Modellen ist, ist es oft schwierig, solche Datensätze zu sammeln, insbesondere in Domänen wie der Medizin oder der Robotik, wo die Daten rar und teuer sind \cite{}. In solchen Fällen können synthetische Daten eine nützliche Alternative oder Ergänzung zu echten Daten sein.
@@ -156,31 +156,50 @@ Bei Diffusion-Modellen handelt es sich um eine Klasse von generativen Deep Learn
 
 \section{Integration von DA-Fusion und Supervised Contrastive Learning}
 
-% Eigene Strategie zum Negative Sampling: Near OOD-Negatives
-
+% Kurze Einleitung; Rückverweis auf Anwendungsfall
 ...
 
-\subsection{Starke Augmentationen als Near OOD-Negatives}
+\subsection{Forschungslücke}
 
-% Warum near OOD-Negatives?
-	% Bessere Generalisierung
-		% SimCLR profitierte besonders von hard negatives, um gute Repräsentationen zu lernen
-		% OOD-Augmentationen müssen an sich keine spezifischen Klassen akkurat repräsentieren, sind aber dennoch nah genug an den echten Daten, um dessen Repräsentationen zu verbessern
-	% Bessere OOD-Detektion
-		% OOD-Detection profitiert von einer guten Repräsentation der Daten, um die Distanz zwischen In-Distribution und OOD-Daten zu maximieren
-		% Near OOD-Negatives sind nah genug an den echten Daten, um die Repräsentationen zu verbessern, aber dennoch OOD genug, um die Distanz zu maximieren
-% Wie werden die Augmentationen generiert?
+% Einleitung
+Der dargestellte Forschungsstand rund um die synthetische Generierung von Bilddaten und die Verwendung von Contrastive Learning zur Bildrepräsentation und Klassifikation ist vielversprechend. Während sich DA-Fusion als flexible Methode zur Datenaugmentation und zur Generierung von synthetischen Daten herausstellt, hat sich Contrastive Learning als effektive Methode zur Verbesserung der Generalisierungsfähigkeit und zur Verbesserung der Robustheit gegenüber Out-of-Distribution-Daten erwiesen. Vor dem Hintergrund des in dieser Arbeit behandelten Anwendungsfalls (s. Einleitung) stellt sich allerdings noch eine Forschungslücke dar, die nun erläutert werden soll.
+
+% StableRep
+	% Stable Diffusion "off-the-shelf" ist nicht akkurat genug
+		% Objekte zu komplex
+		% Zu ähnlich; feine Unterschiede
+	% Auch die gleichbleibenden Hintergründe sind fatal
+	% Außerdem: Unsupervised
+...
+
+% Vanilla DA-Fusion
+	% An sich vielversprechend für die synthetische Datengenerierung im Anwendungsfall; könnte Generalisierung verbessern
+	% Bezieht sich aber auf keine Trainingsmethode; Mit Standard Cross-Entropy wäre nicht die Robustheit des CL gegeben, bisher noch nicht explizit für CL getestet (tatsächlich bessere Repräsentationen?)
+	% Und nach wie vor ähnliches Risiko
+		% Komplexe Objekte
+		% Fine-grained
+Eine "herkömmliche" Verwendung von DA-Fusion zur Generierung synthetischer Augmentationen und dessen naive Integration in ein Cross-Entropy Training könnte womöglich die Generalisierungsfähigkeit des Modells im Vergleich mit ausschließlich echten Daten verbessern. ...
+
+% Supervised Contrastive Learning mit Hard Negatives
+	% Gute Strategie für Negative-Sampling
+	% Aber keine synthetischen Daten
+...
+
+\subsection{Near OOD-Daten als Hard Negatives im Supervised Contrastive Learning}
+
+% Was wenn: Anstatt Negatives aus Nähe im Darstellungsraum zu samplen, Near OOD-Augmentationen aus Anchor-Klasse?
+% DA-Fusion zur Generierung von ID- und Near OOD-Daten
 	% Einfach den strength-Parameter der DA-Fusion-Augmentationen erhöhen
 	% Bei der Generierung die Maske verwenden, damit die Hintergründe gleich bleiben
-
-...
-
-\subsection{Motivation für die Kombination}
-
-% ...
-
+% Supervised Contrastive Learning mit eigener Sampling-Strategie für Near OOD-Negatives
 ...
 
 \subsection{Potenzielle Vorteile und Herausforderungen}
 
+% Bessere Generalisierung
+	% SimCLR profitierte besonders von hard negatives, um gute Repräsentationen zu lernen
+	% OOD-Augmentationen müssen an sich keine spezifischen Klassen akkurat repräsentieren, sind aber dennoch nah genug an den echten Daten, um dessen Repräsentationen zu verbessern
+% Bessere OOD-Detektion
+	% OOD-Detection profitiert von einer guten Repräsentation der Daten, um die Distanz zwischen In-Distribution und OOD-Daten zu maximieren
+	% Near OOD-Negatives sind nah genug an den echten Daten, um die Repräsentationen zu verbessern, aber dennoch OOD genug, um die Distanz zu maximieren
 ...
