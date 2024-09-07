@@ -5,17 +5,23 @@ In diesem Kapitel wird das methodische Vorgehen der Arbeit beschrieben. Es wird 
 
 \section{Forschungsfragen und Hypothesen}
 
-Die Forschungsarbeit beschäftigt sich mit der Frage, ob synthetische Daten, die mit dem Modell DA-Fusion generiert wurden, die Generalisierung und Robustheit von Modellen verbessern können, die mit Supervised Contrastive Learning trainiert wurden. Im Detail sollen folgende Forschungsfragen beantwortet werden:
+% Einleitung; Forschungslücken aus vorherigem Kapitel
+Im vorherigen Kapitel wurden Forschungslücken identifiziert, die sich aus der Verwendung von DA-Fusion im Supervised Contrastive Learning und der Verwendung von Near OOD-Augmentationen für das Negative Sampling ergeben. Um diese Lücken zu schließen, werden im Folgenden Forschungsfragen formuliert und Hypothesen aufgestellt, die im Rahmen dieser Arbeit untersucht werden sollen.
 
 \textbf{1. Kann DA-Fusion für den EIBA-Datensatz synthetische Augmentationen erzeugen, die die Generalisierungsfähigkeit im Supervised Contrastive Learning verbessern?}
 
-% ID-Augmentationen
+% Einfluss von ID-Augmentationen auf die Generalisierungsfähigkeit
+% Dazu wird DA-Fusion auf "normale" Weise verwendet
+% Ziel ist es, festzustellen, ob sich DA-Fusion für den Anwendungsfall eignet
+% Auf EIBA-Datensatz wird genauer in Abschnitt 2.1 eingegangen
 
 ...
 
 \textbf{2. Trägt die Verwendung von Out-of-Distribution (OOD) Augmentationen im Supervised Contrastive Learning dazu bei, die Robustheit des Modells gegenüber OOD-Daten zu erhöhen und die Repräsentationen von In-Distribution-Daten zu verbessern?}
 
-% OOD-Augmentationen
+% Einfluss von Near OOD-Augmentationen sowohl auf die Generalisierungsfähigkeit als auch auf die Robustheit gegenüber OOD-Daten
+% Dazu wird sowohl DA-Fusion als auch eine neue Negative Sampling-Strategie für das Contrastive Learning verwendet
+% Ziel ist es, festzustellen, ob Near OOD-Augmentationen im Contrastive Learning einen Mehrwert bieten
 
 ...
 
@@ -25,22 +31,22 @@ Die Forschungsarbeit beschäftigt sich mit der Frage, ob synthetische Daten, die
 
 \subsection{EIBA}
 
+% EIBA-Projekt
 Grundlage der Forschungsarbeit ist ein am Fraunhofer-IPK entstandener Datensatz von Gebrauchsgegenständen, darunter hauptsächlich Autoteile und Komponenten. Er wurde im Rahmen des Projekts “Sensorische Erfassung, automatisierte Identifikation und Bewertung von Altteilen anhand von Produktdaten sowie Informationen über bisherige Lieferungen” (EIBA) erstellt, das von 2019 bis 2023 lief und von der Circular Economy Solutions GmbH koordiniert und in Kooperation mit der Technischen Universität Berlin und der deutschen Akademie der Technikwissenschaften durchgeführt wurde. \cite{}
 
+% Multimodalität
 Der Datensatz ist multimodal, d.h. er besteht aus verschiedenen Datenquellen, die unterschiedliche Informationen über die Gegenstände enthalten. Neben herkömmlichen RGB-Bildern aus verschiedenen Perpektiven und weiteren Bilddaten, wie z.B. Objektmasken, gibt es auch Metadaten, etwa das Gewicht, oder Beschreibungen der Objekte in natürlicher Sprache durch verschiedene Stichwörter ("CarComponent", "cylinder", "rusty", usw.).
 
-% Klassen und Anzahl der Bilder insgesamt
-% Verteilung der Klassen
+% Details: Klassen und Anzahl der Bilder insgesamt, Verteilung der Klassen
 % Beispielbilder, -masken, -metadaten
-
 ...
 
 \subsection{Teildatensatz}
 
+% Wahl eines Teildatensatzes mit 20 "CarComponent" Klassen
 Um die Rechenzeit zu reduzieren und die Experimente auf eine bestimmte Objektkategorie zu beschränken, wurde ein Teildatensatz des EIBA-Datensatzes verwendet. Dabei wurden zufällig 20 Klassen aus der super class "CarComponent" ausgewählt. Es wurden außerdem nur die RGB-Bilder verwendet, allerdings kommen auch die Objektmasken im Pre-Processing der Daten zum Einsatz. ...
 
-% Klassen und Anzahl der Bilder in Teildatensatz
-
+% Details: Klassen und Anzahl der Bilder in Teildatensatz
 ...
 
 \subsection{Vorverarbeitung}
@@ -59,27 +65,20 @@ Um die Rechenzeit zu reduzieren und die Experimente auf eine bestimmte Objektkat
 \section{Implementierung}
 
 % Arbeitsumgebung, Rechner-Zugang, etc.
-% Programmiersprache, Bibliotheken, etc.
-% DA-Fusion
-	% Bestehende Implementierung verstehen
-	% Klasse zum Laden des EIBA-Teildatensatzes
-		% Masken-cropping
-		% Masken für Augmentation
-	% Workflow-Anpassungen für Input/Output
-% Supervised Contrastive Learning
-	% Klasse zum Laden des EIBA-Teildatensatzes und der Augmentationen
-	% Workflow-Anpassungen für Input/Output (wie DA-Fusion)
-	% Parameter für Konfiguration der Verwendung der Augmentationen
-	% Integration von OOD-Augmentationen im Contrastive Learning
-	% Metriken für Evaluation
-		% Accuracy
-		% ID- und OOD-Confidence
+% Verwendung vorhandener Implementierungen
+% Gemeinsame Programmiersprache, Bibliotheken, etc.
 
 Für die Vorbereitung der in dieser Arbeit durchgeführten Experimente konnte sich größtenteils auf die Implementierung von DA-Fusion und Supervised Contrastive Learning aus den Quellen ... und ... gestützt werden. Beide Implementierungen sind in Python geschrieben und verwenden die Bibliothek PyTorch. ...
 
 Dennoch mussten einige Anpassungen vorgenommen werden, um die Modelle auf den EIBA-Teildatensatz anzuwenden, und um die synthetischen Augmentationen aus DA-Fusion im Supervised Contrastive Learning zu verwenden. ...
 
 \subsection{DA-Fusion}
+
+% Bestehende Implementierung verstehen
+% Klasse zum Laden des EIBA-Teildatensatzes
+	% Masken-cropping
+	% Masken für Augmentation
+% Workflow-Anpassungen für Input/Output
 
 In ...'s Implementierung von DA-Fusion wird zunächst mit Textual Inversion ein vortrainiertes Stable Diffusion-Modell fine-tuned, indem ein neuer Token für jede Klasse im Datensatz erlernt wird. Um anschließend die Augmentationen zu generieren, werden die Bilder des Datensatzes genommen, Rauschen hinzugefügt und unter Konditionierung auf den entsprechenden Token wiederhergestellt. Je nachdem, wie viel Rauschen hinzugefügt wurde, entstehen so mehr oder weniger stark veränderte Bilder, die als synthetische Daten verwendet werden können.
 
@@ -89,31 +88,36 @@ Die Implementierung von DA-Fusion kann weitgehend unverändert angewendet werden
 
 \subsection{Supervised Contrastive Learning}
 
+% Bestehende Implementierung verstehen
+% Klasse zum Laden des EIBA-Teildatensatzes und der Augmentationen
+% Workflow-Anpassungen für Input/Output (wie DA-Fusion)
+% Parameter für Konfiguration der Verwendung der Augmentationen
+% Integration von OOD-Augmentationen im Contrastive Learning
+% Metriken für Evaluation
+	% Accuracy
+	% ID- und OOD-Confidence
+
 ...'s Implementierung von Supervised Contrastive Learning beinhaltet drei Trainings-Skripte; eines für das Pre-Training der latenten Repräsentationen unter Verwendung der Supervised Contrastive Loss-Funktion, eines für die lineare Klassifikation der Repräsentationen und eines zum Training eines klassischen Klassifikator-Modells mit Cross Entropy Loss (zum Vergleich).
 
 ...
 
 Auch hier muss eine eigene Klasse für den EIBA-Teildatensatz erstellt werden, die die Bilder und Masken lädt und die synthetischen Daten von DA-Fusion bereitstellt. Die Klasse muss nun auch Parameter bereitstellen, die die Verwendung der synthetischen Daten steuern, z.B. ob keine Augmentationen, ausschließlich positiv-Beispiele oder auch negativ-Beispiele verwendet werden sollen. ...
 
-% Metriken
-
 ...
 
 \section{Synthetische Datengenerierung mit DA-Fusion}
 
-% Synthetische Datengenerierung mit DA-Fusion
-	% ID-Augmentationen, OOD-Augmentationen
-	% Trial and Error, um Parameter zu bestimmen, Validierung ist schwierig
+% ID-Augmentationen, OOD-Augmentationen
+% Trial and Error, um Parameter zu bestimmen, Validierung ist schwierig
 
 ...
 
 \section{Trainings- und Testdurchläufe mit Supervised Contrastive Learning}
 
-% Trainings- und Testdurchläufe mit Supervised Contrastive Learning
-	% Nur reale Daten
-	% Mit ID-Augmentationen
-	% Mit ID-Augmentationen (und Contrastive Pre-Training mit OOD-Augmentationen)
-% Evtl. klassischer Klassifikator mit Cross-Entropy Loss
+% Nur reale Daten
+% Mit ID-Augmentationen
+% Mit ID-Augmentationen (und Contrastive Pre-Training mit OOD-Augmentationen)
+% (Evtl. klassischer Klassifikator mit Cross-Entropy Loss)
 
 ...
 

@@ -168,15 +168,9 @@ da-fusion/datasets/
 sup-contrast/datasets/
 
 # TeX files
-tex-document/*.aux
-tex-document/*.bbl
-tex-document/*.bcf
-tex-document/*.fdb_latexmk
-tex-document/*.fls
-tex-document/*.lof
-tex-document/*.log
-tex-document/*.lot
-tex-document/*.out
-tex-document/*.run.xml
-tex-document/*.synctex.gz
-tex-document/*.toc
+tex-doc/*
+!tex-doc/*.tex
+!tex-doc/*.bib
+!tex-doc/*.pdf
+!tex-doc/*.png
+!tex-doc/*.jpg
