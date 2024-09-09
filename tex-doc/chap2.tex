@@ -51,7 +51,7 @@ Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Mo
 
 \begin{figure}[]
 	\centering
-	\includegraphics[width=6cm]{figure_neural_network.png}
+	\includegraphics[]{figure_neural_network.png}
 	\caption{Beispiel eines einfachen künstlichen neuronalen Netzes. Quelle: \parencite{Zhou2021}}
 \end{figure}
 
@@ -65,23 +65,24 @@ Die Optimierung des Netzwerks geschieht durch eine Rückwärtsausbreitung (engl.
 	% (Stochastic Gradient Descend)
 	% (Backpropagation)
 	% (Regularisierung)
+...
 
-\subsection{Convolutional Neural Networks} % Brauche ich das überhaupt? Als Beispiel?
-
+%\subsection{Convolutional Neural Networks} % Brauche ich das überhaupt? Als Beispiel?
+%
 % Kurze Definition
-Ein Convolutional Neural Network (CNN) ist ein spezielles künstliches neuronales Netz, das hauptsächlich für die Bildklassifikation entwickelt wurde. Es verwendet Faltungsebenen, um ein Eingangsbild Schritt für Schritt in immer abstraktere “Feature Maps” zu verarbeiten.
-
+%Ein Convolutional Neural Network (CNN) ist ein spezielles künstliches neuronales Netz, das hauptsächlich für die Bildklassifikation entwickelt wurde. Es verwendet Faltungsebenen, um ein Eingangsbild Schritt für Schritt in immer abstraktere “Feature Maps” zu verarbeiten.
+%
 % Architektur eines CNN
-Die Architektur eines CNN besteht typischerweise aus mehreren Schichten, die in der folgenden Reihenfolge angeordnet sind:
-
-\begin{enumerate}[]
-	\item Eingabeschicht (Input Layer): Diese Schicht nimmt die Rohdaten auf, z.B. ein Bild in Form eines 2D-Arrays von Pixelwerten.
-	\item Faltungsschicht (Convolutional Layer): Diese Schicht führt die eigentliche Faltung (Convolution) durch, indem sie einen Filter (Kernel) über das Eingabebild verschiebt und Punktoperationen durchführt. Das Ergebnis ist eine Feature-Map, die lokale Merkmale des Bildes extrahiert. Jeder Filter kann unterschiedliche Merkmale wie Kanten, Ecken oder Texturen erkennen.
-	\item Aktivierungsschicht (Activation Layer): Nach jeder Faltungsschicht wird normalerweise eine Aktivierungsfunktion angewendet, um nichtlineare Eigenschaften des Netzwerks zu modellieren. Die häufig verwendete Aktivierungsfunktion ist die ReLU (Rectified Linear Unit), die alle negativen Werte auf Null setzt und positive Werte unverändert lässt.
-	\item Pooling-Schicht (Pooling Layer): Diese Schicht reduziert die räumliche Dimension der Feature-Maps, was die Berechnungen effizienter macht und die Gefahr von Überanpassung (Overfitting) verringert. Die gängigsten Pooling-Methoden sind Max-Pooling (wählt den maximalen Wert in einem bestimmten Bereich) und Average-Pooling (berechnet den Durchschnittswert in einem bestimmten Bereich).
-	\item Vollständig verbundene Schicht (Fully Connected Layer): Dies ist eine herkömmliche neuronale Netzwerkschicht, bei der jeder Neuron mit jedem Neuron der vorherigen Schicht verbunden ist. Sie kombiniert die extrahierten Merkmale, um das endgültige Ergebnis zu liefern, z.B. die Klassifikation des Bildes.
-	\item Ausgabeschicht (Output Layer): In der letzten Schicht wird eine Aktivierungsfunktion wie Softmax verwendet, um die Wahrscheinlichkeitsverteilung der möglichen Klassen zu berechnen.
-\end{enumerate}
+%Die Architektur eines CNN besteht typischerweise aus mehreren Schichten, die in der folgenden Reihenfolge angeordnet sind:
+%
+%\begin{enumerate}[]
+%	\item Eingabeschicht (Input Layer): Diese Schicht nimmt die Rohdaten auf, z.B. ein Bild in Form eines 2D-Arrays von Pixelwerten.
+%	\item Faltungsschicht (Convolutional Layer): Diese Schicht führt die eigentliche Faltung (Convolution) durch, indem sie einen Filter (Kernel) über das Eingabebild verschiebt und Punktoperationen durchführt. Das Ergebnis ist eine Feature-Map, die lokale Merkmale des Bildes extrahiert. Jeder Filter kann unterschiedliche Merkmale wie Kanten, Ecken oder Texturen erkennen.
+%	\item Aktivierungsschicht (Activation Layer): Nach jeder Faltungsschicht wird normalerweise eine Aktivierungsfunktion angewendet, um nichtlineare Eigenschaften des Netzwerks zu modellieren. Die häufig verwendete Aktivierungsfunktion ist die ReLU (Rectified Linear Unit), die alle negativen Werte auf Null setzt und positive Werte unverändert lässt.
+%	\item Pooling-Schicht (Pooling Layer): Diese Schicht reduziert die räumliche Dimension der Feature-Maps, was die Berechnungen effizienter macht und die Gefahr von Überanpassung (Overfitting) verringert. Die gängigsten Pooling-Methoden sind Max-Pooling (wählt den maximalen Wert in einem bestimmten Bereich) und Average-Pooling (berechnet den Durchschnittswert in einem bestimmten Bereich).
+%	\item Vollständig verbundene Schicht (Fully Connected Layer): Dies ist eine herkömmliche neuronale Netzwerkschicht, bei der jeder Neuron mit jedem Neuron der vorherigen Schicht verbunden ist. Sie kombiniert die extrahierten Merkmale, um das endgültige Ergebnis zu liefern, z.B. die Klassifikation des Bildes.
+%	\item Ausgabeschicht (Output Layer): In der letzten Schicht wird eine Aktivierungsfunktion wie Softmax verwendet, um die Wahrscheinlichkeitsverteilung der möglichen Klassen zu berechnen.
+%\end{enumerate}
 
 \subsection{Out-of-Distribution Daten}
 
@@ -99,7 +100,7 @@ Datenaugmentation ist ein wichtiger Schritt im Training von neuronalen Netzen, i
 % Beispiele
 %\begin{figure}[]
 %	\centering
-%	\includegraphics[width=6cm]{figure_data_augmentation.webp}
+%	\includegraphics[]{figure_data_augmentation.webp}
 %	\caption{Beispiele für Datenaugmentationstechniken. Quelle: Thijs Kooi}
 %\end{figure}
 
@@ -141,6 +142,12 @@ Der \textbf{Variational Autoencoder} (VAE) adressiert diese Schwachstellen und v
 
 Ein Generative Adversarial Network (GAN) ist ein KI-Modell, das in \cite{} vorgestellt wurde. GANs bestehen aus zwei neuralen Netzwerken, die gegeneinander antreten, um realistische synthetische Daten zu erzeugen. Diese Technologie hat sich als äußerst mächtig in der Bild- und Datengenerierung erwiesen.
 
+\begin{figure}[]
+	\centering
+	\includegraphics{figure_GAN.pdf}
+	\caption{Überblick über die GAN-Struktur. Quelle: Google for Developers}
+\end{figure}
+
 Die Architektur eines GANs besteht aus zwei Hauptkomponenten:
 
 \begin{itemize}
@@ -148,25 +155,40 @@ Die Architektur eines GANs besteht aus zwei Hauptkomponenten:
 	\item \textbf{Diskriminator}: Das diskriminative Netzwerk erhält sowohl echte Daten aus dem Trainingsdatensatz als auch die vom Generator erzeugten Daten. Seine Aufgabe ist es, zwischen echten und künstlichen Daten zu unterscheiden. Der Diskriminator gibt eine Wahrscheinlichkeit aus, dass die Eingabedaten echt sind.
 \end{itemize}
 
+Der Trainingsprozess eines GANs ist als minimax-Spiel zwischen dem Generator und dem Diskriminator formuliert:
+
+\begin{enumerate}[]
+	\item \textbf{Diskriminator-Training}: Der Diskriminator wird trainiert, um echte Daten von generierten Daten zu unterscheiden. Dies geschieht durch eine binäre Klassifikation („echt“ oder „synthetisch“). Der Diskriminator passt seine Gewichte an, um die Unterscheidung zu verbessern.
+	\item \textbf{Generator-Training}: Der Generator wird trainiert, um den Diskriminator zu täuschen. Dies geschieht, indem der Generator seine erzeugten Daten durch den Diskriminator laufen lässt und die Rückmeldung (Gradienten) des Diskriminators verwendet, um seine eigenen Parameter zu optimieren. Ziel ist es, den Diskriminator zu überlisten, sodass er die generierten Daten als echt klassifiziert.
+\end{enumerate}
+
+% Hohe Qualität
+% Felixibilität bei Eingangsdaten
+% Aber instabiles Training
+% Modus-Kollaps
+% Hoher Rechenaufwand
 ...
 
-\subsection{Stable Diffusion}
+\subsection{Diffusion Models}
 
-Unter Diffusion versteht man den Prozess der langsamen Vermischung von Partikeln oder Informationen über die Zeit. In der Physik beschreibt die Diffusionsgleichung die zeitliche Entwicklung der Dichte von Teilchen, die sich zufällig bewegen. Dieses Konzept fand erstmals im maschinellen Lernen Anwendung, als Jascha Sohl-Dickstein et al. 2015 das Konzept der Diffusion-Modelle einführten \parencite{}.
+% Einleitung
+In den letzten Jahren haben sogenannte Diffusion Models für einen enormen Sprung in der Bildgenerierung, insbesondere der Text-to-Image (T2I) Generierung, gesorgt. Das Konzept der Diffusion soll hier deshalb einmal genauer erläutert werden.
 
-Bei Diffusion-Modellen handelt es sich um eine Klasse von generativen Deep Learning-Modellen, die in den letzten Jahren erhebliche Fortschritte erzielt haben. Im Trainingsprozess wird schrittweise die Struktur der Eingabedaten durch Hinzufügen von Rauschen aufgelöst. Das Modell wird dann darauf trainiert, das ursprüngliche Bild aus dem verrauschten Bild zu rekonstruieren.
-
-...
-
-\subsection{DA-Fusion}
+% Konzept der Diffusion
+Unter Diffusion versteht man den Prozess der langsamen Vermischung von Partikeln oder Informationen über die Zeit. So beschreibt die Diffusionsgleichung in der Physik die zeitliche Entwicklung der Dichte von Teilchen, die sich zufällig bewegen. Im maschinellen Lernen fand das Konzept erstmals in \cite{} Anwendung. Es entstand eine neue Klasse von generativen Deep Learning-Modellen, die Diffusion Models, welche im Trainingsprozess schrittweise die Struktur der Eingabedaten durch Hinzufügen von Rauschen auflösen und anschließend darauf trainiert werden, das ursprüngliche Bild aus dem verrauschten Bild zu rekonstruieren.
 
 ...
 
-\section{Contrastive Learning}
+\section{Semantische Datenaugmentation mit DA-Fusion}
 
+...
+
+\section{Robuste Datenrepräsentation durch Contrastive Learning}
+
+% Einleitung; Sprung von synthetischen Daten auf Contrastive Learning abfedern
 % Ursprung Contrastive Learning
-% Einführung in die Grundprinzipien
-% Unterscheidung zwischen Self-Supervised *Instance* Discrimination, Supervised *Class* Discrimination (Keshtmand2022)
+% Die Grundprinzipien
+% Self-Supervised *Instance* Discrimination vs. Supervised *Class* Discrimination (Keshtmand2022)
 
 ...
 
@@ -227,34 +249,40 @@ Bei Diffusion-Modellen handelt es sich um eine Klasse von generativen Deep Learn
 	% Verbesserung der OOD-Detektion
 ...
 
-\subsection{“Schlechte” synthetische Daten als negativ-Beispiele im Contrastive Learning?}
+\subsection{“Schlechte” synthetische Daten als negativ-Beispiele im\ Contrastive Learning?}
 
-% Forschungslücke bei der Integration von synthetischen Daten im Contrastive Learning
-	% StableRep
+% Anschließend an die Herausforderungen bei der Datengenerierung
+% Frage: Könnte Contrastive Learning eine Möglichkeit bieten, auch aus mangelhaften Daten zu lernen?
+	% Dürfen nicht zu entfernt sein: CL lernt vor allem aus HARD Negatives
+		% SimCLR profitierte besonders von hard negatives, um gute Repräsentationen zu lernen
+	% Sind NEAR OOD-Daten gute Hard Negatives?
+		% Gilt es, zu untersuchen
+		% Near OOD-Negatives sind nah genug an den echten Daten, um die Repräsentationen zu verbessern, aber dennoch OOD genug, um die Distanz zu maximieren
+% Forschungslücke; Was wurde schon untersucht? Wo ist die Lücke?
+	% StableRep: Synthetische Diffusion-Daten im Contrastive Learning, aber nur normale ID-Beispiele
 		% Stable Diffusion "off-the-shelf" ist nicht akkurat genug
 			% Objekte zu komplex
 			% Zu ähnlich; feine Unterschiede
 		% Auch die gleichbleibenden Hintergründe sind fatal
 		% Außerdem: Unsupervised
-	% Supervised Contrastive Learning mit Hard Negatives
+	% SCL mit Hard Negatives: Verfeinertes Negative Sampling, aber ohne synthetische Daten
 		% Gute Strategie für Negative-Sampling
 		% Aber keine synthetischen Daten
-% Was wenn: Anstatt Negatives aus Nähe im Darstellungsraum zu samplen, Near OOD-Augmentationen aus Anchor-Klasse?
-
+	% Was wenn: Anstatt Negatives aus Nähe im Darstellungsraum zu samplen, Near OOD-Augmentationen aus Anchor-Klasse?
 ...
 
 \subsection{Integration von DA-Fusion und Supervised Contrastive Learning}
 
-% Die Idee
-	% DA-Fusion zur Generierung von ID- und Near OOD-Daten
-	% Einfach den strength-Parameter der DA-Fusion-Augmentationen erhöhen
-	% Bei der Generierung die Maske verwenden, damit die Hintergründe gleich bleiben
-	% Supervised Contrastive Learning mit eigener Sampling-Strategie für Near OOD-Negatives
-% Potenzielle Vorteile und Herausforderungen
-	% Bessere Generalisierung
-		% SimCLR profitierte besonders von hard negatives, um gute Repräsentationen zu lernen
+% DA-Fusion zur Generierung von ID- und Near OOD-Daten
+% Einfach den strength-Parameter der DA-Fusion-Augmentationen erhöhen
+% Bei der Generierung die Maske verwenden, damit die Hintergründe gleich bleiben
+% Supervised Contrastive Learning mit eigener Sampling-Strategie für Near OOD-Negatives
+
+% Potenzielle Vorteile
+	% Bessere Generalisierung trotz Limitationen in der Datengenerierung
 		% OOD-Augmentationen müssen an sich keine spezifischen Klassen akkurat repräsentieren, sind aber dennoch nah genug an den echten Daten, um dessen Repräsentationen zu verbessern
 	% Bessere OOD-Detektion
 		% OOD-Detection profitiert von einer guten Repräsentation der Daten, um die Distanz zwischen In-Distribution und OOD-Daten zu maximieren
-		% Near OOD-Negatives sind nah genug an den echten Daten, um die Repräsentationen zu verbessern, aber dennoch OOD genug, um die Distanz zu maximieren
+% Potenzielle Herausforderungen
+	% ...
 ...
