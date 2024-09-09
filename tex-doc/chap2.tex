@@ -6,12 +6,12 @@ Im folgenden Kapitel werden die theoretischen Grundlagen des maschinellen Lernen
 \section{Maschinelles Lernen} \label{sec-ml}
 
 % Ursprung ML; Problemstellung
-Die ersten großen Durchbrüche in der künstlichen Intelligenz (KI) kamen im Bezug auf Aufgaben, die für Menschen intellektuell eine große Herausforderung darstellten, die aber von Computern relativ einfach zu lösen waren, da sie als Liste formaler, mathematischer Regeln beschrieben werden konnten. Die große Schwierigkeit lag hingegen in den Aufgaben, die für Menschen relativ einfach und intuitiv sind, welche sich aber nur schwer formal beschreiben lassen. Hierunter fallen z.B. die Spracherkennung, oder Objekterkennung. \parencite{Goodfellow2016}
+Die ersten großen Durchbrüche in der künstlichen Intelligenz (KI) kamen im Bezug auf Aufgaben, die für Menschen intellektuell eine große Herausforderung darstellten, die aber von Computern relativ einfach zu lösen waren, da sie als Liste formaler, mathematischer Regeln beschrieben werden konnten. Die große Schwierigkeit lag hingegen in den Aufgaben, die für Menschen relativ einfach und intuitiv sind, welche sich aber nur schwer formal beschreiben lassen. Hierunter fallen z.B. die Spracherkennung, oder Objekterkennung. \parencite{Goodfellow2016deeplearning}
 
 Maschinelles Lernen (ML) beschreibt den Ansatz, Computer mit der Fähigkeit auszustatten, selbstständig Wissen aus Erfahrung zu generieren, indem Muster und Konzepte aus rohen Daten erlernt werden. So kann ein Computerprogramm auf Basis von Beispielen lernen, wie es eine bestimmte Aufgabe lösen soll, ohne dass ihm explizit Regeln oder Algorithmen vorgegeben werden.
 
 % Definition ML (Mitchell), weiter ausgeführt
-Eine allgemeine Definition für maschinelles Lernen bietet \parencite{Mitchell1997}:
+Eine allgemeine Definition für maschinelles Lernen bietet \parencite{Mitchell1997machinelearning}:
 
 \begin{quote}
 Ein Computerprogramm soll aus Erfahrung $E$ in Bezug auf eine Klasse von Aufgaben $T$ und Leistungsmaß $P$ lernen, wenn sich seine Leistung bei Aufgaben $T$, gemessen durch $P$, mit Erfahrung $E$ verbessert.
@@ -50,11 +50,11 @@ Während die rasante Entwicklung von Deep Learning vor allem in den vergangenen 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Einzelnes Neuron im Detail
-Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Modellierung des biologischen Neurons, das erstmals 1943 von Warren McCulloh und Walter Pitts vorgestellt wurde \parencite{Zhou2021}. Jedes Neuron empfängt eine Reihe von Eingaben, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es ein zugehöriges Gewicht (engl. \textit{weight}), das die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingabe auf das Neuron bestimmt. Das Neuron berechnet dann die gewichtete Summe aller Eingabe und falls ein bestimmter Schwellenwert (engl. \textit{bias}) überschritten wurde, wird das Neuron aktiviert. Diese Aktivierung kann durch verschiedene Aktivierungsfunktionen angepasst werden. Häufig wird etwa die sogenannte Sigmoid-Funktion verwendet, welche im Gegensatz zur einfachen Step-Funktion differenzierbar ist und somit die Optimierung des Netzwerk vereinfacht.
+Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Modellierung des biologischen Neurons, das erstmals 1943 von Warren McCulloh und Walter Pitts vorgestellt wurde \parencite{Zhou2021machinelearning}. Jedes Neuron empfängt eine Reihe von Eingaben, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es ein zugehöriges Gewicht (engl. \textit{weight}), das die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingabe auf das Neuron bestimmt. Das Neuron berechnet dann die gewichtete Summe aller Eingabe und falls ein bestimmter Schwellenwert (engl. \textit{bias}) überschritten wurde, wird das Neuron aktiviert. Diese Aktivierung kann durch verschiedene Aktivierungsfunktionen angepasst werden. Häufig wird etwa die sogenannte Sigmoid-Funktion verwendet, welche im Gegensatz zur einfachen Step-Funktion differenzierbar ist und somit die Optimierung des Netzwerk vereinfacht.
 
 \begin{figure}[] \label{figure-neuron}
 	\includegraphics[]{figure_neural_network.png}
-	\caption{Beispiel eines einfachen künstlichen neuronalen Netzes. Quelle: \parencite{Zhou2021}}
+	\caption{Beispiel eines einfachen künstlichen neuronalen Netzes. Quelle: \parencite{Zhou2021machinelearning}}
 \end{figure}
 
 % Wie neuronale Netze lernen
@@ -123,7 +123,7 @@ Synthetische Daten sind künstlich erzeugte Daten, welche die zugrundeliegenden 
 
 \subsection{Variational Autoencoder} \label{subsec-vae}
 
-Ein Autoencoder ist eine spezielle Art von KI-Modell, das darauf ausgelegt ist, Daten effizient zu komprimieren und dann wieder zu rekonstruieren. Es besteht aus zwei Hauptkomponenten: \parencite{Foster2020}
+Ein Autoencoder ist eine spezielle Art von KI-Modell, das darauf ausgelegt ist, Daten effizient zu komprimieren und dann wieder zu rekonstruieren. Es besteht aus zwei Hauptkomponenten: \parencite{Foster2020gendeeplearning}
 
 \begin{itemize}
 	\item einem \textbf{Encoder}-Netzwerk, das hochdimensionale Eingabedaten in einem niederdimensionalen Darstellungsvektor komprimiert, und
@@ -138,7 +138,7 @@ Das Training eines Autoencoders erfolgt durch Minimierung des Rekonstruktionsfeh
 	Loss=\frac{1}{n}\sum_{i=1}^n (x_i-\hat{x}_i)^2
 \end{equation}
 
-Ein besonders interessantes Versprechen des Autoencoders ist, dass man theoretisch durch die Wahl eines beliebigen Punkts im latenten Raum neue Bilder erzeugen kann, indem man diesen Punkt durch den Decoder schickt, da der Decoder gelernt hat, wie man Punkte im latenten Raum in realistische Bilder umwandelt. \parencite{Foster2020} In der herkömmlichen Form hat der Autoencoder in Bezug auf diese Aufgabe allerdings einige Schwachstellen.
+Ein besonders interessantes Versprechen des Autoencoders ist, dass man theoretisch durch die Wahl eines beliebigen Punkts im latenten Raum neue Bilder erzeugen kann, indem man diesen Punkt durch den Decoder schickt, da der Decoder gelernt hat, wie man Punkte im latenten Raum in realistische Bilder umwandelt. \parencite{Foster2020gendeeplearning} In der herkömmlichen Form hat der Autoencoder in Bezug auf diese Aufgabe allerdings einige Schwachstellen.
 
 Der \textbf{Variational Autoencoder} (VAE) adressiert diese Schwachstellen und verwendet probabilistische Methoden, um die Datenverteilung im latenten Raum zu modellieren; Anstatt einen einzelnen, festen Punkt im latenten Raum für jede Eingabe zu lernen, wird eine Verteilung gelernt, aus der die latenten Variablen für jede Eingabe stammen. Dadurch entsteht ein strukturierteer und kontinuierlicher latenter Raum, der es ermöglicht, neue, realistische Daten zu generieren. % \parencite{Kingma2013}?
 
@@ -207,11 +207,11 @@ Eine entscheidende Weiterentwicklung der Diffusion Models war die Text-Kondition
 \section{Semantische Datenaugmentation mit DA-Fusion} \label{sec-da-fusion}
 
 % Einleitung; Kurze Beschreibung, Versprechen der Methode
-In \parencite{Trabucco2023} wird DA-Fusion, eine flexible, auf Stable Diffusion basierende Methode zur Datenaugmentation vorgestellt, die für diese Arbeit von besonderem Interesse ist. Der traditionelle Ansatz der Datenaugmentation, wie in \ref{subsec-data-augmentation} beschrieben, hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit von Modellen zu verbessern. Allerdings erfordert dieser Ansatz auch eine gute Intuition in Bezug auf den verwendeten Datensatz, um zu vermeiden, dass Transformationen gewählt werden, durch die Informationen verloren gehen, die für die Aufgabe des zu trainierenden Modells wichtig sind. Wenn beispielsweise Farbinformationen für die Klassifizierung von Blumen wichtig sind, könnte die Datenaugmentation durch zufällige Farbänderungen die Leistung des Modells verschlechtern. Ein weiteres Beispiel sind Objekte, die klein im Bild sind und durch zufällige Ausschnitte des Bildes aus der Sicht des Modells verschwinden können. DA-Fusion hingegen nutzt das Wissen eines vortrainierten Diffusion Models, um den Bildinhalt semantisch zu verstehen und automatisch neue, realistische Variationen zu generieren.
+In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine flexible, auf Stable Diffusion basierende Methode zur Datenaugmentation vorgestellt, die für diese Arbeit von besonderem Interesse ist. Der traditionelle Ansatz der Datenaugmentation, wie in \ref{subsec-data-augmentation} beschrieben, hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit von Modellen zu verbessern. Allerdings erfordert dieser Ansatz auch eine gute Intuition in Bezug auf den verwendeten Datensatz, um zu vermeiden, dass Transformationen gewählt werden, durch die Informationen verloren gehen, die für die Aufgabe des zu trainierenden Modells wichtig sind. Wenn beispielsweise Farbinformationen für die Klassifizierung von Blumen wichtig sind, könnte die Datenaugmentation durch zufällige Farbänderungen die Leistung des Modells verschlechtern. Ein weiteres Beispiel sind Objekte, die klein im Bild sind und durch zufällige Ausschnitte des Bildes aus der Sicht des Modells verschwinden können. DA-Fusion hingegen nutzt das Wissen eines vortrainierten Diffusion Models, um den Bildinhalt semantisch zu verstehen und automatisch neue, realistische Variationen zu generieren.
 
 \begin{figure}[h] \label{figure-da-fusion}
 	\includegraphics[width=10cm]{figure_da-fusion.png}
-	\caption{Beispiel-Augmentationen aus DA-Fusion. Quelle: \parencite{Trabucco2023}}
+	\caption{Beispiel-Augmentationen aus DA-Fusion. Quelle: \parencite{Trabucco2023dafusion}}
 \end{figure}
 
 % Fine-tuning des SD-Modells
@@ -230,25 +230,43 @@ Ein Vorteil von DA-Fusion ist die Möglichkeit, den Grad der Augmentation durch 
 \section{Robuste Datenrepräsentation durch Contrastive Learning} \label{sec-contrastive-learning}
 
 % Einleitung; Themenwechsel abfedern
-Neben den vorgestellten Methoden zur Vervielfältigung der Trainingsdaten soll nun auch das Contrastive Learning als effektive Methode zur Verbesserung der Generalisierungsfähigkeit und Robustheit von Modellen vorgestellt werden. Contrastive Learning kommt ursprünglich aus dem unüberwachten Lernen und zielt darauf ab, ähnliche Beispiele im Datensatz zu gruppieren und unähnliche Beispiele voneinander zu trennen. Durch die Kontrastierung der Daten wird eine Art von Supervision erzeugt, die es dem Modell ermöglicht, nützliche Repräsentationen der Eingabedaten zu lernen.
+Neben den vorgestellten Methoden zur Vervielfältigung der Trainingsdaten soll nun auch das Contrastive Learning als effektive Methode zur Verbesserung der Generalisierungsfähigkeit und Robustheit von Modellen vorgestellt werden. Die Methode zielt darauf ab, ähnliche Beispiele im Datensatz zu gruppieren und unähnliche Beispiele voneinander zu trennen. Durch die Kontrastierung der Daten wird eine Art von Supervision erzeugt, die es dem Modell ermöglicht, nützliche Repräsentationen der Eingabedaten zu lernen.
 
-% Unsupervised *Instance* Discrimination vs. Supervised *Class* Discrimination (Keshtmand2022)
+% Eine vielversprechende Alternative zum überwachten Lernen
+Contrastive Learning kommt ursprünglich aus dem unüberwachten Lernen. Da die Annotation von Daten sehr aufwendig sein kann, insbesondere in Domänen, in denen Expertenwissen erforderlich ist, hat sich das Contrastive Learning als vielversprechende Alternative mit äußerst starker Generalisierungsfähigkeit und Robustheit gegenüber Adversarial Attacks erwiesen \parencite{Liu2021understandimprovecontrastivelearning}.
+
+% Vermehrt auch überwachte Methoden; *Class* statt *Instance* Discrimination (Keshtmand2022)
 Mittlerweile gibt es vermehrt Ansätze, Contrastive Learning auch im überwachten Setting anzuwenden, um die Repräsentationen von Daten zu verbessern. Während das Modell im unüberwachten Setting lernt, zwischen einzelnen Instanzen zu unterscheiden, werden im überwachten Setting die Klassenzugehörigkeit der Beispiele berücksichtigt.
 
-In den folgenden Abschnitten werden im Detail sowohl unüberwachte als auch überwachte Varianten des Contrastive Learning vorgestellt, die in den letzten Jahren vielversprechende Ergebnisse erzielt haben.
+% Folgende Abschnitte
+In den folgenden Abschnitten wird genauer auf die Funktionsweise von sowohl unüberwachten als auch überwachten Varianten des Contrastive Learning eingegangen, die in den letzten Jahren vielversprechende Ergebnisse erzielt haben.
 
 \subsection{Unsupervised Contrastive Learning} \label{subsec-unsup-contrastive}
 
-% Annotation von Daten ist sehr aufwendig
-Da die Annotation von Daten sehr aufwendig sein kann, insbesondere in Domänen, in denen Expertenwissen erforderlich ist, hat sich das unüberwachte Lernen als vielversprechende Alternative erwiesen. Contrastive Learning ist ein Beispiel für ein unüberwachtes Lernverfahren, das es ermöglicht, nützliche Repräsentationen von Daten zu lernen, ohne auf externe Labels angewiesen zu sein.
-
-% Vor allem deshalb so vielversprechend, weil die erlernten Repräsentationen eine bessere Generalisierung und Robustheit gegenüber Adversarial Attacks aufweisen (Liu2021)
+% Grundprinzipien, Funktionsweise (im Detail, technisch)
+Ob unüberwacht oder überwacht: Im Contrastive Learning soll die Distanz ähnlicher Beispiele in einem Repräsentationsraum minimiert und die Distanz unähnlicher Beispiele maximiert werden. Dazu bildet das Modell kontrastive Paare aus einem Anchor-Beispiel und verschiedenen positiv- oder negativ-Beispielen. Je nach Methode kann vor allem die Anzahl der positiv- und negativ-Beispiele pro Anchor variieren, wodurch sich auch die jeweiligen Loss-Funktionen unterscheiden.
 
 % SimCLR (Chen2020) als prominentes Beispiel
-	% Einführung eines Projection Heads, welcher die Repräsentationen der Eingabedaten in einen höherdimensionalen Raum projiziert
-	% Verwendung von Data Augmentation, um die Robustheit der Repräsentationen zu verbessern
+	% NT-Xent Loss (Normalized Temperature-scaled Cross-Entropy Loss)
+		% Ganzer Batch statt Triplet o.Ä.
+		% Jeder Anchor 2x augmentiert (2 Ansichten): ergibt positives Paar, alle anderen Beispiele im Batch sind negative Beispiele
+		% CNN als Feature Extractor: encodiert die Eingabedaten in eine hochdimensionale Repräsentation
+		% Projection Head: transformiert die features weiter, um einen Repräsentationsraum zu erzeugen, der für die Unterscheidung der Beispiele geeignet ist
+			% 2-Layer MLP mit ReLU-Aktivierung
+		% Similarity Scores: Cosine Similarity zwischen den Repräsentationen der Beispiele
+		% Softmax über die Scores aller Paare im Batch, mit Temperature Scaling, um die Unterscheidung zwischen positiven und negativen Paaren hervorzuheben
+	% Aggressive Data Augmentation (aus der die 2 Ansichten entstehen) entscheidend, um die Robustheit der Repräsentationen zu verbessern
 	% Größere Batch Sizes und längere Trainingszeiten begünstigen die Lernfähigkeit des Modells
-	% Zudem ist besonders die Wahl von hard negatives entscheidend für den Erfolg des Modells
+	% Zudem sind Hard Negatives entscheidend für den Erfolg des Modells
+Das wohl prominenteste Beispiel für Contrastive Learning ist \textbf{SimCLR}, das in \parencite{Chen2020simclr} vorgestellt wurde. SimCLR verwendet den NT-Xent Loss (Normalized Temperature-scaled Cross-Entropy Loss), der die Ähnlichkeiten zwischen allen Paaren im Batch (auch \textit{Mini-Batch}) berücksichtigt, anstatt nur einzelne Triplets oder Paare. Jedes Beispiel wird dabei zweimal augmentiert, um zwei Ansichten zu erzeugen, welche als positives Paar für das jeweilige Beispiel dienen. Alle anderen Beispiele (bzw. dessen Ansichten) im Batch werden als negativ-Beispiele gesehen.
+
+Die Eingabedaten werden durch ein Convolutional Neural Network (CNN) in eine hochdimensionale Repräsentation transformiert. Dieser Schritt wird auch als \textit{Feature Extraction} bezeichnet. SimCLR verwendet anschließend einen sogenannten \textit{Projection Head}, der die encodierten Repräsentationen weiter transformiert, um einen Repräsentationsraum zu erzeugen, der für die Unterscheidung der Beispiele geeignet ist. In diesem Representationsraum werden die Ähnlichkeitswerte der Paare berechnet, um den Loss zu bestimmen.
+
+Um die Ähnlichkeitswerte zu erhalten, wie die Kosinus-Ähnlichkeit der Paare berechnet: \begin{equation}$s_{i,j} = \frac{z_i \cdot z_j}{\|z_i\| \cdot \|z_j\|}$\end{equation}, wobei $z_i$ und $z_j$ die Repräsentationen der beiden Beispiele sind.
+
+Der Loss ergibt sich dann aus der Berechnung des Softmax über die Ähnlichkeiten aller Paare im Batch, skaliert mit einem Temperaturparameter, um die Unterscheidung zwischen positiven und negativen Paaren hervorzuheben.
+
+Durch die Verwendung aggressiver Datenaugmentation zur Erzeugung der zwei Ansichten wird die Robustheit der Repräsentationen verbessert. Größere Batch Sizes und längere Trainingszeiten begünstigen die Lernfähigkeit des Modells. Besonders die Wahl von \textit{Hard Negatives}, also von Paaren, welche ähnliche Konzepte darstellen, aber sehr unterschiedlich aussehen, hat sich als entscheidend für den Erfolg des Modells erwiesen.
 
 % Eine neuere Variante: StableRep (Tian2023)
 	% Verwendung von synthetischen Daten aus T2I-Modellen, insbesondere Stable Diffusion
