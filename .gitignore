@@ -174,3 +174,4 @@ tex-doc/*
 !tex-doc/*.pdf
 !tex-doc/*.png
 !tex-doc/*.jpg
+!tex-doc/*.webp

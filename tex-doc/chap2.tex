@@ -25,34 +25,48 @@ Die Erfahrung $E$ besteht dabei aus einer Menge von Trainingsdaten, die etwa aus
 Wie genau Wissen aus Erfahrung bzw. aus Rohdaten generiert wird hängt vom gewählten Verfahren ab. Im Maschinellen Lernen gibt es dabei verschiedene Paradigmen, wobei die wichtigsten das überwachte (engl. \textit{supervised}) und das unüberwachte (engl. \textit{unsupervised}) Lernen sind.
 
 % Supervised
-Beim überwachten Lernen wird das Modell mit einem vollständig annotierten Datensatz trainiert. Das heißt, jeder Datenpunkt ist mit einem Klassenlabel versehen, sodass Eingabe-Ausgabe-Paare entstehen. Das Ziel ist es, eine Funktion zu lernen, die Eingaben (Features) auf die entsprechenden Ausgaben (Labels) abbildet. Beispiele für überwachtes Lernen sind Klassifikations- und Regressionsaufgaben. Ein typisches Beispiel ist die Bilderkennung, bei der ein Modell darauf trainiert wird, Bilder von Katzen und Hunden zu unterscheiden.
+Beim überwachten Lernen wird das Modell mit einem vollständig annotierten Datensatz trainiert. Das heißt, jeder Datenpunkt ist mit einem Klassenlabel versehen, sodass Eingabe-Ausgabe-Paare entstehen. Das Ziel ist es, eine Funktion zu lernen, die Eingaben auf die entsprechenden Ausgaben abbildet. Beispiele für überwachtes Lernen sind Klassifikations- und Regressionsaufgaben. Ein typisches Beispiel ist die Bilderkennung, bei der ein Modell darauf trainiert wird, Bilder von Katzen und Hunden zu unterscheiden. \cite{}
 
 % Unsupervised
-Im Gegensatz dazu arbeitet unüberwachtes Lernen mit unbeschrifteten Daten; es gibt also keine vorgegebenen Ausgaben. Stattdessen wird versucht, ein Modell zu befähigen, eigenständig Muster und Strukturen in den Daten zu erkennen und z.B. Cluster zu bilden, oder nützliche Repräsentationen der Eingangsdaten zu erstellen. Zu den häufigsten Methoden des unüberwachten Lernens gehören Clustering- und Assoziationsalgorithmen. Ein Beispiel ist die Segmentierung von Kunden in verschiedene Gruppen basierend auf ihrem Kaufverhalten. \parencite{}
+Im Gegensatz dazu arbeitet unüberwachtes Lernen mit unbeschrifteten Daten; es gibt also keine vorgegebenen Ausgaben. Stattdessen wird versucht, ein Modell zu befähigen, eigenständig Muster und Strukturen in den Daten zu erkennen und z.B. nützliche Repräsentationen der Eingangsdaten zu erlernen. Zu den häufigsten Methoden des unüberwachten Lernens gehören Clustering- und Assoziationsalgorithmen. Ein Beispiel ist die Segmentierung von Kunden in verschiedene Gruppen basierend auf ihrem Kaufverhalten. \cite{}
 
-% Andere
-In der Praxis werden oft auch hybride Ansätze genutzt, wie das semi-überwachte Lernen, bei dem eine Kombination aus beschrifteten und unbeschrifteten Daten verwendet wird, oder das selbstüberwachte Lernen, bei dem das Modell sich selbst überwacht, indem es Teile der Daten als pseudo-beschriftet behandelt.
+% Andere; semi-supervised & self-supervised
+In der Praxis werden oft auch hybride Ansätze genutzt, wie das semi-überwachte Lernen, bei dem eine Kombination aus beschrifteten und unbeschrifteten Daten verwendet wird, oder das selbstüberwachte Lernen, bei dem das Modell eigenständig Teile der Daten zur Erzeugung von Überwachungssignalen verwendet, anstatt sich auf externe, von Menschen bereitgestellte Labels zu verlassen. \cite{}
 
 \subsection{Deep Learning}
 
-% Deep Learning als Hierarchie von Konzepten/Merkmalen
-Das Wissen, das ein Modell aus den Trainingsdaten lernt, wird in Form von Merkmalen (engl. \textit{features}) repräsentiert. Diese Merkmale können einfache Konzepte wie Kanten oder Farben sein, oder komplexere Konzepte wie Gesichter oder Objekte. Unter Deep Learning versteht man eine tiefe, hierarchische Vernetzung dieser Konzepte, sodass komplexere Konzepte auf simpleren Konzepten aufbauen können. Visuell veranschaulicht entsteht ein Graph mit vielen Ebenen (engl. \textit{deep layers}). Damit ist Deep Learning eine spezialisierte Unterkategorie des maschinellen Lernens, die auf künstlichen neuronalen Netzen basiert. Diese Netzwerke bestehen aus mehreren Schichten, die eine hierarchische Repräsentation von Daten ermöglichen. Jede Schicht transformiert die Eingabedaten in eine etwas abstraktere Darstellung.
+% Eine Hierarchie von Konzepten
+Das Wissen, das ein Modell aus den Trainingsdaten lernt, wird in Form von Merkmalen (engl. \textit{features}) repräsentiert. Diese Merkmale können einfache Konzepte wie Kanten oder Farben sein, oder komplexere Konzepte wie Gesichter oder Objekte. Unter Deep Learning versteht man eine tiefe, hierarchische Vernetzung dieser Konzepte, sodass komplexere Konzepte auf simpleren Konzepten aufbauen können. Visuell veranschaulicht entsteht ein Graph mit vielen Ebenen (engl. \textit{deep layers}) \cite{}. Somit ist Deep Learning eine spezialisierte Unterkategorie des maschinellen Lernens, in der künstlichen neuronale Netzen mit mehreren Schichten verwendet werden, um eine hierarchische Repräsentation von Daten zu ermöglichen. Jede Schicht transformiert die Eingabedaten in eine etwas abstraktere Darstellung.
 
 % Fortschritte im Deep Learning
-Deep Learning hat in den letzten Jahren erhebliche Fortschritte gemacht und findet Anwendung in Bereichen wie Bild- und Spracherkennung, autonomen Fahrzeugen und vielen anderen. Die Popularität von Deep Learning ist auf mehrere Faktoren zurückzuführen, darunter die Verfügbarkeit großer Datensätze, die Leistungsfähigkeit moderner Hardware und die Entwicklung effizienter Algorithmen.
+Deep Learning hat in den letzten Jahren erhebliche Fortschritte gemacht und findet Anwendung in Bereichen wie Bild- und Spracherkennung, autonomen Fahrzeugen und vielen anderen. Die Popularität von Deep Learning ist auf mehrere Faktoren zurückzuführen, darunter die Verfügbarkeit großer Datensätze, die Leistungsfähigkeit moderner Hardware und die Entwicklung effizienter Algorithmen. \cite{}
 
 \subsection{Neuronale Netze}
 
 % Einleitung und grundlegender Aufbau
-Das künstliche neuronale Netz (KNN) bildet die Grundlage der allermeisten Deep-Learning-Algorithmen. Es ist inspiriert von der Struktur und Funktionsweise des menschlichen Gehirns und besteht aus einer Vielzahl von miteinander verbundenen Knoten (Neuronen), die in Schichten organisiert sind. Die Struktur eines neuronalen Netzes besteht aus einer Eingabeschicht, einer oder mehreren versteckten Schichten (engl. \textit{hidden layers}) und einer Ausgabeschicht.
+Während die rasante Entwicklung von Deep Learning vor allem in den vergangenen Jahren spürbar geworden ist, sind die zugrundeliegenden Algorithmen und Modelle schon seit Jahrzehnten bekannt \cite{}. Dabei bildet das künstliche neuronale Netz (KNN) die Grundlage der allermeisten Deep-Learning-Modelle. Es ist inspiriert von der Struktur und Funktionsweise des menschlichen Gehirns und besteht aus einer Vielzahl von miteinander verbundenen Knoten (Neuronen), die in Schichten organisiert sind. Die Struktur eines neuronalen Netzes besteht aus einer Eingabeschicht, einer oder mehreren versteckten Schichten (engl. \textit{hidden layers}) und einer Ausgabeschicht.
 
 % Einzelnes Neuron im Detail
 Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Modellierung des biologischen Neurons, das erstmals 1943 von Warren McCulloh und Walter Pitts vorgestellt wurde \parencite{Zhou2021}. Jedes Neuron empfängt eine Reihe von Eingaben, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es ein zugehöriges Gewicht (engl. \textit{weight}), das die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingabe auf das Neuron bestimmt. Das Neuron berechnet dann die gewichtete Summe aller Eingabe und falls ein bestimmter Schwellenwert (engl. \textit{bias}) überschritten wurde, wird das Neuron aktiviert. Diese Aktivierung kann durch verschiedene Aktivierungsfunktionen angepasst werden. Häufig wird etwa die sogenannte Sigmoid-Funktion verwendet, welche im Gegensatz zur einfachen Step-Funktion differenzierbar ist und somit die Optimierung des Netzwerk vereinfacht.
 
+\begin{figure}[]
+	\centering
+	\includegraphics[width=6cm]{figure_neural_network.png}
+	\caption{Beispiel eines einfachen künstlichen neuronalen Netzes. Quelle: \parencite{Zhou2021}}
+\end{figure}
+
 % Wie neuronale Netze lernen
 Die Optimierung des Netzwerks geschieht durch eine Rückwärtsausbreitung (engl. \textit{backpropagation}), welche den berechneten Fehler rückwärts durch das Netz propagiert, um die Gewichte und Schwellenwerte um einen geringen Wert in die Richtung anzupassen, die den Fehler minimieren würde. ...
 
-\subsection{Convolutional Neural Networks}
+% Mathematik beschreiben; kann mehr oder weniger im Schnelldurchlauf
+	% Softmax
+	% Loss
+		% Cross-Entropy
+	% (Stochastic Gradient Descend)
+	% (Backpropagation)
+	% (Regularisierung)
+
+\subsection{Convolutional Neural Networks} % Brauche ich das überhaupt? Als Beispiel?
 
 % Kurze Definition
 Ein Convolutional Neural Network (CNN) ist ein spezielles künstliches neuronales Netz, das hauptsächlich für die Bildklassifikation entwickelt wurde. Es verwendet Faltungsebenen, um ein Eingangsbild Schritt für Schritt in immer abstraktere “Feature Maps” zu verarbeiten.
@@ -69,17 +83,25 @@ Die Architektur eines CNN besteht typischerweise aus mehreren Schichten, die in 
 	\item Ausgabeschicht (Output Layer): In der letzten Schicht wird eine Aktivierungsfunktion wie Softmax verwendet, um die Wahrscheinlichkeitsverteilung der möglichen Klassen zu berechnen.
 \end{enumerate}
 
-\subsection{Datenaugmentation}
+\subsection{Out-of-Distribution Daten}
+
+% Definition und Problematik
+Wenn ein KI-Modell mit Daten konfrontiert wird, die außerhalb des Bereichs liegen, den es während des Trainings gesehen hat, spricht man von Out-of-Distribution (OOD) Daten. Es handelt sich also um Datenpunkte oder Muster, die sich signifikant von den Trainingsdaten unterscheiden. Dies kann zu Problemen führen, da das Modell möglicherweise nicht in der Lage ist, angemessene Vorhersagen oder Entscheidungen für diese ungewohnten Daten zu treffen. Stattdessen werden falsche Vorhersagen mit übermäßigem Vertrauen getroffen.
+
+% OOD-Detection
+Die Erkennung von OOD-Daten ist ein wichtiges Forschungsgebiet im maschinellen Lernen, da sie dazu beitragen kann, die Zuverlässigkeit und Sicherheit von KI-Systemen zu verbessern. Idealerweise sollte ein neuronales Netz höhere Softmax-Wahrscheinlichkeiten für In-Distribution-Daten und niedrigere Wahrscheinlichkeiten für OOD-Daten ausgeben. Durch Festlegen eines Schwellenwerts für diese Wahrscheinlichkeiten können Instanzen unterhalb des Schwellenwerts frühzeitig als OOD-Instanzen erkannt und entsprechend behandelt werden. In der Praxis kommt dieser Ansatz jedoch oft an seine Grenzen, da die Softmax-Wahrscheinlichkeiten nicht immer zuverlässig sind und das Modell auch für OOD-Daten hohe Wahrscheinlichkeiten ausgeben kann. Daher werden alternative Ansätze verwendet, wie etwa das Training eines binären Klassifikationsmodells zur Unterscheidung von In-Distribution und OOD-Daten.
+
+\subsection{Datenaugmentation und Generalisierung}
 
 % Definition und Zweck
 Datenaugmentation ist ein wichtiger Schritt im Training von neuronalen Netzen, insbesondere bei begrenzten Datensätzen. Sie bezieht sich auf die künstliche Erweiterung des Trainingsdatensatzes durch Anwenden von Transformationen auf die vorhandenen Daten. Diese Transformationen können z.B. Rotation, Skalierung, Verschiebung, Spiegelung, Helligkeitsanpassung oder Rauschen sein. Das Ziel der Datenaugmentation ist es, das Modell robuster gegenüber Variationen in den Eingabedaten zu machen und die Generalisierungsfähigkeit zu verbessern.
 
 % Beispiele
-...
-
-\subsection{Out-of-Distribution Daten}
-
-...
+%\begin{figure}[]
+%	\centering
+%	\includegraphics[width=6cm]{figure_data_augmentation.webp}
+%	\caption{Beispiele für Datenaugmentationstechniken. Quelle: Thijs Kooi}
+%\end{figure}
 
 \section{Synthetische Daten}
 
@@ -161,37 +183,44 @@ Bei Diffusion-Modellen handelt es sich um eine Klasse von generativen Deep Learn
 
 \section{Integration von DA-Fusion und Supervised Contrastive Learning}
 
-% Kurze Einleitung; Rückverweis auf Anwendungsfall
+% Rückverweis auf Anwendungsfall
+% Einleitung für den vorzustellenden Ansatz
 ...
 
-\subsection{Forschungslücke}
+\subsection{Herausforderungen bei der Generierung synthetischer Daten}
 
-% Einleitung
-Der dargestellte Forschungsstand rund um die synthetische Generierung von Bilddaten und die Verwendung von Contrastive Learning zur Bildrepräsentation und Klassifikation ist vielversprechend. Während sich DA-Fusion als flexible Methode zur Datenaugmentation und zur Generierung von synthetischen Daten herausstellt, hat sich Contrastive Learning als effektive Methode zur Verbesserung der Generalisierungsfähigkeit und zur Verbesserung der Robustheit gegenüber Out-of-Distribution-Daten erwiesen. Vor dem Hintergrund des in dieser Arbeit behandelten Anwendungsfalls (s. Einleitung) stellt sich allerdings noch eine Forschungslücke dar, die nun erläutert werden soll.
-
-% StableRep
-	% Stable Diffusion "off-the-shelf" ist nicht akkurat genug
-		% Objekte zu komplex
-		% Zu ähnlich; feine Unterschiede
-	% Auch die gleichbleibenden Hintergründe sind fatal
-	% Außerdem: Unsupervised
+% Herausforderungen bei der Generierung synthetischer Daten
+	% Komplexe Objekte
+	% Feine Unterschiede zwischen Klassen
+	% Wenig Variation
+	% (Detaillierte Meta-Informationen, Multimodalität)
+	% Risiko der Fehlklassifikation von OOD-Daten
+% Welche Anforderungen ergeben sich?
+	% Hohe Kontrolle über die Generierung der synthetischen Daten; Genauigkeit
+	% Trotzdem Verbesserung der Generalisierungsfähigkeit
+	% Verbesserung der OOD-Detektion
 ...
 
-% Vanilla DA-Fusion
-	% An sich vielversprechend für die synthetische Datengenerierung im Anwendungsfall; könnte Generalisierung verbessern
-	% Bezieht sich aber auf keine Trainingsmethode; Mit Standard Cross-Entropy wäre nicht die Robustheit des CL gegeben, bisher noch nicht explizit für CL getestet (tatsächlich bessere Repräsentationen?)
-	% Und nach wie vor ähnliches Risiko
-		% Komplexe Objekte
-		% Fine-grained
-Eine "herkömmliche" Verwendung von DA-Fusion zur Generierung synthetischer Augmentationen und dessen naive Integration in ein Cross-Entropy Training könnte womöglich die Generalisierungsfähigkeit des Modells im Vergleich mit ausschließlich echten Daten verbessern. ...
+\subsection{Potenzial von DA-Fusion zur kontrollierten Augmentation}
 
-% Supervised Contrastive Learning mit Hard Negatives
-	% Gute Strategie für Negative-Sampling
-	% Aber keine synthetischen Daten
 ...
 
-\subsection{Near Out-of-Distribution Augmentationen als Hard Negatives}
+\subsection{Supervised Contrastive Learning zur Verbesserung der Generalisierung und Robustheit}
 
+...
+
+\subsection{“Schlechte” synthetische Daten als negativ-Beispiele?}
+
+% Forschungslücke bei der Integration von synthetischen Daten im Contrastive Learning
+	% StableRep
+		% Stable Diffusion "off-the-shelf" ist nicht akkurat genug
+			% Objekte zu komplex
+			% Zu ähnlich; feine Unterschiede
+		% Auch die gleichbleibenden Hintergründe sind fatal
+		% Außerdem: Unsupervised
+	% Supervised Contrastive Learning mit Hard Negatives
+		% Gute Strategie für Negative-Sampling
+		% Aber keine synthetischen Daten
 % Was wenn: Anstatt Negatives aus Nähe im Darstellungsraum zu samplen, Near OOD-Augmentationen aus Anchor-Klasse?
 % DA-Fusion zur Generierung von ID- und Near OOD-Daten
 	% Einfach den strength-Parameter der DA-Fusion-Augmentationen erhöhen
