@@ -131,7 +131,9 @@ Das Training eines Autoencoders erfolgt durch Minimierung des Rekonstruktionsfeh
 
 $$Loss=\frac{1}{n}\sum_{i=1}^n (x_i-\hat{x}_i)^2$$
 
-Ein besonders interessantes Versprechen des Autoencoders ist, dass man theoretisch durch die Wahl eines beliebigen Punkts im latenten Raum neue Bilder erzeugen kann, indem man diesen Punkt durch den Decoder schickt, da der Decoder gelernt hat, wie man Punkte im latenten Raum in realistische Bilder umwandelt. \parencite{Foster2020} In der herkömmlichen Form hat der Autoencoder in Bezug auf diese Aufgabe allerdings einige Schwachstellen, die durch den \textbf{Variational Autoencoder} (VAE) adressiert werden. Der VAE verwendet probabilistische Methoden, um die Datenverteilung im latenten Raum zu modellieren; Anstatt einen einzelnen, festen Punkt im latenten Raum für jede Eingabe zu lernen, wird eine Verteilung gelernt, aus der die latenten Variablen für jede Eingabe stammen. Dadurch entsteht ein strukturierteer und kontinuierlicher latenter Raum, der es ermöglicht, neue, realistische Daten zu generieren. % \parencite{Kingma2013}?
+Ein besonders interessantes Versprechen des Autoencoders ist, dass man theoretisch durch die Wahl eines beliebigen Punkts im latenten Raum neue Bilder erzeugen kann, indem man diesen Punkt durch den Decoder schickt, da der Decoder gelernt hat, wie man Punkte im latenten Raum in realistische Bilder umwandelt. \parencite{Foster2020} In der herkömmlichen Form hat der Autoencoder in Bezug auf diese Aufgabe allerdings einige Schwachstellen.
+
+Der \textbf{Variational Autoencoder} (VAE) adressiert diese Schwachstellen und verwendet probabilistische Methoden, um die Datenverteilung im latenten Raum zu modellieren; Anstatt einen einzelnen, festen Punkt im latenten Raum für jede Eingabe zu lernen, wird eine Verteilung gelernt, aus der die latenten Variablen für jede Eingabe stammen. Dadurch entsteht ein strukturierteer und kontinuierlicher latenter Raum, der es ermöglicht, neue, realistische Daten zu generieren. % \parencite{Kingma2013}?
 
 ...
 
@@ -205,7 +207,7 @@ Bei Diffusion-Modellen handelt es sich um eine Klasse von generativen Deep Learn
 
 ...
 
-\section{Integration von DA-Fusion und Supervised Contrastive Learning}
+\section{Forschungslücke}
 
 % Rückverweis auf Anwendungsfall
 % Einleitung für den vorzustellenden Ansatz
@@ -225,15 +227,7 @@ Bei Diffusion-Modellen handelt es sich um eine Klasse von generativen Deep Learn
 	% Verbesserung der OOD-Detektion
 ...
 
-\subsection{Potenzial von DA-Fusion zur kontrollierten Augmentation}
-
-...
-
-\subsection{Supervised Contrastive Learning zur Verbesserung der Generalisierung und Robustheit}
-
-...
-
-\subsection{“Schlechte” synthetische Daten als negativ-Beispiele?}
+\subsection{“Schlechte” synthetische Daten als negativ-Beispiele im Contrastive Learning?}
 
 % Forschungslücke bei der Integration von synthetischen Daten im Contrastive Learning
 	% StableRep
@@ -246,18 +240,21 @@ Bei Diffusion-Modellen handelt es sich um eine Klasse von generativen Deep Learn
 		% Gute Strategie für Negative-Sampling
 		% Aber keine synthetischen Daten
 % Was wenn: Anstatt Negatives aus Nähe im Darstellungsraum zu samplen, Near OOD-Augmentationen aus Anchor-Klasse?
-% DA-Fusion zur Generierung von ID- und Near OOD-Daten
-	% Einfach den strength-Parameter der DA-Fusion-Augmentationen erhöhen
-	% Bei der Generierung die Maske verwenden, damit die Hintergründe gleich bleiben
-% Supervised Contrastive Learning mit eigener Sampling-Strategie für Near OOD-Negatives
+
 ...
 
-\subsection{Potenzielle Vorteile und Herausforderungen}
+\subsection{Integration von DA-Fusion und Supervised Contrastive Learning}
 
-% Bessere Generalisierung
-	% SimCLR profitierte besonders von hard negatives, um gute Repräsentationen zu lernen
-	% OOD-Augmentationen müssen an sich keine spezifischen Klassen akkurat repräsentieren, sind aber dennoch nah genug an den echten Daten, um dessen Repräsentationen zu verbessern
-% Bessere OOD-Detektion
-	% OOD-Detection profitiert von einer guten Repräsentation der Daten, um die Distanz zwischen In-Distribution und OOD-Daten zu maximieren
-	% Near OOD-Negatives sind nah genug an den echten Daten, um die Repräsentationen zu verbessern, aber dennoch OOD genug, um die Distanz zu maximieren
+% Die Idee
+	% DA-Fusion zur Generierung von ID- und Near OOD-Daten
+	% Einfach den strength-Parameter der DA-Fusion-Augmentationen erhöhen
+	% Bei der Generierung die Maske verwenden, damit die Hintergründe gleich bleiben
+	% Supervised Contrastive Learning mit eigener Sampling-Strategie für Near OOD-Negatives
+% Potenzielle Vorteile und Herausforderungen
+	% Bessere Generalisierung
+		% SimCLR profitierte besonders von hard negatives, um gute Repräsentationen zu lernen
+		% OOD-Augmentationen müssen an sich keine spezifischen Klassen akkurat repräsentieren, sind aber dennoch nah genug an den echten Daten, um dessen Repräsentationen zu verbessern
+	% Bessere OOD-Detektion
+		% OOD-Detection profitiert von einer guten Repräsentation der Daten, um die Distanz zwischen In-Distribution und OOD-Daten zu maximieren
+		% Near OOD-Negatives sind nah genug an den echten Daten, um die Repräsentationen zu verbessern, aber dennoch OOD genug, um die Distanz zu maximieren
 ...
