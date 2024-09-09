@@ -118,9 +118,33 @@ Synthetische Daten sind künstlich erzeugte Daten, welche die zugrundeliegenden 
 
 \subsection{Variational Autoencoder}
 
+Ein Autoencoder ist eine spezielle Art von KI-Modell, das darauf ausgelegt ist, Daten effizient zu komprimieren und dann wieder zu rekonstruieren. Es besteht aus zwei Hauptkomponenten: \parencite{Foster2020}
+
+\begin{itemize}
+	\item einem \textbf{Encoder}-Netzwerk, das hochdimensionale Eingabedaten in einem niederdimensionalen Darstellungsvektor komprimiert, und
+	\item einem \textbf{Decoder}-Netzwerk, das einen gegebenen Darstellungsvektor zurück in den ursprünglichen hochdimensionalen Raum umwandelt
+\end{itemize}
+
+Der Darstellungsvektor ist eine Kompression des Originalbilds in einen niedriger dimensionalen latenten Raum, wodurch es sich beim Autoencoder um eine Form des \textit{Representation Learning} handelt.
+
+Das Training eines Autoencoders erfolgt durch Minimierung des Rekonstruktionsfehlers, der die Differenz zwischen den ursprünglichen Eingabedaten und den rekonstruierten Ausgaben beschreibt. Eine gängige Verlustfunktion hierfür ist der \textit{Mean Squared Error} (MSE):
+
+$$Loss=\frac{1}{n}\sum_{i=1}^n (x_i-\hat{x}_i)^2$$
+
+Ein besonders interessantes Versprechen des Autoencoders ist, dass man theoretisch durch die Wahl eines beliebigen Punkts im latenten Raum neue Bilder erzeugen kann, indem man diesen Punkt durch den Decoder schickt, da der Decoder gelernt hat, wie man Punkte im latenten Raum in realistische Bilder umwandelt. \parencite{Foster2020} In der herkömmlichen Form hat der Autoencoder in Bezug auf diese Aufgabe allerdings einige Schwachstellen, die durch den \textbf{Variational Autoencoder} (VAE) adressiert werden. Der VAE verwendet probabilistische Methoden, um die Datenverteilung im latenten Raum zu modellieren; Anstatt einen einzelnen, festen Punkt im latenten Raum für jede Eingabe zu lernen, wird eine Verteilung gelernt, aus der die latenten Variablen für jede Eingabe stammen. Dadurch entsteht ein strukturierteer und kontinuierlicher latenter Raum, der es ermöglicht, neue, realistische Daten zu generieren. % \parencite{Kingma2013}?
+
 ...
 
 \subsection{Generative Adversarial Networks}
+
+Ein Generative Adversarial Network (GAN) ist ein KI-Modell, das in \cite{} vorgestellt wurde. GANs bestehen aus zwei neuralen Netzwerken, die gegeneinander antreten, um realistische synthetische Daten zu erzeugen. Diese Technologie hat sich als äußerst mächtig in der Bild- und Datengenerierung erwiesen.
+
+Die Architektur eines GANs besteht aus zwei Hauptkomponenten:
+
+\begin{itemize}
+	\item \textbf{Generator}: Das generative Netzwerk nimmt Zufallsrauschen als Eingabe und erzeugt daraus Daten, die möglichst realistisch wirken sollen. Der Generator versucht, die wahre Datenverteilung zu imitieren und realistische Beispiele zu erstellen.
+	\item \textbf{Diskriminator}: Das diskriminative Netzwerk erhält sowohl echte Daten aus dem Trainingsdatensatz als auch die vom Generator erzeugten Daten. Seine Aufgabe ist es, zwischen echten und künstlichen Daten zu unterscheiden. Der Diskriminator gibt eine Wahrscheinlichkeit aus, dass die Eingabedaten echt sind.
+\end{itemize}
 
 ...
 
