@@ -3,53 +3,48 @@
 
 In diesem Kapitel wird das methodische Vorgehen der Arbeit beschrieben. Es wird auf die Forschungsfragen und Hypothesen eingegangen, der verwendete Datensatz vorgestellt und die Implementierung der Modelle DA-Fusion und Supervised Contrastive Learning erläutert. Anschließend wird die synthetische Datengenerierung mit DA-Fusion und die Trainings- und Testdurchläufe mit Supervised Contrastive Learning beschrieben. Abschließend werden die Evaluationsmethoden und Metriken vorgestellt, die zur Analyse der Ergebnisse verwendet werden.
 
-\section{Forschungsfragen und Hypothesen}
+\section{Forschungsfragen und Hypothesen} \label{sec:research-questions}
 
 % Einleitung; Forschungslücken aus vorherigem Kapitel
-Im vorherigen Kapitel wurden Forschungslücken identifiziert, die sich aus der Verwendung von DA-Fusion im Supervised Contrastive Learning und der Verwendung von Near OOD-Augmentationen für das Negative Sampling ergeben. Um diese Lücken zu schließen, werden im Folgenden Forschungsfragen formuliert und Hypothesen aufgestellt, die im Rahmen dieser Arbeit untersucht werden sollen.
+Im vorherigen Kapitel wurden Forschungslücken identifiziert, die sich aus der Verwendung von DA-Fusion im Supervised Contrastive Learning und der Verwendung von Near OOD-Augmentationen für das Negative Sampling ergeben. Um diese Lücken zu schließen, werden die folgenden Forschungsfragen und Hypothesen formuliert:
 
-\textbf{1. Kann DA-Fusion für den EIBA-Datensatz synthetische Augmentationen erzeugen, die die Generalisierungsfähigkeit im Supervised Contrastive Learning verbessern?}
+\textbf{Forschungsfrage 1:} Kann DA-Fusion für den EIBA-Datensatz synthetische Augmentationen erzeugen, die die Generalisierungsfähigkeit im Supervised Contrastive Learning verbessern?
 
-% Einfluss von ID-Augmentationen auf die Generalisierungsfähigkeit
-% Dazu wird DA-Fusion auf "normale" Weise verwendet
-% Ziel ist es, festzustellen, ob sich DA-Fusion für den Anwendungsfall eignet
-% Auf EIBA-Datensatz wird genauer in Abschnitt 2.1 eingegangen
+Durch Beantwortung dieser Frage soll festgestellt werden, ob sich DA-Fusion grundsätzlich eignet, um die Herausforderungen der synthetischen Datengenerierung in Anwendungsfällen wie dem EIBA-Datensatz zu bewältigen (genaueres zum Datensatz in Abschnitt \ref{sec:eiba}). Dazu wird DA-Fusion auf "normale" Weise verwendet, d.h. es werden synthetische In-Distribution Daten generiert, die die Repräsentationen der realen Daten verbessern sollen. Es wird untersucht, ob die Verwendung der Augmentationen im Supervised Contrastive Learning dazu beiträgt, die Leistung des Modells für zuvor ungesehene Daten zu verbessern.
 
-...
+% Hypothese
 
-\textbf{2. Trägt die Verwendung von Out-of-Distribution (OOD) Augmentationen im Supervised Contrastive Learning dazu bei, die Robustheit des Modells gegenüber OOD-Daten zu erhöhen und die Repräsentationen von In-Distribution-Daten zu verbessern?}
+\textbf{Forschungsfrage 2:} Trägt die Verwendung von Out-of-Distribution (OOD) Augmentationen im Supervised Contrastive Learning dazu bei, die Robustheit des Modells gegenüber OOD-Daten zu erhöhen und die Repräsentationen von In-Distribution-Daten zu verbessern?
 
-% Einfluss von Near OOD-Augmentationen sowohl auf die Generalisierungsfähigkeit als auch auf die Robustheit gegenüber OOD-Daten
-% Dazu wird sowohl DA-Fusion als auch eine neue Negative Sampling-Strategie für das Contrastive Learning verwendet
-% Ziel ist es, festzustellen, ob Near OOD-Augmentationen im Contrastive Learning einen Mehrwert bieten
+Im Rahmen dieser Frage wird untersucht, ob Near OOD-Augmentationen \textemdash also synthetische Daten, welche aus den echten Objekten abgeleitet sind, diese aber nicht akkurat darstellen müssen \textemdash im Supervised Contrastive Learning einen Mehrwert bieten, indem sie die Repräsentationen der In-Distribution-Daten verbessern und die Robustheit gegenüber OOD-Daten erhöhen. Dazu wird eine neue Negative Sampling-Strategie für das Supervised Contrastive Learning verwendet, die es ermöglicht, für jeden Anchor genau die Near OOD-Augmentationen als negativ-Beispiele heranzuziehen, die aus einem Beispiel der Anchor-Klasse generiert wurden. Es wird untersucht, ob so die Generalisierungsfähigkeit und die Robustheit gegenüber OOD-Daten noch weiter gesteigert werden kann.
 
-...
+% Hypothese
 
-\section{Datensatz}
+\section{Datensatz} \label{sec:dataset}
 
-... % EIBA / MVIP ?
+% Einleitung
+Es soll zunächst genauer auf den verwendeten Datensatz eingegangen werden, um den untersuchen Anwendungsfall im Detail zu verstehen.
 
-\subsection{EIBA}
+\subsection{EIBA} \label{sec:eiba}
 
 % EIBA-Projekt
-Grundlage der Forschungsarbeit ist ein am Fraunhofer-IPK entstandener Datensatz von Gebrauchsgegenständen, darunter hauptsächlich Autoteile und Komponenten. Er wurde im Rahmen des Projekts “Sensorische Erfassung, automatisierte Identifikation und Bewertung von Altteilen anhand von Produktdaten sowie Informationen über bisherige Lieferungen” (EIBA) erstellt, das von 2019 bis 2023 lief und von der Circular Economy Solutions GmbH koordiniert und in Kooperation mit der Technischen Universität Berlin und der deutschen Akademie der Technikwissenschaften durchgeführt wurde. \cite{}
+Grundlage der Forschungsarbeit ist ein am Fraunhofer-IPK entstandener Datensatz von Gebrauchsgegenständen, darunter hauptsächlich Autoteile und Komponenten. Er wurde im Rahmen des Projekts “Sensorische Erfassung, automatisierte Identifikation und Bewertung von Altteilen anhand von Produktdaten sowie Informationen über bisherige Lieferungen” (EIBA) erstellt, das von 2019 bis 2023 lief und von der Circular Economy Solutions GmbH koordiniert und in Kooperation mit der Technischen Universität Berlin und der deutschen Akademie der Technikwissenschaften durchgeführt wurde. \parencite{}
 
 % Multimodalität
 Der Datensatz ist multimodal, d.h. er besteht aus verschiedenen Datenquellen, die unterschiedliche Informationen über die Gegenstände enthalten. Neben herkömmlichen RGB-Bildern aus verschiedenen Perpektiven und weiteren Bilddaten, wie z.B. Objektmasken, gibt es auch Metadaten, etwa das Gewicht, oder Beschreibungen der Objekte in natürlicher Sprache durch verschiedene Stichwörter ("CarComponent", "cylinder", "rusty", usw.).
 
 % Details: Klassen und Anzahl der Bilder insgesamt, Verteilung der Klassen
-% Beispielbilder, -masken, -metadaten
-...
 
-\subsection{Teildatensatz}
+% Beispielbilder, -masken, -metadaten
+
+\subsection{Teildatensatz} \label{sec:subdataset}
 
 % Wahl eines Teildatensatzes mit 20 "CarComponent" Klassen
 Um die Rechenzeit zu reduzieren und die Experimente auf eine bestimmte Objektkategorie zu beschränken, wurde ein Teildatensatz des EIBA-Datensatzes verwendet. Dabei wurden zufällig 20 Klassen aus der super class "CarComponent" ausgewählt. Es wurden außerdem nur die RGB-Bilder verwendet, allerdings kommen auch die Objektmasken im Pre-Processing der Daten zum Einsatz. ...
 
 % Details: Klassen und Anzahl der Bilder in Teildatensatz
-...
 
-\subsection{Vorverarbeitung}
+\subsection{Vorverarbeitung} \label{sec:preprocessing}
 
 % Verwendung der Objektmasken, um die Bilder zu croppen
 	% Bounding Box
@@ -59,10 +54,9 @@ Um die Rechenzeit zu reduzieren und die Experimente auf eine bestimmte Objektkat
 	% Rotation
 	% ColorJitter
 % Normalisierung der Bilder
-
 ...
 
-\section{Implementierung}
+\section{Implementierung} \label{sec:implementation}
 
 % Arbeitsumgebung, Rechner-Zugang, etc.
 % Verwendung vorhandener Implementierungen
@@ -72,7 +66,7 @@ Für die Vorbereitung der in dieser Arbeit durchgeführten Experimente konnte si
 
 Dennoch mussten einige Anpassungen vorgenommen werden, um die Modelle auf den EIBA-Teildatensatz anzuwenden, und um die synthetischen Augmentationen aus DA-Fusion im Supervised Contrastive Learning zu verwenden. ...
 
-\subsection{DA-Fusion}
+\subsection{DA-Fusion} \label{sec:impl-da-fusion}
 
 % Bestehende Implementierung verstehen
 % Klasse zum Laden des EIBA-Teildatensatzes
@@ -86,7 +80,7 @@ In ...'s Implementierung von DA-Fusion wird zunächst mit Textual Inversion ein 
 
 Die Implementierung von DA-Fusion kann weitgehend unverändert angewendet werden, um synthetische Daten für den EIBA-Teildatensatz zu generieren. Es muss lediglich eine eigene Klasse für den Datensatz erstellt werden, die die Bilder und Masken aus dem EIBA-Datensatz lädt und die Token für die Klassen bereitstellt. ...
 
-\subsection{Supervised Contrastive Learning}
+\subsection{Supervised Contrastive Learning} \label{sec:impl-supcon}
 
 % Bestehende Implementierung verstehen
 % Klasse zum Laden des EIBA-Teildatensatzes und der Augmentationen
@@ -105,13 +99,13 @@ Auch hier muss eine eigene Klasse für den EIBA-Teildatensatz erstellt werden, d
 
 ...
 
-\section{Synthetische Datengenerierung mit DA-Fusion}
+\section{Synthetische Datengenerierung mit DA-Fusion} \label{sec:synt-gen-da-fusion}
 
 % ID-Augmentationen, OOD-Augmentationen
 % Trial and Error, um Parameter zu bestimmen, Validierung ist schwierig
 ...
 
-\section{Trainings- und Testdurchläufe mit Supervised Contrastive Learning}
+\section{Trainings- und Testdurchläufe mit Supervised Contrastive Learning} \label{sec:train-test-supcon}
 
 % Training ist aufgeteilt in Pre-Training und Lineare Klassifikation
 % Drei Versuche
@@ -120,7 +114,7 @@ Auch hier muss eine eigene Klasse für den EIBA-Teildatensatz erstellt werden, d
 	% Versuch 3: - Wie 2., aber Contrastive Pre-Training Near OOD-Augmentationen als Hard Negatives
 ...
 
-\section{Evaluationsmethoden und Metriken}
+\section{Evaluationsmethoden und Metriken} \label{sec:evaluation}
 
 % Menschliche Evaluierung der Augmentationen selbst
 % Accuracy, ID- und OOD-Confidence des SCL Klassifikators

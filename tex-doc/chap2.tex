@@ -3,10 +3,10 @@
 
 Im folgenden Kapitel werden die theoretischen Grundlagen des maschinellen Lernens und der verwendeten Modelle erläutert. Es wird auf die Konzepte des maschinellen Lernens, insbesondere des überwachten und unüberwachten Lernens, des Deep Learnings und der neuronalen Netze eingegangen. Anschließend wird die Funktionsweise von Diffusion-Modellen, insbesondere Stable Diffusion und DA-Fusion, sowie von Contrastive Learning und Supervised Contrastive Learning beschrieben. Zuletzt wird die bestehende Forschungslücke und die in dieser Arbeit thematisierte Integration von DA-Fusion und Supervised Contrastive Learning diskutiert.
 
-\section{Maschinelles Lernen} \label{sec-ml}
+\section{Maschinelles Lernen} \label{sec:ml}
 
 % Ursprung ML; Problemstellung
-Die ersten großen Durchbrüche in der künstlichen Intelligenz (KI) kamen im Bezug auf Aufgaben, die für Menschen intellektuell eine große Herausforderung darstellten, die aber von Computern relativ einfach zu lösen waren, da sie als Liste formaler, mathematischer Regeln beschrieben werden konnten. Die große Schwierigkeit lag hingegen in den Aufgaben, die für Menschen relativ einfach und intuitiv sind, welche sich aber nur schwer formal beschreiben lassen. Hierunter fallen z.B. die Spracherkennung, oder Objekterkennung. \parencite{Goodfellow2016deeplearning}
+Die ersten großen Durchbrüche in der künstlichen Intelligenz (KI) kamen im Bezug auf Aufgaben, die für Menschen intellektuell eine große Herausforderung darstellten, die aber von Computern relativ einfach zu lösen waren, da sie als Liste formaler, mathematischer Regeln beschrieben werden konnten. Die große Schwierigkeit lag hingegen in den Aufgaben, die für Menschen relativ einfach und intuitiv sind, welche sich aber nur schwer formal beschreiben lassen. Hierunter fallen z.B. die Spracherkennung, oder Objekterkennung \parencite{Goodfellow2016deeplearning}.
 
 Maschinelles Lernen (ML) beschreibt den Ansatz, Computer mit der Fähigkeit auszustatten, selbstständig Wissen aus Erfahrung zu generieren, indem Muster und Konzepte aus rohen Daten erlernt werden. So kann ein Computerprogramm auf Basis von Beispielen lernen, wie es eine bestimmte Aufgabe lösen soll, ohne dass ihm explizit Regeln oder Algorithmen vorgegeben werden.
 
@@ -19,73 +19,91 @@ Ein Computerprogramm soll aus Erfahrung $E$ in Bezug auf eine Klasse von Aufgabe
 
 Die Erfahrung $E$ besteht dabei aus einer Menge von Trainingsdaten, die etwa aus Eingabe-Ausgabe-Paaren bestehen. Die Aufgaben $T$ können sehr vielfältig sein, von einfachen Klassifikations- und Regressionsaufgaben bis hin zu komplexen Problemen wie Spracherkennung oder autonomen Fahren. Das Leistungsmaß $P$ gibt an, wie gut das Modell die Aufgaben $T$ löst, und kann z.B. die Genauigkeit (engl. \textit{accuracy}) einer Klassifikation oder die mittlere quadratische Abweichung bei einer Regression sein.
 
-\subsection{Überwachtes und unüberwachtes Lernen} \label{subsec-sup-unsup}
+\subsection{Überwachtes und unüberwachtes Lernen} \label{sec:sup-unsup}
 
 % Supervised & Unsupervised als die zwei wichtigsten Lernparadigmen im ML
 Wie genau Wissen aus Erfahrung bzw. aus Rohdaten generiert wird hängt vom gewählten Verfahren ab. Im Maschinellen Lernen gibt es dabei verschiedene Paradigmen, wobei die wichtigsten das überwachte (engl. \textit{supervised}) und das unüberwachte (engl. \textit{unsupervised}) Lernen sind.
 
 % Supervised
-Beim überwachten Lernen wird das Modell mit einem vollständig annotierten Datensatz trainiert. Das heißt, jeder Datenpunkt ist mit einem Klassenlabel versehen, sodass Eingabe-Ausgabe-Paare entstehen. Das Ziel ist es, eine Funktion zu lernen, die Eingaben auf die entsprechenden Ausgaben abbildet. Beispiele für überwachtes Lernen sind Klassifikations- und Regressionsaufgaben. Ein typisches Beispiel ist die Bilderkennung, bei der ein Modell darauf trainiert wird, Bilder von Katzen und Hunden zu unterscheiden. \cite{}
+Beim überwachten Lernen wird das Modell mit einem vollständig annotierten Datensatz trainiert. Das heißt, jeder Datenpunkt ist mit einem Klassenlabel versehen, sodass Eingabe-Ausgabe-Paare entstehen. Das Ziel ist es, eine Funktion zu lernen, die Eingaben auf die entsprechenden Ausgaben abbildet. Beispiele für überwachtes Lernen sind Klassifikations- und Regressionsaufgaben. Ein typisches Beispiel ist die Bilderkennung, bei der ein Modell darauf trainiert wird, Bilder von Katzen und Hunden zu unterscheiden. \parencite{}
 
 % Unsupervised
-Im Gegensatz dazu arbeitet unüberwachtes Lernen mit unbeschrifteten Daten; es gibt also keine vorgegebenen Ausgaben. Stattdessen wird versucht, ein Modell zu befähigen, eigenständig Muster und Strukturen in den Daten zu erkennen und z.B. nützliche Repräsentationen der Eingangsdaten zu erlernen. Zu den häufigsten Methoden des unüberwachten Lernens gehören Clustering- und Assoziationsalgorithmen. Ein Beispiel ist die Segmentierung von Kunden in verschiedene Gruppen basierend auf ihrem Kaufverhalten. \cite{}
+Im Gegensatz dazu arbeitet unüberwachtes Lernen mit unbeschrifteten Daten; es gibt also keine vorgegebenen Ausgaben. Stattdessen wird versucht, ein Modell zu befähigen, eigenständig Muster und Strukturen in den Daten zu erkennen und z.B. nützliche Repräsentationen der Eingangsdaten zu erlernen. Zu den häufigsten Methoden des unüberwachten Lernens gehören Clustering- und Assoziationsalgorithmen. Ein Beispiel ist die Segmentierung von Kunden in verschiedene Gruppen basierend auf ihrem Kaufverhalten. \parencite{}
 
 % Andere; semi-supervised & self-supervised
-In der Praxis werden oft auch hybride Ansätze genutzt, wie das semi-überwachte Lernen, bei dem eine Kombination aus beschrifteten und unbeschrifteten Daten verwendet wird, oder das selbstüberwachte Lernen, bei dem das Modell eigenständig Teile der Daten zur Erzeugung von Überwachungssignalen verwendet, anstatt sich auf externe, von Menschen bereitgestellte Labels zu verlassen. \cite{}
+In der Praxis werden oft auch hybride Ansätze genutzt, wie das semi-überwachte Lernen, bei dem eine Kombination aus beschrifteten und unbeschrifteten Daten verwendet wird, oder das selbstüberwachte Lernen, bei dem das Modell eigenständig Teile der Daten zur Erzeugung von Überwachungssignalen verwendet, anstatt sich auf externe, von Menschen bereitgestellte Labels zu verlassen. \parencite{}
 
-\subsection{Deep Learning} \label{subsec-deep-learning}
+\subsection{Deep Learning} \label{sec:deep-learning}
 
-% Eine Hierarchie von Konzepten
-Das Wissen, das ein Modell aus den Trainingsdaten lernt, wird in Form von Merkmalen (engl. \textit{features}) repräsentiert. Diese Merkmale können einfache Konzepte wie Kanten oder Farben sein, oder komplexere Konzepte wie Gesichter oder Objekte. Unter Deep Learning versteht man eine tiefe, hierarchische Vernetzung dieser Konzepte, sodass komplexere Konzepte auf simpleren Konzepten aufbauen können. Visuell veranschaulicht entsteht ein Graph mit vielen Ebenen (engl. \textit{deep layers}) \cite{}. Somit ist Deep Learning eine spezialisierte Unterkategorie des maschinellen Lernens, in der künstlichen neuronale Netzen mit mehreren Schichten verwendet werden, um eine hierarchische Repräsentation von Daten zu ermöglichen. Jede Schicht transformiert die Eingabedaten in eine etwas abstraktere Darstellung.
+% Eine Hierarchie von Konzepten % (engl. \textit{deep layers})
+Das Wissen, das ein Modell aus den Trainingsdaten lernt, wird in Form von Merkmalen (engl. \textit{features}) repräsentiert. Diese Merkmale können einfache Konzepte wie Kanten oder Farben sein, oder komplexere Konzepte wie Gesichter oder Objekte. Unter Deep Learning versteht man eine tiefe, hierarchische Vernetzung dieser Konzepte, sodass komplexere Konzepte auf simpleren Konzepten aufbauen können. Visuell veranschaulicht entsteht ein Graph mit vielen Ebenen \parencite{Goodfellow2016deeplearning}. Deep Learning ist daher eine spezialisierte Unterkategorie des maschinellen Lernens, in der künstlichen neuronale Netzen mit mehreren Schichten verwendet werden, um eine hierarchische Repräsentation von Daten zu ermöglichen. Jede Schicht transformiert die Eingabedaten in eine etwas abstraktere Darstellung.
 
-% Fortschritte im Deep Learning
-Deep Learning hat in den letzten Jahren erhebliche Fortschritte gemacht und findet Anwendung in Bereichen wie Bild- und Spracherkennung, autonomen Fahrzeugen und vielen anderen. Die Popularität von Deep Learning ist auf mehrere Faktoren zurückzuführen, darunter die Verfügbarkeit großer Datensätze, die Leistungsfähigkeit moderner Hardware und die Entwicklung effizienter Algorithmen. \cite{}
-
-\subsection{Neuronale Netze} \label{subsec-neural-networks}
-
-% Einleitung und grundlegender Aufbau
-Während die rasante Entwicklung von Deep Learning vor allem in den vergangenen Jahren spürbar geworden ist, sind die zugrundeliegenden Algorithmen und Modelle schon seit Jahrzehnten bekannt \cite{}. Dabei bildet das künstliche neuronale Netz (KNN) die Grundlage der allermeisten Deep-Learning-Modelle. Es ist inspiriert von der Struktur und Funktionsweise des menschlichen Gehirns und besteht aus einer Vielzahl von miteinander verbundenen Knoten (Neuronen), die in Schichten organisiert sind. Die Struktur eines neuronalen Netzes besteht aus einer Eingabeschicht, einer oder mehreren versteckten Schichten (engl. \textit{hidden layers}) und einer Ausgabeschicht.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Einzelnes Neuron im Detail
-Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Modellierung des biologischen Neurons, das erstmals 1943 von Warren McCulloh und Walter Pitts vorgestellt wurde \parencite{Zhou2021machinelearning}. Jedes Neuron empfängt eine Reihe von Eingaben, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es ein zugehöriges Gewicht (engl. \textit{weight}), das die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingabe auf das Neuron bestimmt. Das Neuron berechnet dann die gewichtete Summe aller Eingabe und falls ein bestimmter Schwellenwert (engl. \textit{bias}) überschritten wurde, wird das Neuron aktiviert. Diese Aktivierung kann durch verschiedene Aktivierungsfunktionen angepasst werden. Häufig wird etwa die sogenannte Sigmoid-Funktion verwendet, welche im Gegensatz zur einfachen Step-Funktion differenzierbar ist und somit die Optimierung des Netzwerk vereinfacht.
-
-\begin{figure}[] \label{figure-neuron}
-	\includegraphics[]{figure_neural_network.png}
-	\caption{Beispiel eines einfachen künstlichen neuronalen Netzes. Quelle: \parencite{Zhou2021machinelearning}}
+% CNN als Beispiel eines Deep Learning-Modells
+\begin{figure}
+	\centering
+	%\includegraphics{}
+	\label{fig:cnn}
 \end{figure}
 
-% Wie neuronale Netze lernen
-Die Optimierung des Netzwerks geschieht durch eine Rückwärtsausbreitung (engl. \textit{backpropagation}), welche den berechneten Fehler rückwärts durch das Netz propagiert, um die Gewichte und Schwellenwerte um einen geringen Wert in die Richtung anzupassen, die den Fehler minimieren würde. ...
+% Fortschritte im Deep Learning
+Deep Learning hat in den letzten Jahren erhebliche Fortschritte gemacht und findet Anwendung in Bereichen wie Bild- und Spracherkennung, autonomen Fahrzeugen und vielen anderen. Die Popularität von Deep Learning ist auf mehrere Faktoren zurückzuführen, darunter die Verfügbarkeit großer Datensätze, die Leistungsfähigkeit moderner Hardware und die Entwicklung effizienter Algorithmen. \parencite{Zhou2021machinelearning}
 
-% Softmax
-% Loss
-	% Cross-Entropy
-% (Stochastic Gradient Descend)
-% (Backpropagation)
-% (Regularisierung)
-...
+\subsection{Neuronale Netze} \label{sec:neural-networks}
 
-%\subsection{Convolutional Neural Networks} % Brauche ich das überhaupt? Als Beispiel?
-%
-% Kurze Definition
-%Ein Convolutional Neural Network (CNN) ist ein spezielles künstliches neuronales Netz, das hauptsächlich für die Bildklassifikation entwickelt wurde. Es verwendet Faltungsebenen, um ein Eingangsbild Schritt für Schritt in immer abstraktere “Feature Maps” zu verarbeiten.
-%
-% Architektur eines CNN
-%Die Architektur eines CNN besteht typischerweise aus mehreren Schichten, die in der folgenden Reihenfolge angeordnet sind:
-%
-%\begin{enumerate}[]
-%	\item Eingabeschicht (Input Layer): Diese Schicht nimmt die Rohdaten auf, z.B. ein Bild in Form eines 2D-Arrays von Pixelwerten.
-%	\item Faltungsschicht (Convolutional Layer): Diese Schicht führt die eigentliche Faltung (Convolution) durch, indem sie einen Filter (Kernel) über das Eingabebild verschiebt und Punktoperationen durchführt. Das Ergebnis ist eine Feature-Map, die lokale Merkmale des Bildes extrahiert. Jeder Filter kann unterschiedliche Merkmale wie Kanten, Ecken oder Texturen erkennen.
-%	\item Aktivierungsschicht (Activation Layer): Nach jeder Faltungsschicht wird normalerweise eine Aktivierungsfunktion angewendet, um nichtlineare Eigenschaften des Netzwerks zu modellieren. Die häufig verwendete Aktivierungsfunktion ist die ReLU (Rectified Linear Unit), die alle negativen Werte auf Null setzt und positive Werte unverändert lässt.
-%	\item Pooling-Schicht (Pooling Layer): Diese Schicht reduziert die räumliche Dimension der Feature-Maps, was die Berechnungen effizienter macht und die Gefahr von Überanpassung (Overfitting) verringert. Die gängigsten Pooling-Methoden sind Max-Pooling (wählt den maximalen Wert in einem bestimmten Bereich) und Average-Pooling (berechnet den Durchschnittswert in einem bestimmten Bereich).
-%	\item Vollständig verbundene Schicht (Fully Connected Layer): Dies ist eine herkömmliche neuronale Netzwerkschicht, bei der jeder Neuron mit jedem Neuron der vorherigen Schicht verbunden ist. Sie kombiniert die extrahierten Merkmale, um das endgültige Ergebnis zu liefern, z.B. die Klassifikation des Bildes.
-%	\item Ausgabeschicht (Output Layer): In der letzten Schicht wird eine Aktivierungsfunktion wie Softmax verwendet, um die Wahrscheinlichkeitsverteilung der möglichen Klassen zu berechnen.
-%\end{enumerate}
+% Einleitung und grundlegender Aufbau
+Während die rasante Entwicklung von Deep Learning vor allem in den vergangenen Jahren spürbar geworden ist, sind die zugrundeliegenden Algorithmen und Konzepte schon seit Jahrzehnten bekannt \parencite{Zhou2021machinelearning}. Dabei bildet das künstliche neuronale Netz (KNN) die Grundlage der allermeisten Deep-Learning-Modelle. Es ist inspiriert von der Struktur und Funktionsweise des menschlichen Gehirns und besteht aus einer Vielzahl von miteinander verbundenen Knoten (Neuronen), die in Schichten organisiert sind. Die Struktur eines neuronalen Netzes besteht aus einer Eingabeschicht, einer oder mehreren versteckten Schichten (engl. \textit{hidden layers}) und einer Ausgabeschicht, wie in Abbildung \ref{fig:ffn} dargestellt.
 
-\subsection{Out-of-Distribution Daten} \label{subsec-ood}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=11cm]{figure_ffn.png}
+	\caption{Darstellung eines einfachen neuronalen Netzes \parencite{oshea2015cnnintro}.}
+	\label{fig:ffn}
+\end{figure}
+
+% Einzelnes Neuron im Detail
+Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Modellierung des biologischen Neurons, das erstmals 1943 von Warren McCulloh und Walter Pitts vorgestellt wurde \parencite{Zhou2021machinelearning}. Jedes Neuron empfängt eine Reihe von Eingaben $x_{1 \dots n}$, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es zugehörige Gewichtungen (engl. \textit{weights}) $w_{1j \dots nj}$, welche die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingaben auf das Neuron bestimmen.
+
+\begin{figure}[h]
+	\centering
+	\vspace*{4mm}
+	%\includegraphics[width=12cm]{figure_mp-neuron.png} % https://commons.wikimedia.org/w/index.php?curid=224561
+	\includegraphics[width=12cm]{figure_mp-neuron_nd.png} % https://commons.wikimedia.org/wiki/File:ArtificialNeuronModel.png
+	\vspace*{2mm}
+	\caption{Das McCulloch-Pitts-Modell eines Neurons.}
+	\label{fig:neuron}
+\end{figure}
+
+% Aktivierung allgemein
+Das Neuron berechnet dann die gewichtete Summe aller Eingaben und falls ein bestimmter Schwellenwert (engl. \textit{bias}) überschritten wurde, wird das Neuron aktiviert:
+
+\begin{equation}
+	o_j = \phi \left( \sum_{i=1}^{n} w_i x_i - \theta_j \right)
+	\label{eq:mp-neuron}
+\end{equation}
+
+% Aktivierungsfunktionen; Sigmoid & Softmax
+Die Aktivierungsfunktion $\phi$ kann dabei unterschiedlich gewählt werden, um die Ausgabe des Neurons zu modellieren. Eine simples Beispiel ist die sogenannte Schwellenwertfunktion (engl. \textit{step function}), die den Wert 1 zurückgibt, wenn die gewichtete Summe größer als der Schwellenwert ist, sonst 0. Eine häufig verwendete Aktivierungsfunktion ist jedoch die sogenannte Sigmoid-Funktion, die kontinuierlich und differenzierbar ist und somit die Optimierung des Netzwerks vereinfacht:
+
+\begin{equation}
+	\text{Sigmoid}(x) = \frac{1}{1 + e^{-x}}
+	\label{eq:sigmoid}
+\end{equation}
+
+Während die Sigmoid-Funktion allerdings nur für binäre Klassifikationen geeignet ist, wird für die Klassifikation von mehreren Klassen die Softmax-Funktion verwendet, die die Wahrscheinlichkeitsverteilung über alle Klassen berechnet:
+
+\begin{equation}
+	\text{Softmax}(x)_i = \frac{e^{x_i}}{\sum_{j=1}^{n} e^{x_j}}
+	\label{eq:softmax}
+\end{equation}
+
+% Wie neuronale Netze lernen; Loss-Funktionen, Backpropagation, Stochastic Gradient Descent
+Im Training fließen die Eingabedaten in einer Vorwärtsausbreitung (engl. \textit{forward propagation}) durch das Netzwerk, um die Ausgabe zu berechnen. Es wird dann eine geeignete Verlustfunktion (engl. \textit{loss function}) angewendet, um den Fehler des Modells zu berechnen. Das Ziel des Trainings ist es, die Gewichtungen der Neuronen so anzupassen, dass der Fehler minimiert wird.
+
+Diese Optimierung geschieht durch eine Rückwärtsausbreitung (engl. \textit{backpropagation}), welche den berechneten Fehler rückwärts durch das Netz propagiert, um die Gewichte und Schwellenwerte um einen geringen Wert in die Richtung anzupassen, die den Fehler minimieren würde. Dieser Prozess wird in der Regel mit dem Stochastic Gradient Descent (SGD) Algorithmus durchgeführt, der die Gewichtungen iterativ anpasst, um den Fehler zu minimieren.
+
+% Outro; Vielseitigkeit, Anwendungsbereiche
+
+\subsection{Out-of-Distribution Daten} \label{sec:ood}
 
 % Definition und Problematik
 Wenn ein KI-Modell mit Daten konfrontiert wird, die außerhalb des Bereichs liegen, den es während des Trainings gesehen hat, spricht man von Out-of-Distribution (OOD) Daten. Es handelt sich also um Datenpunkte oder Muster, die sich signifikant von den Trainingsdaten unterscheiden. Dies kann zu Problemen führen, da das Modell möglicherweise nicht in der Lage ist, angemessene Vorhersagen oder Entscheidungen für diese Daten zu treffen. Stattdessen werden falsche Vorhersagen mit übermäßigem Vertrauen getroffen.
@@ -93,19 +111,19 @@ Wenn ein KI-Modell mit Daten konfrontiert wird, die außerhalb des Bereichs lieg
 % OOD-Detection
 Die Erkennung von OOD-Daten ist ein wichtiges Forschungsgebiet im maschinellen Lernen, da sie dazu beitragen kann, die Zuverlässigkeit und Sicherheit von KI-Systemen zu verbessern. Idealerweise sollte ein neuronales Netz höhere Softmax-Wahrscheinlichkeiten für In-Distribution-Daten und niedrigere Wahrscheinlichkeiten für OOD-Daten ausgeben. Durch Festlegen eines Schwellenwerts für diese Wahrscheinlichkeiten können Instanzen unterhalb des Schwellenwerts frühzeitig als OOD-Instanzen erkannt und entsprechend behandelt werden. In der Praxis kommt dieser Ansatz jedoch oft an seine Grenzen, da die Softmax-Wahrscheinlichkeiten nicht immer zuverlässig sind und das Modell auch für OOD-Daten hohe Wahrscheinlichkeiten ausgeben kann. Daher werden alternative Ansätze verwendet, wie etwa das Training eines binären Klassifikationsmodells zur Unterscheidung von In-Distribution und OOD-Daten.
 
-\subsection{Datenaugmentation und Generalisierung} \label{subsec-data-augmentation}
+\subsection{Datenaugmentation und Generalisierung} \label{sec:data-augmentation}
 
 % Definition und Zweck
 Datenaugmentation ist ein wichtiger Schritt im Training von neuronalen Netzen, insbesondere bei begrenzten Datensätzen. Sie bezieht sich auf die künstliche Erweiterung des Trainingsdatensatzes durch Anwenden von Transformationen auf die vorhandenen Daten. Diese Transformationen können z.B. Rotation, Skalierung, Verschiebung, Spiegelung, Helligkeitsanpassung oder Rauschen sein. Das Ziel der Datenaugmentation ist es, das Modell robuster gegenüber Variationen in den Eingabedaten zu machen und die Generalisierungsfähigkeit zu verbessern.
 
 % Beispiele
-%\begin{figure}[]
-%	\centering
-%	\includegraphics[]{figure_data_augmentation.webp}
-%	\caption{Beispiele für Datenaugmentationstechniken. Quelle: Thijs Kooi}
-%\end{figure}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=16cm]{figure_data_augmentation.png}
+	\caption{Beispiele für unterschiedliche Datenaugmentationstechniken und Kombinationen. \parencite{}} % https://medium.com/lunit/photometric-data-augmentation-in-projection-radiography-bed3ae9f55c3
+\end{figure}
 
-\section{Synthetische Daten} \label{sec-synt-data}
+\section{Synthetische Daten} \label{sec:synt-data}
 
 % Anschließend an Datenaugmentation; Problematik der Datensammlung
 
@@ -115,13 +133,13 @@ Datenaugmentation ist ein wichtiger Schritt im Training von neuronalen Netzen, i
 
 % Fortschritte generativer Modellierung, Einleitung folgender Abschnitte
 
-Während die Verfügbarkeit großer Datensätze für das Training von neuronalen Netzen ein entscheidender Faktor für den Erfolg von Deep Learning-Modellen ist, ist es oft schwierig, solche Datensätze zu sammeln, insbesondere in Domänen wie der Medizin oder der Robotik, wo die Daten rar und teuer sind \cite{}. In solchen Fällen können synthetische Daten eine nützliche Alternative oder Ergänzung zu echten Daten sein.
+Während die Verfügbarkeit großer Datensätze für das Training von neuronalen Netzen ein entscheidender Faktor für den Erfolg von Deep Learning-Modellen ist, ist es oft schwierig, solche Datensätze zu sammeln, insbesondere in Domänen wie der Medizin oder der Robotik, wo die Daten rar und teuer sind \parencite{}. In solchen Fällen können synthetische Daten eine nützliche Alternative oder Ergänzung zu echten Daten sein.
 
 Synthetische Daten sind künstlich erzeugte Daten, welche die zugrundeliegenden Muster der realen Daten nachahmen. Sie können durch Simulation, Generierung oder Transformation von echten Daten erstellt werden.
 
 ...
 
-\subsection{Variational Autoencoder} \label{subsec-vae}
+\subsection{Variational Autoencoder} \label{sec:vae}
 
 Ein Autoencoder ist eine spezielle Art von KI-Modell, das darauf ausgelegt ist, Daten effizient zu komprimieren und dann wieder zu rekonstruieren. Es besteht aus zwei Hauptkomponenten: \parencite{Foster2020gendeeplearning}
 
@@ -134,8 +152,9 @@ Der Darstellungsvektor ist eine Kompression des Originalbilds in einen niedriger
 
 Das Training eines Autoencoders erfolgt durch Minimierung des Rekonstruktionsfehlers, der die Differenz zwischen den ursprünglichen Eingabedaten und den rekonstruierten Ausgaben beschreibt. Eine gängige Verlustfunktion hierfür ist der \textit{Mean Squared Error} (MSE):
 
-\begin{equation} \label{eq-loss-mse}
+\begin{equation}
 	Loss=\frac{1}{n}\sum_{i=1}^n (x_i-\hat{x}_i)^2
+	\label{eq:loss-mse}
 \end{equation}
 
 Ein besonders interessantes Versprechen des Autoencoders ist, dass man theoretisch durch die Wahl eines beliebigen Punkts im latenten Raum neue Bilder erzeugen kann, indem man diesen Punkt durch den Decoder schickt, da der Decoder gelernt hat, wie man Punkte im latenten Raum in realistische Bilder umwandelt. \parencite{Foster2020gendeeplearning} In der herkömmlichen Form hat der Autoencoder in Bezug auf diese Aufgabe allerdings einige Schwachstellen.
@@ -144,14 +163,14 @@ Der \textbf{Variational Autoencoder} (VAE) adressiert diese Schwachstellen und v
 
 ...
 
-\subsection{Generative Adversarial Networks} \label{subsec-gan}
+\subsection{Generative Adversarial Networks} \label{sec:gan}
 
-Ein Generative Adversarial Network (GAN) ist ein KI-Modell, das in \cite{} vorgestellt wurde. GANs bestehen aus zwei neuralen Netzwerken, die gegeneinander antreten, um realistische synthetische Daten zu erzeugen. Diese Technologie hat sich als äußerst mächtig in der Bild- und Datengenerierung erwiesen.
+Ein Generative Adversarial Network (GAN) ist ein KI-Modell, das in \parencite{} vorgestellt wurde. GANs bestehen aus zwei neuralen Netzwerken, die gegeneinander antreten, um realistische synthetische Daten zu erzeugen. Diese Technologie hat sich als äußerst mächtig in der Bild- und Datengenerierung erwiesen.
 
 \begin{figure}[h]
-	\label{figure-gan}
 	\includegraphics{figure_gan.pdf}
 	\caption{Überblick über die GAN-Struktur. Quelle: Google for Developers}
+	\label{fig:gan}
 \end{figure}
 
 Die Architektur eines GANs besteht aus zwei Hauptkomponenten:
@@ -175,43 +194,47 @@ Der Trainingsprozess eines GANs ist als minimax-Spiel zwischen dem Generator und
 % Hoher Rechenaufwand
 ...
 
-\subsection{Diffusion Models} \label{subsec-diffusion}
+\subsection{Diffusion Models} \label{sec:diffusion}
 
 % Einleitung
 In den letzten Jahren haben sogenannte Diffusion Models für einen enormen Sprung in der Bildgenerierung, insbesondere der Text-to-Image (T2I) Generierung, gesorgt. Das Konzept der Diffusion soll hier deshalb einmal genauer erläutert werden.
 
 % Konzept der Diffusion
-Unter Diffusion versteht man den Prozess der langsamen Vermischung von Partikeln oder Informationen über die Zeit. So beschreibt die Diffusionsgleichung in der Physik die zeitliche Entwicklung der Dichte von Teilchen, die sich zufällig bewegen. Im maschinellen Lernen fand das Konzept erstmals in \cite{} Anwendung. Es entstand eine neue Klasse von generativen Deep Learning-Modellen, die Diffusion Models, welche im Trainingsprozess schrittweise die Struktur der Eingabedaten durch das Hinzufügen von Rauschen auflösen und anschließend darauf trainiert werden, das ursprüngliche Bild aus dem verrauschten Bild zu rekonstruieren.
+Unter Diffusion versteht man den Prozess der langsamen Vermischung von Partikeln oder Informationen über die Zeit. So beschreibt die Diffusionsgleichung in der Physik die zeitliche Entwicklung der Dichte von Teilchen, die sich zufällig bewegen. Im maschinellen Lernen fand das Konzept erstmals in \parencite{} Anwendung. Es entstand eine neue Klasse von generativen Deep Learning-Modellen, die Diffusion Models, welche im Trainingsprozess schrittweise die Struktur der Eingabedaten durch das Hinzufügen von Rauschen auflösen und anschließend darauf trainiert werden, das ursprüngliche Bild aus dem verrauschten Bild zu rekonstruieren.
 
 % Vorwärts- und Rückwärtsdiffusion als Markov-Ketten
 Das Training von Diffusion Models teilt sich somit in zwei Phasen auf, die Vorwärts- und die Rückwärtsdiffusion. Beide Phasen ...
 
-\begin{equation} \label{eq-forward-diffusion}
-	$$q \left( x^{(0 \dots T)} \right) = q \left(x^{(0)}\right)\prod_{t=1}^T q \left(x^{(t)}|x^{(t-1)}\right)$$
+\begin{equation}
+	q \left( x^{(0 \dots T)} \right) = q \left(x^{(0)}\right)\prod_{t=1}^T q \left(x^{(t)}|x^{(t-1)}\right)
+	\label{eq:forward-diffusion}
 \end{equation}
 
 In der Rückwärtsdiffusion geht das Bild durch ein Modell, welches selbst nur Rauschen generiert. Es ist die Vorhersage darüber, welches Rauschen vom Eingang entfernt werden soll, um das gewünschte entrauschte Bild zu erhalten.
 
-\begin{equation} \label{eq-reverse-diffusion}
-	$$p \left( x^{(0 \dots T)} \right) = p \left(x^{(T)}\right)\prod_{t=1}^T p \left(x^{(t-1)}|x^{(t)}\right)$$
+\begin{equation}
+	p \left( x^{(0 \dots T)} \right) = p \left(x^{(T)}\right)\prod_{t=1}^T p \left(x^{(t-1)}|x^{(t)}\right)
+	\label{eq:reverse-diffusion}
 \end{equation}
 
 Anders als bei GANs gibt es keine direkten adversarialen Optimierungsmechanismen, die zu einem Ungleichgewicht führen können. Es wird stattdessen explizit die Wahrscheinlichkeitsdichte zwischen den realen Daten und den erzeugten Daten minimiert, was zu einem robusteren und stabileren Trainingsprozess führt.
 
 % DALL-E für Text-to-Image
-Eine entscheidende Weiterentwicklung der Diffusion Models war die Text-Konditionierung des generativen Prozesses. In \cite{} wurde DALL-E vorgestellt, ein Modell, das es ermöglicht, Bilder aus Textbeschreibungen zu generieren. DALL-E ...
+Eine entscheidende Weiterentwicklung der Diffusion Models war die Text-Konditionierung des generativen Prozesses. In \parencite{} wurde DALL-E vorgestellt, ein Modell, das es ermöglicht, Bilder aus Textbeschreibungen zu generieren. DALL-E ...
 
 % Stable Diffusion
 ...
 
-\section{Semantische Datenaugmentation mit DA-Fusion} \label{sec-da-fusion}
+\section{Semantische Datenaugmentation mit DA-Fusion} \label{sec:da-fusion}
 
 % Einleitung; Kurze Beschreibung, Versprechen der Methode
-In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine flexible, auf Stable Diffusion basierende Methode zur Datenaugmentation vorgestellt, die für diese Arbeit von besonderem Interesse ist. Der traditionelle Ansatz der Datenaugmentation, wie in \ref{subsec-data-augmentation} beschrieben, hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit von Modellen zu verbessern. Allerdings erfordert dieser Ansatz auch eine gute Intuition in Bezug auf den verwendeten Datensatz, um zu vermeiden, dass Transformationen gewählt werden, durch die Informationen verloren gehen, die für die Aufgabe des zu trainierenden Modells wichtig sind. Wenn beispielsweise Farbinformationen für die Klassifizierung von Blumen wichtig sind, könnte die Datenaugmentation durch zufällige Farbänderungen die Leistung des Modells verschlechtern. Ein weiteres Beispiel sind Objekte, die klein im Bild sind und durch zufällige Ausschnitte des Bildes aus der Sicht des Modells verschwinden können. DA-Fusion hingegen nutzt das Wissen eines vortrainierten Diffusion Models, um den Bildinhalt semantisch zu verstehen und automatisch neue, realistische Variationen zu generieren.
+In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine flexible, auf Stable Diffusion basierende Methode zur Datenaugmentation vorgestellt, die für diese Arbeit von besonderem Interesse ist. Der traditionelle Ansatz der Datenaugmentation, wie in Abschnitt \ref{subsec-data-augmentation} beschrieben, hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit von Modellen zu verbessern. Allerdings erfordert dieser Ansatz auch eine gute Intuition in Bezug auf den verwendeten Datensatz, um zu vermeiden, dass Transformationen gewählt werden, durch die Informationen verloren gehen, die für die Aufgabe des zu trainierenden Modells wichtig sind. Wenn beispielsweise Farbinformationen für die Klassifizierung von Blumen wichtig sind, könnte die Datenaugmentation durch zufällige Farbänderungen die Leistung des Modells verschlechtern. Ein weiteres Beispiel sind Objekte, die klein im Bild sind und durch zufällige Ausschnitte des Bildes aus der Sicht des Modells verschwinden können. DA-Fusion hingegen nutzt das Wissen eines vortrainierten Diffusion Models, um den Bildinhalt semantisch zu verstehen und automatisch neue, realistische Variationen zu generieren.
 
-\begin{figure}[h] \label{figure-da-fusion}
-	\includegraphics[width=10cm]{figure_da-fusion.png}
-	\caption{Beispiel-Augmentationen aus DA-Fusion. Quelle: \parencite{Trabucco2023dafusion}}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=16cm]{figure_da-fusion.png}
+	\caption{Vergleich zwischen semantischen Augmentationen aus Baseline-Methode und DA-Fusion \parencite{Trabucco2023dafusion}.}
+	\label{fig:da-fusion}
 \end{figure}
 
 % Fine-tuning des SD-Modells
@@ -227,7 +250,7 @@ Ein Vorteil von DA-Fusion ist die Möglichkeit, den Grad der Augmentation durch 
 
 % Ein paar Details zur Implementierung
 
-\section{Robuste Datenrepräsentation durch Contrastive Learning} \label{sec-contrastive-learning}
+\section{Robuste Datenrepräsentation durch Contrastive Learning} \label{sec:contrastive-learning}
 
 % Einleitung; Themenwechsel abfedern
 Neben den vorgestellten Methoden zur Vervielfältigung der Trainingsdaten soll nun auch das Contrastive Learning als effektive Methode zur Verbesserung der Generalisierungsfähigkeit und Robustheit von Modellen vorgestellt werden. Die Methode zielt darauf ab, ähnliche Beispiele im Datensatz zu gruppieren und unähnliche Beispiele voneinander zu trennen. Durch die Kontrastierung der Daten wird eine Art von Supervision erzeugt, die es dem Modell ermöglicht, nützliche Repräsentationen der Eingabedaten zu lernen.
@@ -241,7 +264,7 @@ Mittlerweile gibt es vermehrt Ansätze, Contrastive Learning auch im überwachte
 % Folgende Abschnitte
 In den folgenden Abschnitten wird genauer auf die Funktionsweise von sowohl unüberwachten als auch überwachten Varianten des Contrastive Learning eingegangen, die in den letzten Jahren vielversprechende Ergebnisse erzielt haben.
 
-\subsection{Unsupervised Contrastive Learning} \label{subsec-unsup-contrastive}
+\subsection{Unsupervised Contrastive Learning} \label{sec:unsup-contrastive}
 
 % Grundprinzipien, Funktionsweise (im Detail, technisch)
 Ob unüberwacht oder überwacht: Im Contrastive Learning soll die Distanz ähnlicher Beispiele in einem Repräsentationsraum minimiert und die Distanz unähnlicher Beispiele maximiert werden. Dazu bildet das Modell kontrastive Paare aus einem Anchor-Beispiel und verschiedenen positiv- oder negativ-Beispielen. Je nach Methode kann vor allem die Anzahl der positiv- und negativ-Beispiele pro Anchor variieren, wodurch sich auch die jeweiligen Loss-Funktionen unterscheiden.
@@ -262,7 +285,12 @@ Das wohl prominenteste Beispiel für Contrastive Learning ist \textbf{SimCLR}, d
 
 Die Eingabedaten werden durch ein Convolutional Neural Network (CNN) in eine hochdimensionale Repräsentation transformiert. Dieser Schritt wird auch als \textit{Feature Extraction} bezeichnet. SimCLR verwendet anschließend einen sogenannten \textit{Projection Head}, der die encodierten Repräsentationen weiter transformiert, um einen Repräsentationsraum zu erzeugen, der für die Unterscheidung der Beispiele geeignet ist. In diesem Representationsraum werden die Ähnlichkeitswerte der Paare berechnet, um den Loss zu bestimmen.
 
-Um die Ähnlichkeitswerte zu erhalten, wie die Kosinus-Ähnlichkeit der Paare berechnet: \begin{equation}$s_{i,j} = \frac{z_i \cdot z_j}{\|z_i\| \cdot \|z_j\|}$\end{equation}, wobei $z_i$ und $z_j$ die Repräsentationen der beiden Beispiele sind.
+Dafür wird die Kosinus-Ähnlichkeit $s_{i,j}$ der Paare $z_i$ und $z_j$ berechnet:
+
+\begin{equation}
+	s_{i,j} = \frac{z_i \cdot z_j}{\|z_i\| \cdot \|z_j\|}
+	\label{eq:cosine-similarity}
+\end{equation}
 
 Der Loss ergibt sich dann aus der Berechnung des Softmax über die Ähnlichkeiten aller Paare im Batch, skaliert mit einem Temperaturparameter, um die Unterscheidung zwischen positiven und negativen Paaren hervorzuheben.
 
@@ -274,7 +302,7 @@ Durch die Verwendung aggressiver Datenaugmentation zur Erzeugung der zwei Ansich
 	% Kann mit den richtigen Einstellungen auch mit Training nur auf synthetischen Daten die Leistung von SimCLR übertreffen
 	% Noch bessere Ergebnisse bei Einbeziehung von Textsupervision
 
-\subsection{Supervised Contrastive Learning} \label{subsec-sup-contrastive}
+\subsection{Supervised Contrastive Learning} \label{sec:sup-contrastive}
 
 % Erweiterung der Contrastive Learning-Methode durch Verwendung von Label-Informationen
 
@@ -292,14 +320,16 @@ Durch die Verwendung aggressiver Datenaugmentation zur Erzeugung der zwei Ansich
 
 % Supervised Contrastive Learning with Hard Negatives (Jiang2022)
 	% Zusätzliche Einschränkung des Negative Samplings für Auswahl von Hard Negatives (Nähe im Repräsentationsraums)
+...
 
-\section{Forschungslücke} \label{sec-research-gap}
+\section{Forschungslücke} \label{sec:research-gap}
 
 % Rückverweis auf Anwendungsfall
 
 % Einleitung für den vorzustellenden Ansatz
+...
 
-\subsection{Herausforderungen bei der Generierung synthetischer Daten} \label{subsec-challenges-synt-data}
+\subsection{Herausforderungen bei der Generierung synthetischer Daten} \label{sec:challenges-synt-data}
 
 % Herausforderungen bei der Generierung synthetischer Daten
 	% Komplexe Objekte
@@ -312,8 +342,9 @@ Durch die Verwendung aggressiver Datenaugmentation zur Erzeugung der zwei Ansich
 	% Hohe Kontrolle über die Generierung der synthetischen Daten; Genauigkeit
 	% Trotzdem Verbesserung der Generalisierungsfähigkeit
 	% Verbesserung der OOD-Detektion
+...
 
-\subsection{Synthetische Out-of-Distribution Daten als negativ-Beispiele im Contrastive Learning} \label{subsec-synt-ood-contrastive}
+\subsection{Synthetische Daten als negativ-Beispiele im Contrastive Learning} \label{sec:synt-ood-contrastive}
 
 % Anschließend an die Herausforderungen bei der Datengenerierung
 % Frage: Könnte Contrastive Learning eine Möglichkeit bieten, auch aus mangelhaften Daten zu lernen?
@@ -335,7 +366,7 @@ Durch die Verwendung aggressiver Datenaugmentation zur Erzeugung der zwei Ansich
 	% Was wenn: Anstatt Negatives aus Nähe im Darstellungsraum zu samplen, Near OOD-Augmentationen aus Anchor-Klasse?
 ...
 
-\subsection{Integration von DA-Fusion und Supervised Contrastive Learning} \label{subsec-da-fusion-scl}
+\subsection{Integration von DA-Fusion und Supervised Contrastive Learning} \label{sec:da-fusion-scl}
 
 % DA-Fusion zur Generierung von ID- und Near OOD-Daten
 % Einfach den strength-Parameter der DA-Fusion-Augmentationen erhöhen
