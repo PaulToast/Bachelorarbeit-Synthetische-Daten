@@ -1,23 +1,30 @@
 % !TEX root = Bachelorarbeit Synthetische Daten.tex
 \chapter{Theoretische Grundlagen}
 
-Im folgenden Kapitel werden die theoretischen Grundlagen des maschinellen Lernens und der verwendeten Modelle erläutert. Es wird auf die Konzepte des maschinellen Lernens, insbesondere des überwachten und unüberwachten Lernens, des Deep Learnings und der neuronalen Netze eingegangen. Anschließend wird die Funktionsweise von Diffusion-Modellen, insbesondere Stable Diffusion und DA-Fusion, sowie von Contrastive Learning und Supervised Contrastive Learning beschrieben. Zuletzt wird die bestehende Forschungslücke und die in dieser Arbeit thematisierte Integration von DA-Fusion und Supervised Contrastive Learning diskutiert.
+Das folgende Kapitel gibt eine Einführung in die theoretischen Grundlagen, die für das Verständnis der Arbeit notwendig sind. Dabei werden vor allem zentrale Konzepte und Methoden des maschinellen Lernens, der synthetischen Datengenerierung, sowie des Contrastive Learning behandelt. Zuletzt wird die Forschungslücke vorgestellt, die die Arbeit adressiert, und ein eigener Ansatz zur Integration von DA-Fusion und Supervised Contrastive Learning definiert.
 
 \section{Maschinelles Lernen} \label{sec:ml}
+	% KI-Einleitung?
+	% Was geht ab bei dem goodfellow Zitat?
+
+% Einleitung; KI als Herausforderung
+Maschinelles Lernen (ML) ist als Teilgebiet der Künstlichen Intelligenz (KI) einzuordnen, einem interdisziplinären Forschungsfeld, das sich mit der Entwicklung von Algorithmen und Techniken befasst, welche es Computern ermöglichen, menschenähnliche Intelligenz zu erlangen.
 
 % Ursprung ML; Problemstellung
-Die ersten großen Durchbrüche in der künstlichen Intelligenz (KI) kamen im Bezug auf Aufgaben, die für Menschen intellektuell eine große Herausforderung darstellten, die aber von Computern relativ einfach zu lösen waren, da sie als Liste formaler, mathematischer Regeln beschrieben werden konnten. Die große Schwierigkeit lag hingegen in den Aufgaben, die für Menschen relativ einfach und intuitiv sind, welche sich aber nur schwer formal beschreiben lassen. Hierunter fallen z.B. die Spracherkennung, oder Objekterkennung \parencite{Goodfellow2016deeplearning}.
+Die ersten großen Durchbrüche in der KI kamen im Bezug auf Aufgaben, die für Menschen intellektuell eine große Herausforderung darstellten, die aber von Computern relativ einfach zu lösen waren, da sie als Liste formaler, mathematischer Regeln beschrieben werden konnten. Die große Schwierigkeit lag hingegen in den Aufgaben, die für Menschen relativ einfach und intuitiv sind, welche sich aber nur schwer formal beschreiben lassen. Hierunter fallen z.B. die Spracherkennung, oder Objekterkennung \parencite{Goodfellow2016deeplearning}.
 
-Maschinelles Lernen (ML) beschreibt den Ansatz, Computer mit der Fähigkeit auszustatten, selbstständig Wissen aus Erfahrung zu generieren, indem Muster und Konzepte aus rohen Daten erlernt werden. So kann ein Computerprogramm auf Basis von Beispielen lernen, wie es eine bestimmte Aufgabe lösen soll, ohne dass ihm explizit Regeln oder Algorithmen vorgegeben werden.
+Maschinelles Lernen beschreibt den Ansatz, Computer mit der Fähigkeit auszustatten, selbstständig Wissen aus Erfahrung zu generieren, indem Muster und Konzepte aus rohen Daten erlernt werden. So kann ein Computerprogramm auf Basis von Beispielen lernen, wie es eine bestimmte Aufgabe lösen soll, ohne dass ihm explizit Regeln oder Algorithmen vorgegeben werden.
 
 % Definition ML (Mitchell), weiter ausgeführt
-Eine allgemeine Definition für maschinelles Lernen bietet \parencite{Mitchell1997machinelearning}:
+Eine allgemeine Definition für Maschinelles Lernen bietet \parencite{Mitchell1997machinelearning}:
 
 \begin{quote}
-Ein Computerprogramm soll aus Erfahrung $E$ in Bezug auf eine Klasse von Aufgaben $T$ und Leistungsmaß $P$ lernen, wenn sich seine Leistung bei Aufgaben $T$, gemessen durch $P$, mit Erfahrung $E$ verbessert.
+	Ein Computerprogramm soll aus Erfahrung $E$ in Bezug auf eine Klasse von Aufgaben $T$ und Leistungsmaß $P$ lernen, wenn sich seine Leistung bei Aufgaben $T$, gemessen durch $P$, mit Erfahrung $E$ verbessert.
 \end{quote}
 
-Die Erfahrung $E$ besteht dabei aus einer Menge von Trainingsdaten, die etwa aus Eingabe-Ausgabe-Paaren bestehen. Die Aufgaben $T$ können sehr vielfältig sein, von einfachen Klassifikations- und Regressionsaufgaben bis hin zu komplexen Problemen wie Spracherkennung oder autonomen Fahren. Das Leistungsmaß $P$ gibt an, wie gut das Modell die Aufgaben $T$ löst, und kann z.B. der Anteil der korrekt klassifizierten Beispiele (Accuracy).
+Die Erfahrung $E$ besteht dabei aus einer Menge von Trainingsdaten, die etwa aus Eingabe-Ausgabe-Paaren bestehen können, also die erwünschte Ausgabe des Programms für jede Eingabe mitliefern. Die Aufgaben $T$ können sehr unterschiedlich sein, von einfachen Klassifikations- und Regressionsaufgaben bis hin zu komplexen Problemen wie Spracherkennung oder autonomes Fahren. Das Leistungsmaß $P$ gibt an, wie gut das Programm die Aufgaben $T$ löst, und kann z.B. der Anteil korrekt klassifizierter Beispiele sein (Accuracy).
+
+Durch das Lernen aus den Trainingsdaten wird das Programm zu einem \textit{Modell} des zugrundeliegenden Problems, das dann auf neue, unbekannte Daten angewendet werden kann, um Vorhersagen zu treffen oder Entscheidungen zu treffen.
 
 \subsection{Überwachtes und unüberwachtes Lernen} \label{sec:sup-unsup}
 
@@ -36,7 +43,7 @@ In der Praxis werden oft auch hybride Ansätze genutzt, wie das semi-überwachte
 \subsection{Deep Learning} \label{sec:deep-learning}
 
 % Eine Hierarchie von Konzepten % (engl. \textit{deep layers})
-Das Wissen, das ein Modell aus den Trainingsdaten lernt, wird in Form von Merkmalen (engl. \textit{features}) repräsentiert. Diese Merkmale können einfache Konzepte wie Kanten oder Farben sein, oder komplexere Konzepte wie Gesichter oder Objekte. Unter Deep Learning versteht man eine tiefe, hierarchische Vernetzung dieser Konzepte, sodass komplexere Konzepte auf simpleren Konzepten aufbauen können. Visuell veranschaulicht entsteht ein Graph mit vielen Ebenen \parencite{Goodfellow2016deeplearning}. Deep Learning ist daher eine spezialisierte Unterkategorie des maschinellen Lernens, in der künstlichen neuronale Netzen mit mehreren Schichten verwendet werden, um eine hierarchische Repräsentation von Daten zu ermöglichen. Jede Schicht transformiert die Eingabedaten in eine etwas abstraktere Darstellung.
+Das Wissen, das ein Modell aus den Trainingsdaten lernt, wird in Form von Merkmalen (engl. \textit{Features}) repräsentiert. Diese Merkmale können einfache Konzepte wie Kanten oder Farben sein, oder komplexere Konzepte wie Gesichter oder Objekte. Unter Deep Learning versteht man eine tiefe, hierarchische Vernetzung dieser Konzepte, sodass komplexere Konzepte auf simpleren Konzepten aufbauen können. Visuell veranschaulicht entsteht ein Graph mit vielen Ebenen \parencite{Goodfellow2016deeplearning}. Deep Learning ist daher eine spezialisierte Unterkategorie des maschinellen Lernens, in der künstlichen neuronale Netzen mit mehreren Schichten verwendet werden, um eine hierarchische Repräsentation von Daten zu ermöglichen. Jede Schicht transformiert die Eingabedaten in eine etwas abstraktere Darstellung.
 
 % Fortschritte im Deep Learning
 Deep Learning hat in den letzten Jahren erhebliche Fortschritte gemacht und findet Anwendung in Bereichen wie Bild- und Spracherkennung, autonomen Fahrzeugen und vielen anderen. Die Popularität von Deep Learning ist auf mehrere Faktoren zurückzuführen, darunter die Verfügbarkeit großer Datensätze, die Leistungsfähigkeit moderner Hardware und die Entwicklung effizienter Algorithmen. \parencite{Zhou2021machinelearning}
@@ -49,7 +56,7 @@ Während die rasante Entwicklung von Deep Learning vor allem in den vergangenen 
 \begin{figure}[]
 	\centering
 	\includegraphics[width=11cm]{figure_ffn.png}
-	\caption{Darstellung eines einfachen neuronalen Netzes \parencite{oshea2015cnnintro}.}
+	\caption{Darstellung eines einfachen neuronalen Netzes \parencite{Oshea2015cnnintro}.}
 	\label{fig:ffn}
 \end{figure}
 
@@ -273,7 +280,7 @@ Eine entscheidende Weiterentwicklung der Diffusionsmodelle war die Text-Konditio
 % Stable Diffusion
 Ein besonders einflussreiches Diffusionsmodell ist \textbf{Stable Diffusion} \parencite{Rombach2022stablediffusion}. Die entscheidende Weiterentwicklung von Stable Diffusion liegt darin, dass die Diffusionsprozesse jeweils nur in einem niedrigdimensionalen latenten Raum stattfinden, bevor die Darstellungen wieder in hochauflösende Bilder umgewandelt werden (siehe Abbildung \ref{fig:stable-diffusion}). Dies ermöglicht es, die Komplexität des Modells zu reduzieren und gleichzeitig realistische Bilder zu generieren.
 
-\begin{figure}[h] % \vspace*{0.5cm}
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=7cm]{figure_stable-diffusion_vae.png}%
 	\includegraphics[width=8cm]{figure_stable-diffusion_latent.png}
@@ -287,7 +294,7 @@ Ein besonders einflussreiches Diffusionsmodell ist \textbf{Stable Diffusion} \pa
 \section{Semantische Datenaugmentation mit DA-Fusion} \label{sec:da-fusion}
 
 % Einleitung; Kurze Beschreibung, Versprechen der Methode
-In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine flexible, auf Stable Diffusion basierende Methode zur Datenaugmentation vorgestellt, die für diese Arbeit von besonderem Interesse ist. Der traditionelle Ansatz der Datenaugmentation, wie in Abschnitt \ref{subsec-data-augmentation} beschrieben, hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit von Modellen zu verbessern. Allerdings erfordert dieser Ansatz auch eine gute Intuition in Bezug auf den verwendeten Datensatz, um zu vermeiden, dass Transformationen gewählt werden, durch die Informationen verloren gehen, die für die Aufgabe des zu trainierenden Modells wichtig sind. Wenn beispielsweise Farbinformationen für die Klassifizierung von Blumen wichtig sind, könnte die Datenaugmentation durch zufällige Farbänderungen die Leistung des Modells verschlechtern. Ein weiteres Beispiel sind Objekte, die klein im Bild sind und durch zufällige Ausschnitte des Bildes aus der Sicht des Modells verschwinden können. DA-Fusion hingegen nutzt das Wissen eines vortrainierten Diffusionsmodelle, um den Bildinhalt semantisch zu verstehen und automatisch neue, realistische Variationen zu generieren.
+In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine flexible, auf Stable Diffusion basierende Methode zur Datenaugmentation vorgestellt, die für diese Arbeit von besonderem Interesse ist. Der traditionelle Ansatz der Datenaugmentation, wie in Abschnitt \ref{sec:data-augmentation} beschrieben, hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit von Modellen zu verbessern. Allerdings erfordert dieser Ansatz auch eine gute Intuition in Bezug auf den verwendeten Datensatz, um zu vermeiden, dass Transformationen gewählt werden, durch die Informationen verloren gehen, die für die Aufgabe des zu trainierenden Modells wichtig sind. Wenn beispielsweise Farbinformationen für die Klassifizierung von Blumen wichtig sind, könnte die Datenaugmentation durch zufällige Farbänderungen die Leistung des Modells verschlechtern. Ein weiteres Beispiel sind Objekte, die klein im Bild sind und durch zufällige Ausschnitte des Bildes aus der Sicht des Modells verschwinden können. DA-Fusion hingegen nutzt das Wissen eines vortrainierten Diffusionsmodelle, um den Bildinhalt semantisch zu verstehen und automatisch neue, realistische Variationen zu generieren.
 
 \begin{figure}[h]
 	\centering
@@ -382,15 +389,15 @@ Trotz der vielversprechenden Ergebnisse im unüberwachten Kontext, gibt es auch 
 		% So soll auch die Notwendigkeit des Hard-Negative Minings reduziert werden
 		% Trotzdem wird gezeigt, dass der resultierende Loss sowohl von hard-negatives wie auch hard-positives profitiert
 		% Verwendung des Mittelwertes der positiven Repräsentationen stabilisiert das Training und führt zu einer verbesserten Leistung
-In \parencite{Khosla2020supcon} wird \textbf{SupCon} vorgestellt, eine Weiterentwicklung der Verlustfunktion aus SimCLR, die das Contrastive Learning aufs überwachte Setting anpasst und mehrere positiv-Beispiele pro Anchor-Sample berücksichtigt. Im Gegensatz zu unüberwachten Methoden, die ein Anchor-Beispiel, ein positives Beispiel und viele negative Beispiele verwenden, kommen im Supervised Contrastive Learning auch viele positiv-Beispiele pro Batch zum Einsatz. Diese positiv-Beispiele werden nicht mehr als Augmentationen des Anchor-Samples generiert, sondern als Samples der gleichen Klasse herangezogen. Dadurch soll auch die Notwendigkeit des Hard-Negative Minings reduziert werden. Trotzdem wird gezeigt, dass der resultierende Loss sowohl von hard-negatives wie auch hard-positives profitiert. Die Verwendung des Mittelwertes der positiven Repräsentationen stabilisiert das Training und führt zu einer verbesserten Leistung.
+In \parencite{Khosla2021supcon} wird \textbf{SupCon} vorgestellt, eine Weiterentwicklung der Verlustfunktion aus SimCLR, die das Contrastive Learning aufs überwachte Setting anpasst und mehrere positiv-Beispiele pro Anchor-Sample berücksichtigt. Im Gegensatz zu unüberwachten Methoden, die ein Anchor-Beispiel, ein positives Beispiel und viele negative Beispiele verwenden, kommen im Supervised Contrastive Learning auch viele positiv-Beispiele pro Batch zum Einsatz. Diese positiv-Beispiele werden nicht mehr als Augmentationen des Anchor-Samples generiert, sondern als Samples der gleichen Klasse herangezogen. Dadurch soll auch die Notwendigkeit des Hard-Negative Minings reduziert werden. Trotzdem wird gezeigt, dass der resultierende Loss sowohl von hard-negatives wie auch hard-positives profitiert. Die Verwendung des Mittelwertes der positiven Repräsentationen stabilisiert das Training und führt zu einer verbesserten Leistung.
 
 % Generalized SCL (Kim2022)
 	% Label als Distribution
-Im überwachten Kontext bieten sich auch neue Möglichkeiten zur Weiterentwicklung von Contrastive Learning. In \parencite{Kim2022generalizedscl} wird \textbf{Generalized SCL} vorgestellt, eine Methode, die die Label-Informationen als Verteilung betrachtet. Anstatt die Klassenzugehörigkeit als harte Kategorie zu betrachten, wird die Unsicherheit der Labels berücksichtigt. Dies ermöglicht es dem Modell, die Repräsentationen der Beispiele besser zu lernen und die Generalisierungsfähigkeit zu verbessern.
+Im überwachten Kontext bieten sich auch neue Möglichkeiten zur Weiterentwicklung von Contrastive Learning. In \parencite{Kim2023generalizedsupcon} wird \textbf{Generalized SCL} vorgestellt, eine Methode, die die Label-Informationen als Verteilung betrachtet. Anstatt die Klassenzugehörigkeit als harte Kategorie zu betrachten, wird die Unsicherheit der Labels berücksichtigt. Dies ermöglicht es dem Modell, die Repräsentationen der Beispiele besser zu lernen und die Generalisierungsfähigkeit zu verbessern.
 
 % Supervised Contrastive Learning with Hard Negatives (Jiang2022)
 	% Zusätzliche Einschränkung des Negative Samplings für Auswahl von Hard Negatives (Nähe im Repräsentationsraums)
-Eine weitere Methode zur Verbesserung des Supervised Contrastive Learning ist \textbf{SCL with Hard Negatives} \parencite{Jiang2022sclhardnegatives}. Hier wird eine zusätzliche Einschränkung des Negative Samplings vorgenommen, um Hard Negatives zu selektieren. Diese sind Beispiele, die zwar unähnlich zum Anchor-Beispiel sind, aber dennoch nah genug im Repräsentationsraum, um die Repräsentationen zu verbessern. Diese Strategie hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit der Modelle zu verbessern.
+Eine weitere Methode zur Verbesserung des Supervised Contrastive Learning ist \textbf{SCL with Hard Negatives} \parencite{Jiang2024supconhardnegatives}. Hier wird eine zusätzliche Einschränkung des Negative Samplings vorgenommen, um Hard Negatives zu selektieren. Diese sind Beispiele, die zwar unähnlich zum Anchor-Beispiel sind, aber dennoch nah genug im Repräsentationsraum, um die Repräsentationen zu verbessern. Diese Strategie hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit der Modelle zu verbessern.
 
 \section{Forschungslücke} \label{sec:research-gap}
 
