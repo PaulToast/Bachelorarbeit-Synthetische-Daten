@@ -291,7 +291,7 @@ In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine flexible, auf Stable Di
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=16cm]{figure_da-fusion.png}
+	\includegraphics[width=16cm]{figure_da-fusion_vs_baseline.png}
 	\caption{Vergleich zwischen semantischen Augmentationen aus Baseline-Methode und DA-Fusion \parencite{Trabucco2023dafusion}.}
 	\label{fig:da-fusion}
 \end{figure}
@@ -300,7 +300,14 @@ In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine flexible, auf Stable Di
 Es wird zunächst die Methode Textual Inversion aus \parencite{Gal2022textualinversion} angewendet, um ein vortrainiertes Stable Diffusion-Modell auf den gegebenen Datensatz feinabzustimmen. Dazu wird für jedes Konzept bzw. für jede Klasse ein neues Text-Embedding $y$ als Platzhalter in das Modell integriert, das unter Verwendung von Trainings-Prompts wie "a photo of a <$y$>" und den zugehörigen Bilddaten trainiert wird. Entscheidend ist hier, dass nicht das ganze Diffusionsmodell neu trainiert wird, sondern lediglich neue wörter erlernt werden, welche die spezifischen Konzepte repräsentieren, sodass sich bei der Bildgenerierung weiterhin auf das vortrainierte semantische Wissens des Modells gestützt werden kann.
 
 % Prozess der Datengenerierung
-Anschließend können die Bilder augmentiert werden, indem ihnen eine geringe Menge an Rauschen hinzugefügt wird, welches dann wieder durch das feinabgestimmte Modell entfernt werden soll. Hier kommen wieder die selben Text-Prompts zum Einsatz. Auf diese Weise müssen keine völlig neuen Bilder generiert werden, denn die grundlegende Struktur wird durch die ursprünglichen Bilder vorgegeben.
+Anschließend können die Bilder augmentiert werden, indem ihnen eine geringe Menge an Rauschen hinzugefügt wird, welches dann durch das feinabgestimmte Modell wieder entfernt werden soll. Hier kommen die selben Text-Prompts zum Einsatz. Auf diese Weise müssen keine völlig neuen Bilder generiert werden, denn die grundlegende Struktur wird durch die ursprünglichen Bilder vorgegeben.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=16cm]{figure_da-fusion_architecture.png}
+	\caption{Überblick über den Prozess zur Datenaugmentation mit DA-Fusion \parencite{Trabucco2023dafusion}.}
+	\label{fig:da-fusion-process}
+\end{figure}
 
 % Insertion Timestep als Parameter
 Ein Vorteil von DA-Fusion ist die Möglichkeit, den Grad der Augmentation durch die Wahl des Insertion Timesteps zu steuern. Der Insertion Timestep bestimmt, wie weit in den Diffusionsprozess das Bild eingefügt wird und wie stark es dafür vorher verrauscht werden muss. Ein niedriger Timestep führt zu stärkeren Augmentationen, während ein hoher Timestep subtilere Variationen erzeugt.
@@ -326,7 +333,7 @@ In den folgenden Abschnitten wird genauer auf die Funktionsweise von sowohl unü
 \subsection{Unsupervised Contrastive Learning} \label{sec:unsup-contrastive}
 
 % Grundprinzipien, Funktionsweise (im Detail, technisch)
-Ob unüberwacht oder überwacht: Im Contrastive Learning soll die Distanz ähnlicher Beispiele in einem Repräsentationsraum minimiert und die Distanz unähnlicher Beispiele maximiert werden. Dazu bildet das Modell kontrastive Paare aus einem Anchor-Beispiel und verschiedenen positiv- oder negativ-Beispielen. Je nach Methode kann vor allem die Anzahl der positiv- und negativ-Beispiele pro Anchor variieren, wodurch sich auch die jeweiligen Loss-Funktionen unterscheiden.
+Ob unüberwacht oder überwacht: Im Contrastive Learning soll die Distanz ähnlicher Beispiele in einem Repräsentationsraum minimiert und die Distanz unähnlicher Beispiele maximiert werden. Dazu bildet das Modell kontrastive Paare aus einem Anchor-Beispiel und verschiedenen positiv- oder negativ-Beispielen. Je nach Methode kann vor allem die Anzahl der positiv- und negativ-Beispiele pro Anchor variieren, wodurch sich auch die jeweiligen Verlustfunktionen unterscheiden.
 
 % SimCLR (Chen2020) als prominentes Beispiel
 	% NT-Xent Loss (Normalized Temperature-scaled Cross-Entropy Loss)
@@ -340,9 +347,9 @@ Ob unüberwacht oder überwacht: Im Contrastive Learning soll die Distanz ähnli
 	% Aggressive Data Augmentation (aus der die 2 Ansichten entstehen) entscheidend, um die Robustheit der Repräsentationen zu verbessern
 	% Größere Batch Sizes und längere Trainingszeiten begünstigen die Lernfähigkeit des Modells
 	% Zudem sind Hard Negatives entscheidend für den Erfolg des Modells
-Das wohl prominenteste Beispiel für Contrastive Learning ist \textbf{SimCLR}, das in \parencite{Chen2020simclr} vorgestellt wurde. SimCLR verwendet den NT-Xent Loss (Normalized Temperature-scaled Cross-Entropy Loss), der die Ähnlichkeiten zwischen allen Paaren im Batch (auch \textit{Mini-Batch}) berücksichtigt, anstatt nur einzelne Triplets oder Paare. Jedes Beispiel wird dabei zweimal augmentiert, um zwei Ansichten zu erzeugen, welche als positives Paar für das jeweilige Beispiel dienen. Alle anderen Beispiele (bzw. dessen Ansichten) im Batch werden als negativ-Beispiele gesehen.
+Das wohl prominenteste Beispiel für Contrastive Learning in der visuellen Domäne ist \textbf{SimCLR}, das in \parencite{Chen2020simclr} vorgestellt wurde. SimCLR verwendet den NT-Xent Loss (Normalized Temperature-scaled Cross-Entropy Loss), der die Ähnlichkeiten zwischen allen Paaren im Batch berücksichtigt, anstatt nur einzelne Triplets oder Paare. Jedes Beispiel wird dabei zweimal augmentiert, um zwei Ansichten zu erzeugen, welche als positives Paar für das jeweilige Beispiel dienen. Alle anderen Beispiele (bzw. dessen Ansichten) im Batch werden als negativ-Beispiele gesehen.
 
-Die Eingabedaten werden durch ein Convolutional Neural Network (CNN) in eine hochdimensionale Repräsentation transformiert. Dieser Schritt wird auch als \textit{Feature Extraction} bezeichnet. SimCLR verwendet anschließend einen sogenannten \textit{Projection Head}, der die encodierten Repräsentationen weiter transformiert, um einen Repräsentationsraum zu erzeugen, der für die Unterscheidung der Beispiele geeignet ist. In diesem Representationsraum werden die Ähnlichkeitswerte der Paare berechnet, um den Loss zu bestimmen.
+Die Eingabedaten werden durch ein Convolutional Neural Network (CNN) in eine latente Repräsentation transformiert. Dieser Schritt wird auch als \textit{Feature Extraction} bezeichnet. SimCLR verwendet anschließend einen sogenannten \textit{Projection Head}, der die encodierten Repräsentationen weiter transformiert, um einen Repräsentationsraum zu erzeugen, der für die Unterscheidung der Beispiele geeignet ist. In diesem Representationsraum werden die Ähnlichkeitswerte der Paare berechnet, um den Fehler zu bestimmen.
 
 Dafür wird die Kosinus-Ähnlichkeit $s_{i,j}$ der Paare $z_i$ und $z_j$ berechnet:
 
@@ -351,7 +358,7 @@ Dafür wird die Kosinus-Ähnlichkeit $s_{i,j}$ der Paare $z_i$ und $z_j$ berechn
 	\label{eq:cosine-similarity}
 \end{equation}
 
-Der Loss ergibt sich dann aus der Berechnung des Softmax über die Ähnlichkeiten aller Paare im Batch, skaliert mit einem Temperaturparameter, um die Unterscheidung zwischen positiven und negativen Paaren hervorzuheben.
+Der Fehler ergibt sich dann aus der Berechnung des Softmax über die Ähnlichkeiten aller Paare im Batch, skaliert mit einem Temperaturparameter, um die Unterscheidung zwischen positiven und negativen Paaren hervorzuheben.
 
 Durch die Verwendung aggressiver Datenaugmentation zur Erzeugung der zwei Ansichten wird die Robustheit der Repräsentationen verbessert. Größere Batch Sizes und längere Trainingszeiten begünstigen die Lernfähigkeit des Modells. Besonders die Wahl von \textit{Hard Negatives}, also von Paaren, welche ähnliche Konzepte darstellen, aber sehr unterschiedlich aussehen, hat sich als entscheidend für den Erfolg des Modells erwiesen.
 
@@ -360,76 +367,78 @@ Durch die Verwendung aggressiver Datenaugmentation zur Erzeugung der zwei Ansich
 	% Verwendet Bilder, die aus dem selben Prompt generiert wurden, als positive Beispiele voneinander
 	% Kann mit den richtigen Einstellungen auch mit Training nur auf synthetischen Daten die Leistung von SimCLR übertreffen
 	% Noch bessere Ergebnisse bei Einbeziehung von Textsupervision
+Eine neuere Variante von Contrastive Learning ist \textbf{StableRep} \parencite{Tian2023stablerep}. Diese Methode verwendet synthetische Daten, die von Diffusionsmodellen generiert wurden, insbesondere von Stable Diffusion. Dabei werden alle Bilder, die aus dem selben Prompt generiert wurden, als positive Beispiele voneinander betrachtet. Es hat sich gezeigt, dass StableRep mit den richtigen Einstellungen auch mit Training nur auf synthetischen Daten die Leistung von SimCLR übertreffen kann. Noch bessere Ergebnisse werden erzielt, wenn Textsupervision in das Training einbezogen wird.
 
 \subsection{Supervised Contrastive Learning} \label{sec:sup-contrastive}
 
 % Erweiterung der Contrastive Learning-Methode durch Verwendung von Label-Informationen
+Trotz der vielversprechenden Ergebnisse im unüberwachten Kontext, gibt es auch im überwachten Setting vermehrt Interesse an Contrastive Learning. Hierbei wird die Label-Information der Daten genutzt, um die Repräsentationen der Beispiele zu verbessern. Im Gegensatz zu unüberwachten Methoden, die auf der Unterscheidung von Instanzen basieren, zielen überwachte Methoden darauf ab, die Klassenzugehörigkeit der Beispiele zu berücksichtigen.
 
 % SupCon (Khosla2020)
-	% Weiterentwicklung der Loss-Funktion, die mehrere positiv-Beispiele pro Anchor-Sample berücksichtigt und das Contrastive Learning auf das Supervised Setting anpasst
+	% Weiterentwicklung der Verlustfunktion, die mehrere positiv-Beispiele pro Anchor-Sample berücksichtigt und das Contrastive Learning auf das Supervised Setting anpasst
 	% Eine rein naive Anpassung wird aber um einige wünschenswerte Anpassungen erweitert
 		% Es wird nicht ein Anchor, ein positiv-Beispiel und viele negativ-Beispiele verwendet; stattdessen kommen im Supervised Contrastive Learning auch viele positiv-Beispiele pro Batch zum Einsatz
 		% Die *vielen* positiv-Beispiele werden zudem nicht mehr als Augmentationen des Anchor-Samples generiert, sondern als Samples der gleichen Klasse herangezogen
 		% So soll auch die Notwendigkeit des Hard-Negative Minings reduziert werden
 		% Trotzdem wird gezeigt, dass der resultierende Loss sowohl von hard-negatives wie auch hard-positives profitiert
 		% Verwendung des Mittelwertes der positiven Repräsentationen stabilisiert das Training und führt zu einer verbesserten Leistung
+In \parencite{Khosla2020supcon} wird \textbf{SupCon} vorgestellt, eine Weiterentwicklung der Verlustfunktion aus SimCLR, die das Contrastive Learning aufs überwachte Setting anpasst und mehrere positiv-Beispiele pro Anchor-Sample berücksichtigt. Im Gegensatz zu unüberwachten Methoden, die ein Anchor-Beispiel, ein positives Beispiel und viele negative Beispiele verwenden, kommen im Supervised Contrastive Learning auch viele positiv-Beispiele pro Batch zum Einsatz. Diese positiv-Beispiele werden nicht mehr als Augmentationen des Anchor-Samples generiert, sondern als Samples der gleichen Klasse herangezogen. Dadurch soll auch die Notwendigkeit des Hard-Negative Minings reduziert werden. Trotzdem wird gezeigt, dass der resultierende Loss sowohl von hard-negatives wie auch hard-positives profitiert. Die Verwendung des Mittelwertes der positiven Repräsentationen stabilisiert das Training und führt zu einer verbesserten Leistung.
 
 % Generalized SCL (Kim2022)
 	% Label als Distribution
+Im überwachten Kontext bieten sich auch neue Möglichkeiten zur Weiterentwicklung von Contrastive Learning. In \parencite{Kim2022generalizedscl} wird \textbf{Generalized SCL} vorgestellt, eine Methode, die die Label-Informationen als Verteilung betrachtet. Anstatt die Klassenzugehörigkeit als harte Kategorie zu betrachten, wird die Unsicherheit der Labels berücksichtigt. Dies ermöglicht es dem Modell, die Repräsentationen der Beispiele besser zu lernen und die Generalisierungsfähigkeit zu verbessern.
 
 % Supervised Contrastive Learning with Hard Negatives (Jiang2022)
 	% Zusätzliche Einschränkung des Negative Samplings für Auswahl von Hard Negatives (Nähe im Repräsentationsraums)
-...
+Eine weitere Methode zur Verbesserung des Supervised Contrastive Learning ist \textbf{SCL with Hard Negatives} \parencite{Jiang2022sclhardnegatives}. Hier wird eine zusätzliche Einschränkung des Negative Samplings vorgenommen, um Hard Negatives zu selektieren. Diese sind Beispiele, die zwar unähnlich zum Anchor-Beispiel sind, aber dennoch nah genug im Repräsentationsraum, um die Repräsentationen zu verbessern. Diese Strategie hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit der Modelle zu verbessern.
 
 \section{Forschungslücke} \label{sec:research-gap}
 
-% Rückverweis auf Anwendungsfall
-
 % Einleitung für den vorzustellenden Ansatz
-...
+In den vorherigen Abschnitten wurden verschiedene Methoden zur Verbesserung der Generalisierungsfähigkeit und Robustheit von Modellen vorgestellt. Während die synthetische Datengenerierung bzw. Datenaugmentation und das Contrastive Learning vielversprechende Ergebnisse erzielen, gibt es noch einige Herausforderungen, die es zu bewältigen gilt. Im Folgenden sollen diese Herausforderungen genauer beleuchtet und ein neuer Ansatz vorgestellt werden, der in dieser Arbeit untersucht wird.
 
 \subsection{Herausforderungen bei der Generierung synthetischer Daten} \label{sec:challenges-synt-data}
 
-% Herausforderungen bei der Generierung synthetischer Daten
-	% Komplexe Objekte
-	% Feine Unterschiede zwischen Klassen
-	% Wenig Variation
-	% (Detaillierte Meta-Informationen, Multimodalität)
-	% Risiko der Fehlklassifikation von OOD-Daten
+% Anwendungsfall, Praktikum, ...
+Der Anwendungsfall, der schon in der Einleitung angesprochen wurde, stellt eine besondere Herausforderung für die Generierung synthetischer Daten dar:
 
-% Welche Anforderungen ergeben sich?
-	% Hohe Kontrolle über die Generierung der synthetischen Daten; Genauigkeit
-	% Trotzdem Verbesserung der Generalisierungsfähigkeit
-	% Verbesserung der OOD-Detektion
-...
+% Herausforderungen
+\begin{itemize}
+	\item Die Objekte weisen teilweise eine sehr hohe \textbf{Komplexität} auf, etwa bei Motoren oder Generatoren mit vielen Details. Auch moderne Methoden zur Bildgenerierung können daran scheitern, diese Details korrekt zu erlenrn und zu reproduzieren \textemdash insbesondere, wenn nur wenige Beispielbilder gegeben sind.
+	\item Es gibt oft nur \textbf{feine Unterschiede} zwischen den Klassen, die es zu berücksichtigen gilt. Sind die generierten Daten nicht akkurat genug, kann es zu Fehlklassifikationen kommen.
+	\item Auf Grund des Multiview-Setups haben die Bilder nur \textbf{wenig Variation}, vor allem in den Hintergründen. Auch die Objekte selbst sind zwar aus verschiedenen Perspektiven aufgenommen, bieten aber pro Klasse nicht viel Variation in Bezug auf die Beschaffenheit, die Farbe, usw.
+\end{itemize}
+
+% Anforderungen
+Es ergeben sich also hohe Anforderungen an die Generierung der synthetischen Daten. Einerseits muss die Genauigkeit der generierten Daten gewährleistet sein, um die Klassifikation der Modelle nicht zu beeinträchtigen. Trotzdem muss genügend Variation ermöglicht werden, um die Generalisierungsfähigkeit der Modelle zu verbessern.
 
 \subsection{Synthetische Daten als negativ-Beispiele im Contrastive Learning} \label{sec:synt-ood-contrastive}
 
-% Anschließend an die Herausforderungen bei der Datengenerierung
-% Frage: Könnte Contrastive Learning eine Möglichkeit bieten, auch aus mangelhaften Daten zu lernen?
-	% Dürfen nicht zu entfernt sein: CL lernt vor allem aus HARD Negatives
-		% SimCLR profitierte besonders von hard negatives, um gute Repräsentationen zu lernen
-	% Sind NEAR OOD-Daten gute Hard Negatives?
-		% Gilt es, zu untersuchen
-		% Near OOD-Negatives sind nah genug an den echten Daten, um die Repräsentationen zu verbessern, aber dennoch OOD genug, um die Distanz zu maximieren
-% Forschungslücke; Was wurde schon untersucht? Wo ist die Lücke?
-	% StableRep: Synthetische Diffusion-Daten im Contrastive Learning, aber nur normale ID-Beispiele
-		% Stable Diffusion "off-the-shelf" ist nicht akkurat genug
-			% Objekte zu komplex
-			% Zu ähnlich; feine Unterschiede
-		% Auch die gleichbleibenden Hintergründe sind fatal
-		% Außerdem: Unsupervised
-	% SCL mit Hard Negatives: Verfeinertes Negative Sampling, aber ohne synthetische Daten
-		% Gute Strategie für Negative-Sampling
-		% Aber keine synthetischen Daten
-	% Was wenn: Anstatt Negatives aus Nähe im Darstellungsraum zu samplen, Near OOD-Augmentationen aus Anchor-Klasse?
+% Herausforderungen -> Forschungslücke ?
+Aus den spezifischen Herausforderungen bei der Generierung synthetischer Daten, zusammen mit den Besonderheiten des Contrastive Learning, ergibt sich eine interessante Forschungslücke: Ist es möglich, auch aus \textit{mangelhaften} synthetischen Daten zu lernen, wenn sie ausschließlich als negativ-Beispiele im Contrastive Learning verwendet werden? Genauer, lässt sich so die Leistung eines Modells bei der Klassifikation von echten Daten verbessern und gleichzeitig die Robustheit gegenüber OOD-Daten erhöhen?
+
+% SimCLR profitierte besonders von hard negatives, um gute Repräsentationen zu lernen
+	% Synt Daten dürfen also nicht zu entfernt sein: CL lernt vor allem aus HARD Negatives
+Die bisherigen Erfolge von Contrastive Learning, insbesondere von SimCLR, zeigen, dass das Modell besonders von Hard Negatives profitiert \parencite{Chen2020simclr}, also von unähnlichen Beispielen, die aber nur schwer zu unterscheiden sind. Auch \parencite{Jiang2024supconhardnegatives} baut auf dieser Erkenntnis auf, jedoch ohne Verwendung von synthetischen Daten. Die synthetischen Daten dürften also nicht zu weit entfernt von den echten Daten sein, um die Repräsentationen zu verbessern. Sie könnten daher als \textit{Near OOD}-Beispiele bezeichnet werden, wobei sie noch OOD genug sein müssen, um die Distanz zwischen den In-Distribution und OOD-Daten zu maximieren. Ob sich diese synthetischen Near OOD-Daten tatsächlich als gute Hard Negatives herausstellen, wird in dieser Arbeit untersucht.
+
+% StableRep: Synthetische Diffusion-Daten im Contrastive Learning, aber nur normale ID-Beispiele
+	% Stable Diffusion "off-the-shelf" ist nicht akkurat genug
+		% Objekte zu komplex
+		% Zu ähnlich; feine Unterschiede
+	% Auch die gleichbleibenden Hintergründe sind fatal
+	% Außerdem: Unsupervised
+
+% Was wenn: Anstatt Negatives aus Nähe im Darstellungsraum zu samplen, Near OOD-Augmentationen aus Anchor-Klasse?
 ...
 
 \subsection{Integration von DA-Fusion und Supervised Contrastive Learning} \label{sec:da-fusion-scl}
 
 % DA-Fusion zur Generierung von ID- und Near OOD-Daten
+
 % Einfach den strength-Parameter der DA-Fusion-Augmentationen erhöhen
+
 % Bei der Generierung die Maske verwenden, damit die Hintergründe gleich bleiben
+
 % Supervised Contrastive Learning mit eigener Sampling-Strategie für Near OOD-Negatives
 
 % Potenzielle Vorteile
