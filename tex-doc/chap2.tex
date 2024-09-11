@@ -17,7 +17,7 @@ Eine allgemeine Definition für maschinelles Lernen bietet \parencite{Mitchell19
 Ein Computerprogramm soll aus Erfahrung $E$ in Bezug auf eine Klasse von Aufgaben $T$ und Leistungsmaß $P$ lernen, wenn sich seine Leistung bei Aufgaben $T$, gemessen durch $P$, mit Erfahrung $E$ verbessert.
 \end{quote}
 
-Die Erfahrung $E$ besteht dabei aus einer Menge von Trainingsdaten, die etwa aus Eingabe-Ausgabe-Paaren bestehen. Die Aufgaben $T$ können sehr vielfältig sein, von einfachen Klassifikations- und Regressionsaufgaben bis hin zu komplexen Problemen wie Spracherkennung oder autonomen Fahren. Das Leistungsmaß $P$ gibt an, wie gut das Modell die Aufgaben $T$ löst, und kann z.B. die Genauigkeit (engl. \textit{accuracy}) einer Klassifikation oder die mittlere quadratische Abweichung bei einer Regression sein.
+Die Erfahrung $E$ besteht dabei aus einer Menge von Trainingsdaten, die etwa aus Eingabe-Ausgabe-Paaren bestehen. Die Aufgaben $T$ können sehr vielfältig sein, von einfachen Klassifikations- und Regressionsaufgaben bis hin zu komplexen Problemen wie Spracherkennung oder autonomen Fahren. Das Leistungsmaß $P$ gibt an, wie gut das Modell die Aufgaben $T$ löst, und kann z.B. der Anteil der korrekt klassifizierten Beispiele (Accuracy).
 
 \subsection{Überwachtes und unüberwachtes Lernen} \label{sec:sup-unsup}
 
@@ -39,9 +39,12 @@ In der Praxis werden oft auch hybride Ansätze genutzt, wie das semi-überwachte
 Das Wissen, das ein Modell aus den Trainingsdaten lernt, wird in Form von Merkmalen (engl. \textit{features}) repräsentiert. Diese Merkmale können einfache Konzepte wie Kanten oder Farben sein, oder komplexere Konzepte wie Gesichter oder Objekte. Unter Deep Learning versteht man eine tiefe, hierarchische Vernetzung dieser Konzepte, sodass komplexere Konzepte auf simpleren Konzepten aufbauen können. Visuell veranschaulicht entsteht ein Graph mit vielen Ebenen \parencite{Goodfellow2016deeplearning}. Deep Learning ist daher eine spezialisierte Unterkategorie des maschinellen Lernens, in der künstlichen neuronale Netzen mit mehreren Schichten verwendet werden, um eine hierarchische Repräsentation von Daten zu ermöglichen. Jede Schicht transformiert die Eingabedaten in eine etwas abstraktere Darstellung.
 
 % CNN als Beispiel eines Deep Learning-Modells
-\begin{figure}
+Ein Beispiel für ein Deep Learning-Modell ist das Convolutional Neural Network (CNN), das speziell für die Verarbeitung von Bildern entwickelt wurde. Ein CNN besteht aus mehreren Schichten (siehe Abbildung \ref{fig:cnn}), darunter Convolutional-Schichten, Pooling-Schichten und Fully-Connected-Schichten. Die Convolutional-Schichten enthalten Filter, die über das Bild gefaltet werden, um Merkmale wie Kanten, Texturen oder Formen zu extrahieren. Die Pooling-Schichten reduzieren die Dimensionalität der Daten, indem sie die Größe der Merkmalskarten verringern. Die Fully-Connected-Schichten dienen dazu, die extrahierten Merkmale zu klassifizieren oder zu regieren.
+
+\begin{figure}[]
 	\centering
-	%\includegraphics{}
+	\includegraphics[width=14cm]{figure_cnn.png} % https://towardsdatascience.com/a-comprehensive-guide-to-convolutional-neural-networks-the-eli5-way-3bd2b1164a53
+	\caption{Aufbau eines Convolutional Neural Networks (CNN)}
 	\label{fig:cnn}
 \end{figure}
 
@@ -53,7 +56,7 @@ Deep Learning hat in den letzten Jahren erhebliche Fortschritte gemacht und find
 % Einleitung und grundlegender Aufbau
 Während die rasante Entwicklung von Deep Learning vor allem in den vergangenen Jahren spürbar geworden ist, sind die zugrundeliegenden Algorithmen und Konzepte schon seit Jahrzehnten bekannt \parencite{Zhou2021machinelearning}. Dabei bildet das künstliche neuronale Netz (KNN) die Grundlage der allermeisten Deep-Learning-Modelle. Es ist inspiriert von der Struktur und Funktionsweise des menschlichen Gehirns und besteht aus einer Vielzahl von miteinander verbundenen Knoten (Neuronen), die in Schichten organisiert sind. Die Struktur eines neuronalen Netzes besteht aus einer Eingabeschicht, einer oder mehreren versteckten Schichten (engl. \textit{hidden layers}) und einer Ausgabeschicht, wie in Abbildung \ref{fig:ffn} dargestellt.
 
-\begin{figure}[h]
+\begin{figure}[]
 	\centering
 	\includegraphics[width=11cm]{figure_ffn.png}
 	\caption{Darstellung eines einfachen neuronalen Netzes \parencite{oshea2015cnnintro}.}
@@ -74,7 +77,7 @@ Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Mo
 \end{figure}
 
 % Aktivierung allgemein
-Das Neuron berechnet dann die gewichtete Summe aller Eingaben und falls ein bestimmter Schwellenwert (engl. \textit{bias}) überschritten wurde, wird das Neuron aktiviert:
+Das Neuron berechnet dann die gewichtete Summe aller Eingaben und falls ein bestimmter Schwellenwert (engl. \textit{bias}) $\theta$ überschritten wurde, wird das Neuron aktiviert:
 
 \begin{equation}
 	o_j = \phi \left( \sum_{i=1}^{n} w_i x_i - \theta_j \right)
@@ -99,7 +102,7 @@ Während die Sigmoid-Funktion allerdings nur für binäre Klassifikationen geeig
 % Wie neuronale Netze lernen; Loss-Funktionen, Backpropagation, Stochastic Gradient Descent
 Im Training fließen die Eingabedaten in einer Vorwärtsausbreitung (engl. \textit{forward propagation}) durch das Netzwerk, um die Ausgabe zu berechnen. Es wird dann eine geeignete Verlustfunktion (engl. \textit{loss function}) angewendet, um den Fehler des Modells zu berechnen. Das Ziel des Trainings ist es, die Gewichtungen der Neuronen so anzupassen, dass der Fehler minimiert wird.
 
-Diese Optimierung geschieht durch eine Rückwärtsausbreitung (engl. \textit{backpropagation}), welche den berechneten Fehler rückwärts durch das Netz propagiert, um die Gewichte und Schwellenwerte um einen geringen Wert in die Richtung anzupassen, die den Fehler minimieren würde. Dieser Prozess wird in der Regel mit dem Stochastic Gradient Descent (SGD) Algorithmus durchgeführt, der die Gewichtungen iterativ anpasst, um den Fehler zu minimieren.
+Diese Optimierung geschieht durch eine Rückwärtsausbreitung (engl. \textit{backpropagation}), welche den berechneten Fehler rückwärts durch das Netz propagiert, um die Gewichte und Schwellenwerte um einen geringen Wert in die Richtung anzupassen, die den Fehler minimieren würde. Um zu berechnen, in welche Richtung die Gewichte angepasst werden sollen, wird der Gradient der Verlustfunktion berechnet. Dieser Gradient zeigt an, wie stark sich der Verlust ändert, wenn sich die Gewichte ändern. Die Anpassung der Gewichte erfolgt dann in kleinen Schritten entlang des Gradienten, um den Fehler zu minimieren. Dieser Prozess wird als Stochastic Gradient Descent (SGD) bezeichnet, da immer nur ein kleiner, zufällig ausgewählter Teil der Trainingsdaten (ein sogenannter Batch) verwendet wird, um den Gradienten zu berechnen und die Gewichte anzupassen. \parencite{Goodfellow2016deeplearning}
 
 % Outro; Vielseitigkeit, Anwendungsbereiche
 
@@ -114,58 +117,72 @@ Die Erkennung von OOD-Daten ist ein wichtiges Forschungsgebiet im maschinellen L
 \subsection{Datenaugmentation und Generalisierung} \label{sec:data-augmentation}
 
 % Definition und Zweck
-Datenaugmentation ist ein wichtiger Schritt im Training von neuronalen Netzen, insbesondere bei begrenzten Datensätzen. Sie bezieht sich auf die künstliche Erweiterung des Trainingsdatensatzes durch Anwenden von Transformationen auf die vorhandenen Daten. Diese Transformationen können z.B. Rotation, Skalierung, Verschiebung, Spiegelung, Helligkeitsanpassung oder Rauschen sein. Das Ziel der Datenaugmentation ist es, das Modell robuster gegenüber Variationen in den Eingabedaten zu machen und die Generalisierungsfähigkeit zu verbessern.
+Der Erfolg von Deep Learning-Modellen ist auf die Verfügbarkeit großer Datensätze angewiesen, die für das Training verwendet werden. Um auf zuvor ungesehen Daten generalisieren zu können, ist es wichtig, dass das Modell eine Vielzahl von Beispielen lernt, die die zugrundeliegenden Muster und Konzepte der Daten repräsentieren. Das Modell kann aber auch robuster gegenüber Variationen in den Eingabedaten gemacht werden, indem es mit leicht veränderten Versionen der Trainingsdaten trainiert wird. Dieser Prozess wird als Datenaugmentation bezeichnet.
+
+Konkret werden unterschiedliche Transformationen auf die vorhandenen Daten angewendet, z.B. Rotation, Skalierung, Verschiebung, Spiegelung, Helligkeitsanpassung oder Rauschen. Die Transofrmationen werden meist mit zufälligen Parametern durchgeführt, um eine Vielzahl von Variationen zu erzeugen. Das Ziel ist es, das Modell zu zwingen, die zugrundeliegenden Muster der Daten zu lernen, anstatt sich auf spezifische Merkmale zu verlassen, die nur in den Trainingsdaten vorhanden sind \parencite{}. Einige Beispiele für Datenaugmentationstechniken sind in Abbildung \ref{fig:data-augmentation} dargestellt. % Shorten2019survey
 
 % Beispiele
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=16cm]{figure_data_augmentation.png}
+	\includegraphics[width=14cm]{figure_data_augmentation.png}
 	\caption{Beispiele für unterschiedliche Datenaugmentationstechniken und Kombinationen. \parencite{}} % https://medium.com/lunit/photometric-data-augmentation-in-projection-radiography-bed3ae9f55c3
+	\label{fig:data-augmentation}
 \end{figure}
 
 \section{Synthetische Daten} \label{sec:synt-data}
 
 % Anschließend an Datenaugmentation; Problematik der Datensammlung
-
-% Abgrenzung synthetischer Datengenerierung zu Datenaugmentation
-
+Datenaugmentation kann an ihre Grenzen stoßen, wenn die verfügbaren Trainingsdaten nicht ausreichen oder nicht die notwendige Vielfalt aufweisen, um die Generalisierungsfähigkeit des Modells zu verbessern. In solchen Fällen können synthetische Daten eine nützliche Alternative oder Ergänzung zu echten Daten sein. Anstatt einfache Transformationen auf die Eingangsdaten anzuwenden, werden völlig neue Datenpunkte generiert, die die zugrundeliegenden Muster der realen Daten nachahmen.
 % (Vorteile und Herausforderungen synthetischer Daten)
 
 % Fortschritte generativer Modellierung, Einleitung folgender Abschnitte
-
-Während die Verfügbarkeit großer Datensätze für das Training von neuronalen Netzen ein entscheidender Faktor für den Erfolg von Deep Learning-Modellen ist, ist es oft schwierig, solche Datensätze zu sammeln, insbesondere in Domänen wie der Medizin oder der Robotik, wo die Daten rar und teuer sind \parencite{}. In solchen Fällen können synthetische Daten eine nützliche Alternative oder Ergänzung zu echten Daten sein.
-
-Synthetische Daten sind künstlich erzeugte Daten, welche die zugrundeliegenden Muster der realen Daten nachahmen. Sie können durch Simulation, Generierung oder Transformation von echten Daten erstellt werden.
-
-...
+Während synthetische Daten auch manuell mit Hilfe von Simulationssoftware erstellt werden können, hat insbesondere die Entwicklung der generativen Modellierung in den letzten Jahren zu einer neuen Ära der synthetischen Datenerzeugung geführt. Diese Modelle sind in der Lage, komplexe Datenstrukturen zu lernen und realistische Daten zu generieren, die von echten Daten kaum zu unterscheiden sind. In den folgenden Abschnitten werden einige der wichtigsten generativen Modelle vorgestellt, die in dieser Arbeit eine Rolle spielen.
+	% NeRF?
 
 \subsection{Variational Autoencoder} \label{sec:vae}
 
-Ein Autoencoder ist eine spezielle Art von KI-Modell, das darauf ausgelegt ist, Daten effizient zu komprimieren und dann wieder zu rekonstruieren. Es besteht aus zwei Hauptkomponenten: \parencite{Foster2020gendeeplearning}
+Ein Autoencoder ist eine spezielle Art von KI-Modell, das entwickelt wurde, um Daten effizient zu komprimieren und anschließend zu rekonstruieren. Es wurde im Wesentlichen in \parencite{Hinton2006autoencoder} vorgestellt, die Grundideen gehen jedoch bis in die 1980er Jahre zurück, z.B. \parencite{Rumelhart1986backpropagation}, wo auch das Backpropagation-Verfahren zur Optimierung neuronaler Netze beschrieben wurde.
+
+Autoencoder bestehen aus zwei Hauptkomponenten \parencite{Foster2020gendeeplearning}:
 
 \begin{itemize}
-	\item einem \textbf{Encoder}-Netzwerk, das hochdimensionale Eingabedaten in einem niederdimensionalen Darstellungsvektor komprimiert, und
-	\item einem \textbf{Decoder}-Netzwerk, das einen gegebenen Darstellungsvektor zurück in den ursprünglichen hochdimensionalen Raum umwandelt
+	\item einem \textbf{Encoder}, der hochdimensionale Eingabedaten in einem niederdimensionalen Darstellungsvektor komprimiert, und
+	\item einem \textbf{Decoder}, der einen gegebenen Darstellungsvektor zurück in den ursprünglichen hochdimensionalen Raum umwandelt
 \end{itemize}
 
-Der Darstellungsvektor ist eine Kompression des Originalbilds in einen niedriger dimensionalen latenten Raum, wodurch es sich beim Autoencoder um eine Form des \textit{Representation Learning} handelt.
+Der Darstellungsvektor repräsentiert das Originalbild als Punkt in einem mehrdimensionalen latenten Raum, wobei jede Dimension eine bestimmte Eigenschaft des Bildes kodiert. Es handelt sich beim Autoencoder deshalb um eine Form des \textit{Representation Learning}.
 
 Das Training eines Autoencoders erfolgt durch Minimierung des Rekonstruktionsfehlers, der die Differenz zwischen den ursprünglichen Eingabedaten und den rekonstruierten Ausgaben beschreibt. Eine gängige Verlustfunktion hierfür ist der \textit{Mean Squared Error} (MSE):
 
 \begin{equation}
-	Loss=\frac{1}{n}\sum_{i=1}^n (x_i-\hat{x}_i)^2
+	Loss=\frac{1}{n}\sum_{i=1}^n (x_i-\hat{x}_i)^2,
 	\label{eq:loss-mse}
 \end{equation}
 
-Ein besonders interessantes Versprechen des Autoencoders ist, dass man theoretisch durch die Wahl eines beliebigen Punkts im latenten Raum neue Bilder erzeugen kann, indem man diesen Punkt durch den Decoder schickt, da der Decoder gelernt hat, wie man Punkte im latenten Raum in realistische Bilder umwandelt. \parencite{Foster2020gendeeplearning} In der herkömmlichen Form hat der Autoencoder in Bezug auf diese Aufgabe allerdings einige Schwachstellen.
+wobei $x_i$ die Eingabedaten und $\hat{x}_i$ die rekonstruierten Ausgaben sind.
 
-Der \textbf{Variational Autoencoder} (VAE) adressiert diese Schwachstellen und verwendet probabilistische Methoden, um die Datenverteilung im latenten Raum zu modellieren; Anstatt einen einzelnen, festen Punkt im latenten Raum für jede Eingabe zu lernen, wird eine Verteilung gelernt, aus der die latenten Variablen für jede Eingabe stammen. Dadurch entsteht ein strukturierteer und kontinuierlicher latenter Raum, der es ermöglicht, neue, realistische Daten zu generieren. % \parencite{Kingma2013}?
+% Weiterentwicklung durch VAE
+Für die synthetische Datengenerierung sind Autoencoders deshalb interessant, weil man theoretisch durch die Wahl eines beliebigen Punkts im latenten Raum neue Bilder erzeugen kann, indem man diesen Punkt durch den Decoder schickt, da der Decoder gelernt hat, wie man Punkte im latenten Raum in realistische Bilder umwandelt. \parencite{Foster2020gendeeplearning} In der herkömmlichen Form hat der Autoencoder in Bezug auf diese Aufgabe allerdings einige Schwachstellen. So lernt er einen festen Punkt im latenten Raum für jede Eingabe, was zu einem diskreten und unstrukturierten latenten Raum führt. Denn wenn zwei Punkte im latenten Raum nahe beieinander liegen, bedeutet das nicht unbedingt, dass die entsprechenden Bilder ähnlich sind, was die Wahl eines Punktes im latenten Raum für die Generierung neuer Daten erschwert. Da keine Modellierung der Datenverteilung im latenten Raum stattfindet, können dann auch keine realistischen Daten generiert werden, die nicht in den Trainingsdaten enthalten sind.
 
-...
+In \parencite{Kingma2022vae} wird der \textbf{Variational Autoencoder} (VAE) vorgestellt. Er adressiert die Schwachstellen des Autoencoders und verwendet probabilistische Methoden, um die Datenverteilung im latenten Raum zu modellieren; An Stelle eines einzelnen, festen Punkt im latenten Raum wird für jede Eingabe eine Verteilung gelernt, aus der die latenten Variablen stammen. Dadurch entsteht ein strukturierteer und kontinuierlicher latenter Raum, der es ermöglicht, neue, realistische Daten zu generieren.
+
+% Funktionsweise VAE
+Der Encoder des VAEs berechnet einerseits den Mittelwert und die Standardabweichung der latenten Verteilung, und erzeugt außerdem eine zufällige Stichprobe aus dieser Verteilung. Der Decoder nimmt diese Stichprobe und rekonstruiert die Eingabedaten. Neben dem Rekonstruktionsfehler wird die Verlustfunktion des VAEs auch durch den Kullback-Leibler-Divergenzterm (KL-Divergenz) erweitert, der die Ähnlichkeit der gelernten Verteilung zu einer Standardnormalverteilung misst:
+
+\begin{equation}
+	D_{KL}(p(x)||q(x)) = \sum_x p(x) \log \frac{p(x)}{q(x)},
+	\label{eq:kl-divergence}
+\end{equation}
+
+wobei $p(x)$ die tatsächliche Verteilung und $q(x)$ die approximierte Verteilung ist. Die Gesamtverlustfunktion des VAEs ist dann die Summe aus Rekonstruktionsfehler und KL-Divergenz.
+
+% Vorteile und Anwendungen
+
+% Nachteile und Herausforderungen
 
 \subsection{Generative Adversarial Networks} \label{sec:gan}
 
-Ein Generative Adversarial Network (GAN) ist ein KI-Modell, das in \parencite{} vorgestellt wurde. GANs bestehen aus zwei neuralen Netzwerken, die gegeneinander antreten, um realistische synthetische Daten zu erzeugen. Diese Technologie hat sich als äußerst mächtig in der Bild- und Datengenerierung erwiesen.
+Ein Generative Adversarial Network (GAN) ist ein KI-Modell, das in \parencite{Goodfellow2014gan} vorgestellt wurde. GANs bestehen aus zwei neuralen Netzwerken, die gegeneinander antreten, um realistische synthetische Daten zu erzeugen. Diese Technologie hat sich als äußerst mächtig in der Bild- und Datengenerierung erwiesen.
 
 \begin{figure}[h]
 	\includegraphics{figure_gan.pdf}
@@ -173,44 +190,43 @@ Ein Generative Adversarial Network (GAN) ist ein KI-Modell, das in \parencite{} 
 	\label{fig:gan}
 \end{figure}
 
-Die Architektur eines GANs besteht aus zwei Hauptkomponenten:
+Auch GANs bestehen aus zwei Hauptkomponenten, die allerdings eine andere Funktionsweise haben als die des Autoencoders:
 
 \begin{itemize}
 	\item \textbf{Generator}: Das generative Netzwerk nimmt Zufallsrauschen als Eingabe und erzeugt daraus Daten, die möglichst realistisch wirken sollen. Der Generator versucht, die wahre Datenverteilung zu imitieren und realistische Beispiele zu erstellen.
 	\item \textbf{Diskriminator}: Das diskriminative Netzwerk erhält sowohl echte Daten aus dem Trainingsdatensatz als auch die vom Generator erzeugten Daten. Seine Aufgabe ist es, zwischen echten und künstlichen Daten zu unterscheiden. Der Diskriminator gibt eine Wahrscheinlichkeit aus, dass die Eingabedaten echt sind.
 \end{itemize}
 
-Der Trainingsprozess eines GANs ist als minimax-Spiel zwischen dem Generator und dem Diskriminator formuliert:
+Der Trainingsprozess eines GANs ist in Abbildung \ref{fig:gan} dargestellt und kann als minimax-Spiel zwischen dem Generator und dem Diskriminator formuliert werden:
 
 \begin{enumerate}[]
 	\item \textbf{Diskriminator-Training}: Der Diskriminator wird trainiert, um echte Daten von generierten Daten zu unterscheiden. Dies geschieht durch eine binäre Klassifikation („echt“ oder „synthetisch“). Der Diskriminator passt seine Gewichte an, um die Unterscheidung zu verbessern.
 	\item \textbf{Generator-Training}: Der Generator wird trainiert, um den Diskriminator zu täuschen. Dies geschieht, indem der Generator seine erzeugten Daten durch den Diskriminator laufen lässt und die Rückmeldung (Gradienten) des Diskriminators verwendet, um seine eigenen Parameter zu optimieren. Ziel ist es, den Diskriminator zu überlisten, sodass er die generierten Daten als echt klassifiziert.
 \end{enumerate}
 
-% Hohe Qualität
-% Felixibilität bei Eingangsdaten
-% Aber instabiles Training
-% Modus-Kollaps
-% Hoher Rechenaufwand
-...
+% Details zum Training
+Im Detail wird der Generator durch Minimierung der Log-Wahrscheinlichkeit, dass der Diskriminator die generierten Daten als echt klassifiziert, trainiert. Der Diskriminator wird durch Maximierung dieser Wahrscheinlichkeit trainiert. Dies führt zu einem Gleichgewichtszustand, in dem der Generator realistische Daten erzeugt, die den echten Daten ähneln, und der Diskriminator nicht in der Lage ist, zwischen echten und generierten Daten zu unterscheiden. % ...
 
-\subsection{Diffusion Models} \label{sec:diffusion}
 
-% Einleitung
-In den letzten Jahren haben sogenannte Diffusion Models für einen enormen Sprung in der Bildgenerierung, insbesondere der Text-to-Image (T2I) Generierung, gesorgt. Das Konzept der Diffusion soll hier deshalb einmal genauer erläutert werden.
+% Vorteile & Nachteile
+Besonders in der Bildgenerierung haben GANs eine hohe Qualität erreicht und sind in der Lage, realistische Bilder zu erzeugen, die von echten Bildern kaum zu unterscheiden sind. GANs sind auch flexibel in Bezug auf die Eingangsdaten und können mit verschiedenen Datentypen wie Bildern, Texten oder Audiodaten arbeiten. Dennoch haben GANs auch einige Nachteile. Beispielsweise kann das Training eines GANs sehr instabil sein, da es schwierig ist, ein Gleichgewicht zwischen Generator und Diskriminator zu finden. Es kann auch zu Modus-Kollaps kommen, bei dem der Generator nur eine begrenzte Anzahl von Beispielen erzeugt, da der Diskriminator diese als besonders realistisch bewertet. Der Generator lernt dann, nur diese Beispiele zu reproduzieren, anstatt die gesamte Datenverteilung zu lernen. Darüber hinaus sind GANs sehr rechenaufwändig und erfordern leistungsstarke Hardware, um effizient trainiert zu werden.
 
-% Konzept der Diffusion
-Unter Diffusion versteht man den Prozess der langsamen Vermischung von Partikeln oder Informationen über die Zeit. So beschreibt die Diffusionsgleichung in der Physik die zeitliche Entwicklung der Dichte von Teilchen, die sich zufällig bewegen. Im maschinellen Lernen fand das Konzept erstmals in \parencite{} Anwendung. Es entstand eine neue Klasse von generativen Deep Learning-Modellen, die Diffusion Models, welche im Trainingsprozess schrittweise die Struktur der Eingabedaten durch das Hinzufügen von Rauschen auflösen und anschließend darauf trainiert werden, das ursprüngliche Bild aus dem verrauschten Bild zu rekonstruieren.
+\subsection{Diffusionsmodelle} \label{sec:diffusion-models}
+
+% Einleitung, Konzept der Diffusion
+Sogenannte Diffusionsmodelle haben in den letzten Jahren zu einem enormen Fortschritt in der Bildgenerierung, insbesondere der Text-to-Image (T2I)-Generierung, geführt. Diese Modelle basieren auf dem Konzept der Diffusion, das aus der Physik stammt. Es beschreibt den Prozess der langsamen Vermischung von Teilchen oder Informationen über die Zeit. Im maschinellen Lernen fand das Konzept erstmals in \parencite{SohlDickstein2015diffusionmodels} Anwendung. Seitdem haben sich Diffusionsmodelle als eine neue Klasse von generativen Deep-Learning-Modellen etabliert, die im Trainingsprozess die Struktur der Eingabedaten durch Hinzufügen von Rauschen schrittweise auflösen und anschließend darauf trainiert werden, aus dem verrauschten Bild das ursprüngliche Bild zu rekonstruieren.
 
 % Vorwärts- und Rückwärtsdiffusion als Markov-Ketten
-Das Training von Diffusion Models teilt sich somit in zwei Phasen auf, die Vorwärts- und die Rückwärtsdiffusion. Beide Phasen ...
+Das Training von Diffusionsmodelle teilt sich somit in zwei Phasen auf, die Vorwärts- und die Rückwärtsdiffusion, welche beide als Markov-Ketten modelliert werden können. Markov-Ketten sind stochastische Prozesse, bei denen die zukünftige Entwicklung eines Systems nur von seinem aktuellen Zustand abhängt.
+
+In der Vorwärtsdiffusion wird das Bild schrittweise durch ein Modell, das Rauschen hinzufügt, in ein verrauschtes Bild umgewandelt. Die Wahrscheinlichkeitsdichte des verrauschten Bildes wird durch die Produktregel der bedingten Wahrscheinlichkeiten berechnet:
 
 \begin{equation}
 	q \left( x^{(0 \dots T)} \right) = q \left(x^{(0)}\right)\prod_{t=1}^T q \left(x^{(t)}|x^{(t-1)}\right)
 	\label{eq:forward-diffusion}
 \end{equation}
 
-In der Rückwärtsdiffusion geht das Bild durch ein Modell, welches selbst nur Rauschen generiert. Es ist die Vorhersage darüber, welches Rauschen vom Eingang entfernt werden soll, um das gewünschte entrauschte Bild zu erhalten.
+In der Rückwärtsdiffusion wird das Modell darauf trainiert, das verrauschte Bild schrittweise in das ursprüngliche Bild zurückzuwandeln. Die Wahrscheinlichkeitsdichte des ursprünglichen Bildes wird durch die Produktregel der bedingten Wahrscheinlichkeiten berechnet:
 
 \begin{equation}
 	p \left( x^{(0 \dots T)} \right) = p \left(x^{(T)}\right)\prod_{t=1}^T p \left(x^{(t-1)}|x^{(t)}\right)
@@ -219,16 +235,16 @@ In der Rückwärtsdiffusion geht das Bild durch ein Modell, welches selbst nur R
 
 Anders als bei GANs gibt es keine direkten adversarialen Optimierungsmechanismen, die zu einem Ungleichgewicht führen können. Es wird stattdessen explizit die Wahrscheinlichkeitsdichte zwischen den realen Daten und den erzeugten Daten minimiert, was zu einem robusteren und stabileren Trainingsprozess führt.
 
-% DALL-E für Text-to-Image
-Eine entscheidende Weiterentwicklung der Diffusion Models war die Text-Konditionierung des generativen Prozesses. In \parencite{} wurde DALL-E vorgestellt, ein Modell, das es ermöglicht, Bilder aus Textbeschreibungen zu generieren. DALL-E ...
+% DALL-E 2 für Text-to-Image
+Eine entscheidende Weiterentwicklung der Diffusionsmodelle war die Text-Konditionierung des generativen Prozesses. In \parencite{Ramesh2021dalle} wurde DALL-E vorgestellt, ein Modell, das es ermöglicht, Bilder aus Textbeschreibungen zu generieren. % ...
 
 % Stable Diffusion
-...
+... \parencite{Rombach2022stablediffusion}
 
 \section{Semantische Datenaugmentation mit DA-Fusion} \label{sec:da-fusion}
 
 % Einleitung; Kurze Beschreibung, Versprechen der Methode
-In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine flexible, auf Stable Diffusion basierende Methode zur Datenaugmentation vorgestellt, die für diese Arbeit von besonderem Interesse ist. Der traditionelle Ansatz der Datenaugmentation, wie in Abschnitt \ref{subsec-data-augmentation} beschrieben, hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit von Modellen zu verbessern. Allerdings erfordert dieser Ansatz auch eine gute Intuition in Bezug auf den verwendeten Datensatz, um zu vermeiden, dass Transformationen gewählt werden, durch die Informationen verloren gehen, die für die Aufgabe des zu trainierenden Modells wichtig sind. Wenn beispielsweise Farbinformationen für die Klassifizierung von Blumen wichtig sind, könnte die Datenaugmentation durch zufällige Farbänderungen die Leistung des Modells verschlechtern. Ein weiteres Beispiel sind Objekte, die klein im Bild sind und durch zufällige Ausschnitte des Bildes aus der Sicht des Modells verschwinden können. DA-Fusion hingegen nutzt das Wissen eines vortrainierten Diffusion Models, um den Bildinhalt semantisch zu verstehen und automatisch neue, realistische Variationen zu generieren.
+In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine flexible, auf Stable Diffusion basierende Methode zur Datenaugmentation vorgestellt, die für diese Arbeit von besonderem Interesse ist. Der traditionelle Ansatz der Datenaugmentation, wie in Abschnitt \ref{subsec-data-augmentation} beschrieben, hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit von Modellen zu verbessern. Allerdings erfordert dieser Ansatz auch eine gute Intuition in Bezug auf den verwendeten Datensatz, um zu vermeiden, dass Transformationen gewählt werden, durch die Informationen verloren gehen, die für die Aufgabe des zu trainierenden Modells wichtig sind. Wenn beispielsweise Farbinformationen für die Klassifizierung von Blumen wichtig sind, könnte die Datenaugmentation durch zufällige Farbänderungen die Leistung des Modells verschlechtern. Ein weiteres Beispiel sind Objekte, die klein im Bild sind und durch zufällige Ausschnitte des Bildes aus der Sicht des Modells verschwinden können. DA-Fusion hingegen nutzt das Wissen eines vortrainierten Diffusionsmodelle, um den Bildinhalt semantisch zu verstehen und automatisch neue, realistische Variationen zu generieren.
 
 \begin{figure}[h]
 	\centering
@@ -238,7 +254,7 @@ In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine flexible, auf Stable Di
 \end{figure}
 
 % Fine-tuning des SD-Modells
-Es wird zunächst die Methode Textual Inversion \parencite{} angewendet, um ein vortrainiertes Stable Diffusion-Modell auf den gegebenen Datensatz feinabzustimmen. Dazu wird für jedes neue Konzept bzw. für jede neue Klasse ein Pseudo-Token $y$ in das Modell integriert, der unter Verwendung von Trainings-Prompts wie "a photo of a <$y$>" und den zugehörigen Bilddaten trainiert wird.
+Es wird zunächst die Methode Textual Inversion aus \parencite{Gal2022textualinversion} angewendet, um ein vortrainiertes Stable Diffusion-Modell auf den gegebenen Datensatz feinabzustimmen. Dazu wird für jedes neue Konzept bzw. für jede neue Klasse ein Pseudo-Token $y$ in das Modell integriert, der unter Verwendung von Trainings-Prompts wie "a photo of a <$y$>" und den zugehörigen Bilddaten trainiert wird.
 
 % Prozess der Datengenerierung
 Anschließend können aus den echten Bildern neue Augmentationen generiert werden, indem den Bildern eine geringe Menge an Rauschen hinzugefügt wird, welches dann wieder durch das feinabgestimmte Modell entfernt werden soll. Hier kommen wieder die selben Text-Prompts zum Einsatz. Auf diese Weise bleibt die grundlegende Struktur der Bilder erhalten, während gleichzeitig neue, semantisch sinnvolle Variationen und Details erzeugt werden.

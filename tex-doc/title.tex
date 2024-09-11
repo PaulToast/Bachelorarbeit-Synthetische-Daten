@@ -7,9 +7,9 @@
   % Blocksatz für die Titelseite deaktivieren
   \raggedright
   % Logos rechtsbündig setzen
-  \hfill\includegraphics[width=6cm]{logo_haw.jpg}\\
+  \hfill\includegraphics[width=5.5cm]{logo_haw.jpg}\\
   \vspace{0.5cm}
-  \hfill\includegraphics[width=5.6cm]{logo_fraunhofer-ipk.png}\\
+  \hspace{\fill}\advance\rightskip1.5mm\includegraphics[width=5.0cm]{logo_fraunhofer-ipk.png}\\
 
   \vspace{5cm}
 
@@ -58,11 +58,13 @@
     \,\rule{9mm}{1mm}\\[1.5mm]
 	
 	% Anschrift HAW
-    \textbf{HOCHSCHULE FÜR ANGEWANDTE}\\
-    \textbf{WISSENSCHAFTEN HAMBURG}\\
-    Department Medientechnik\\
-    Finkenau 35\\
-    22081 Hamburg
+	\begin{tabular}{@{} p{0.75\linewidth} ll} %{p{0.3\linewidth}p{0.3\linewidth}}
+    \textbf{HOCHSCHULE FÜR ANGEWANDTE} & \textbf{FRAUNHOFER-INSTITUT FÜR}\\
+    \textbf{WISSENSCHAFTEN HAMBURG} & \textbf{PRODUKTIONSANLAGEN UND}\\
+    Department Medientechnik & \textbf{KONSTRUKTIONSTECHNIK IPK}\\
+    Finkenau 35 & Pascalstraße 8–9\\
+    22081 Hamburg & 10587 Berlin
+	\end{tabular}\\
   \end{minipage}
 \end{titlepage}
 % Setzt Geometrie wieder auf Standardwerte zurück
