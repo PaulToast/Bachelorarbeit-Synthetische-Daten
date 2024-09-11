@@ -91,15 +91,11 @@
 % eine Beispieldatei für ein Literaturverzeichnis
 \addbibresource{library.bib}
 
-% für die Erzeugung der Grafiken in chap3.tex; wenn Sie PGF/TikZ nicht
-% verwenden wollen, können Sie diese Zeilen entfernen
-\usepackage{tikz}
-% Zusatzbibliotheken für TikZ, die in den genannten Beispielen verwendet
-% werden
-\usetikzlibrary{calc,intersections,angles,3d}
+% Erzeugung von Grafiken mit PGF/TikZ
+%\usepackage{tikz}
+%\usetikzlibrary{calc,intersections,angles,3d}
 
-% für die Erzeugung des Codeblocks in chap3.tex; wenn in Ihrer Arbeit keine
-% Codeblöcke vorkommen, können Sie diese Zeilen entfernen
+% Codeblöcke
 \usepackage{listings}
 % Anpassung des Erscheinungsbildes des Codeblocks; mehr dazu in der
 % Dokumentation des Pakets "listings"
@@ -118,7 +114,7 @@
     aboveskip=\bigskipamount,
 }
 \lstset{style=mystyle}
-% damit es "Codeblock" und nicht "Listing" heißt
+% Damit es "Codeblock" und nicht "Listing" heißt
 \renewcommand{\lstlistingname}{Codeblock}
 
 % für die Verlinkung innerhalb des PDF-Dokuments, für PDF-Lesezeichen und
@@ -132,5 +128,5 @@
 
 % Metadaten des PDF-Dokumentes; setzen Sie hier Ihren eigenen Namen sowie den
 % Titel Ihrer Arbeit ein
-\hypersetup{pdfauthor={Prof. Dr. Edmund Weitz}}
-\hypersetup{pdftitle={Handreichung zur Formatierung von Bachelorarbeiten}}
+\hypersetup{pdfauthor={Paul Hofmann}}
+\hypersetup{pdftitle={Contrastive Learning mit Stable Diffusion-basierter Datenaugmentation}}
