@@ -71,7 +71,9 @@ Während die rasante Entwicklung von Deep Learning vor allem in den vergangenen 
 %\end{figure}
 
 % Einzelnes Neuron im Detail
-\begin{figure}[t]
+Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Modellierung des biologischen Neurons, das erstmals 1943 von Warren McCulloh und Walter Pitts vorgestellt wurde \parencite{Zhou2021machinelearning}. In Abbildung \ref{fig:neuron} ist das Modell dargestellt.
+
+\begin{figure}[h]
 	\centering
 	\vspace*{4mm}
 	%\includegraphics[width=12cm]{figure_mp-neuron.png} % https://commons.wikimedia.org/w/index.php?curid=224561
@@ -80,8 +82,6 @@ Während die rasante Entwicklung von Deep Learning vor allem in den vergangenen 
 	\caption{Das McCulloch-Pitts-Modell eines Neurons.}
 	\label{fig:neuron}
 \end{figure}
-
-Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Modellierung des biologischen Neurons, das erstmals 1943 von Warren McCulloh und Walter Pitts vorgestellt wurde \parencite{Zhou2021machinelearning}. In Abbildung \ref{fig:neuron} ist das Modell dargestellt.
 
 Jedes Neuron empfängt eine Reihe von Eingaben $x_{1 \dots n}$, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es zugehörige Gewichtungen (Weights) $w_{1j \dots nj}$, welche die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingaben auf das Neuron $j$ bestimmen. Das Neuron berechnet dann die gewichtete Summe $net_j$ aller Eingaben und falls ein bestimmter Schwellenwert (Bias) $\theta$ überschritten wurde, wird das Neuron aktiviert. Die Aktivierung $o_j$ des Neurons kann dementsprechend folgendermaßen beschrieben werden:
 
@@ -116,7 +116,7 @@ Es gibt eine Reihe von sogenannten Hyperparametern, welche einen großen Einflus
 % CNN als Beispiel eines Deep Learning-Modells
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=14cm]{figure_cnn.png} % https://towardsdatascience.com/a-comprehensive-guide-to-convolutional-neural-networks-the-eli5-way-3bd2b1164a53
+	\includegraphics[width=\textwidth]{figure_cnn.png} % https://towardsdatascience.com/a-comprehensive-guide-to-convolutional-neural-networks-the-eli5-way-3bd2b1164a53
 	\caption{Aufbau eines Convolutional Neural Networks (CNN)}
 	\label{fig:cnn}
 \end{figure}
@@ -144,7 +144,7 @@ Bei der Datenaugmentation werden unterschiedliche Transformationen auf die vorha
 % Beispiele
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=14cm]{figure_data_augmentation.png}
+	\includegraphics[width=\textwidth]{figure_data_augmentation.png}
 	\caption{Einige Beispiele für unterschiedliche Datenaugmentationstechniken\\
 	und Kombinationen, die in \parencite{Chen2020simclr} verwendet wurden.}
 	\label{fig:data-augmentation}
@@ -159,15 +159,15 @@ Wenn ein KI-Modell mit Daten konfrontiert wird, die außerhalb des Bereichs lieg
 Idealerweise sollte ein neuronales Netz höhere Softmax-Wahrscheinlichkeiten für In-Distribution-Daten und niedrigere Wahrscheinlichkeiten für OOD-Daten ausgeben. Tatsächlich sind die Wahrscheinlichkeiten für OOD-Daten fast immer sehr hoch, meist reicht aber der Abstand zwischen In-Distribution und OOD-Daten aus, um einen Schwellenwert festzulegen und OOD-Instanzen frühzeitig zu identifizieren \parencite{Hendrycks2018baselineooddetection}.
 
 % Andere Ansätze
-Oftmals ist die OOD-Detektion aber weniger trivial, etwa wenn sich In-Distribution und OOD-Daten sehr ähnlich sind. Auch im Falle von Overfitting können OOD-Daten mit hohen Wahrscheinlichkeiten falsch klassifiziert werden, wenn sie in irgendeiner Weise ähnliche Merkmale aufweisen. Es wird daher stets nach alternativen Ansätzen gesucht, um die OOD-Detektion zu verbessern. Ein simples Beispiel ist das Training eines binären Klassifikators, der zwischen In-Distribution und OOD-Daten unterscheidet.
+Oftmals ist die OOD-Detektion aber weniger trivial, etwa wenn sich In-Distribution und OOD-Daten sehr ähnlich sind. Es wird daher stets nach alternativen Ansätzen gesucht, um die OOD-Detektion zu verbessern. In \parencite{Hendrycks2018baselineooddetection} wird dabei ein Klassifikator erweitert, um Rekonstruktionen der Eingabedaten zu erstellen und den Fehler zwischen den Original- und Rekonstruktionsdaten zu messen. Ein hoher Rekonstruktionsfehler kann auf OOD-Daten hinweisen. Auch das Temperature Scaling \parencite{Guo2017tempscaling}, welches die Softmax-Wahrscheinlichkeiten kalibriert, kann zusammen mit kleinen Störungen in den Eingabedaten für zuverlässigere Wahrscheinlichkeitswerte und bessere OOD-Detektion sorgen \parencite{Liang2020odin}.
 
 \section{Synthetische Daten} \label{sec:synt-data}
 
 % Anschließend an Datenaugmentation; Problematik der Datensammlung
-Datenaugmentation kann an ihre Grenzen stoßen, wenn die verfügbaren Trainingsdaten nicht ausreichen oder nicht die notwendige Vielfalt aufweisen, um die Generalisierungsfähigkeit des Modells zu verbessern. In solchen Fällen können synthetische Daten eine nützliche Alternative oder Ergänzung zu echten Daten sein. Anstatt einfache Transformationen auf die Eingangsdaten anzuwenden, werden völlig neue Datenpunkte generiert, die die zugrundeliegenden Muster der realen Daten nachahmen.
+Datenaugmentation wurde bereits als eine Möglichkeit vorgestellt, um die Menge und Vielfalt der Trainingsdaten zu erhöhen und damit die Generalisierungsfähigkeit des Modells zu verbessern. Allerdings kann die bloße Augmentation an ihre Grenzen stoßen, wenn die verfügbaren Trainingsdaten selbst nicht genügend Vielfalt aufweisen. In solchen Fällen können synthetische Daten eine nützliche Ergänzung sein. Anstatt einfache Transformationen auf die Eingangsdaten anzuwenden, werden völlig neue Datenpunkte generiert, die die zugrundeliegenden Muster der realen Daten nachahmen.
 
 % Fortschritte in generativer Modellierung durch Deep Learning
-Während synthetische Daten auch manuell mit Hilfe von Simulationssoftware erstellt werden können, hat insbesondere die Entwicklung der generativen Modellierung in den letzten Jahren zu einer neuen Ära der synthetischen Datenerzeugung geführt. Diese Modelle sind in der Lage, komplexe Datenstrukturen zu lernen und realistische Daten zu generieren, die von echten Daten kaum zu unterscheiden sind. Diese Entwicklung ist vor allem auf die Fortschritte im Deep Learning zurückzuführen \parencite{Foster2020gendeeplearning}: Als Hierarchie der Mustererkennung können Deep Learning-Modelle das hohe Maß an bedingter Abhängigkeiten zwischen Merkmalen in den Daten lernen und reproduzieren. Und als Form des Representation Learning erleichtert Deep Learning die Generierung von Daten, indem nur eine geeignete niedrigdimensionale Repräsentation gewählt werden muss, welches das Modell wieder zu einer realistischen Dateninstanz umwandeln soll.
+Während synthetische Daten auch manuell mit Hilfe von Simulationssoftware erstellt werden können, hat insbesondere die Entwicklung der generativen Modellierung in den letzten Jahren zu einer neuen Ära der synthetischen Datenerzeugung geführt. Diese Modelle sind in der Lage, komplexe Datenstrukturen zu lernen und realistische Daten zu generieren, die von echten Daten kaum zu unterscheiden sind. Diese Entwicklung ist vor allem auf die Fortschritte im Deep Learning zurückzuführen \parencite{Foster2020gendeeplearning}: Als Hierarchie der Mustererkennung können Deep Learning-Modelle das hohe Maß bedingter Abhängigkeiten zwischen Merkmalen in den Daten lernen und reproduzieren. Und als Form des Representation Learning erleichtert Deep Learning die Generierung von Daten, indem nur eine geeignete niedrigdimensionale Repräsentation gewählt werden muss, welches das Modell wieder zu einer realistischen Dateninstanz umwandeln soll.
 
 % Einleitung folgender Abschnitte
 Es sollen nun einige der wichtigsten generativen Modelle vorgestellt werden, um eine Grundlage für den aktuellen Stand der synthetischen Datengenerierung zu schaffen.
@@ -238,7 +238,7 @@ Auch GANs bestehen aus zwei Hauptkomponenten, die allerdings eine andere Funktio
 Der Trainingsprozess eines GANs ist in Abbildung \ref{fig:gan} dargestellt und kann als minimax-Spiel zwischen dem Generator und dem Diskriminator formuliert werden: Der Diskriminator wird trainiert, um echte Daten von generierten Daten zu unterscheiden. Dies geschieht durch eine binäre Klassifikation („echt“ oder „synthetisch“). Der Diskriminator passt seine Gewichte an, um die Unterscheidung zu verbessern. Der Generator wird trainiert, um den Diskriminator zu täuschen. Dies geschieht, indem der Generator seine erzeugten Daten durch den Diskriminator laufen lässt und die Rückmeldung (Gradienten) des Diskriminators verwendet, um seine eigenen Parameter zu optimieren. Ziel ist es, den Diskriminator zu überlisten, sodass er die generierten Daten als echt klassifiziert.
 
 \begin{figure}[h]
-	\includegraphics{figure_gan.pdf}
+	\includegraphics[width=\textwidth]{figure_gan.pdf}
 	\caption{Überblick über die GAN-Struktur. Quelle: Google for Developers}
 	% https://developers.google.com/machine-learning/gan/gan_structure?hl=de
 	\label{fig:gan}
@@ -307,8 +307,7 @@ Ein besonders einflussreiches Diffusionsmodell ist \textbf{Stable Diffusion} \pa
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=7cm]{figure_stable-diffusion_vae.png}%
-	\includegraphics[width=8cm]{figure_stable-diffusion_latent.png}
+	\includegraphics[width=\textwidth]{figure_stable-diffusion_merged.png}
 	% https://medium.com/@steinsfu/stable-diffusion-clearly-explained-ed008044e07e
 	\caption{Darstellung des Vorwärts- und Rückwärtsdiffusion in Stable Diffusion:\\
 		Die	Diffusionsprozesse werden auf die latenten Darstellungen der Bilder\\
@@ -323,7 +322,7 @@ In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine flexible, auf Stable Di
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=16cm]{figure_da-fusion_vs_baseline.png}
+	\includegraphics[width=\textwidth]{figure_da-fusion_vs_baseline.png}
 	\caption{Vergleich zwischen semantischen Augmentationen aus Baseline-Methode und DA-Fusion \parencite{Trabucco2023dafusion}.}
 	\label{fig:da-fusion}
 \end{figure}
@@ -336,7 +335,7 @@ Anschließend können die Bilder augmentiert werden, indem ihnen eine geringe Me
 
 \begin{figure}
 	\centering
-	\includegraphics[width=16cm]{figure_da-fusion_architecture.png}
+	\includegraphics[width=\textwidth]{figure_da-fusion_architecture.png}
 	\caption{Überblick über den Prozess zur Datenaugmentation mit DA-Fusion \parencite{Trabucco2023dafusion}.}
 	\label{fig:da-fusion-process}
 \end{figure}
