@@ -4,7 +4,7 @@
   title     = {Deep Learning},
   year      = {2016},
   note      = {\url{http://www.deeplearningbook.org}},
-  groups    = {Grundlagen},
+  groups    = {Grundlagen, Basics},
 }
 
 @Misc{Kumari2023customdiffusion,
@@ -23,7 +23,7 @@
   title     = {Natural Language Processing mit Transformern},
   year      = {2023},
   isbn      = {978-3-96010-713-2},
-  groups    = {Grundlagen},
+  groups    = {Grundlagen, Basics},
 }
 
 @Misc{Keshtmand2022contrastood,
@@ -93,7 +93,7 @@
   title     = {Machine Learning},
   year      = {2021},
   isbn      = {978-981-15-1967-3},
-  groups    = {Grundlagen},
+  groups    = {Grundlagen, Basics},
 }
 
 @Book{Foster2020gendeeplearning,
@@ -101,7 +101,7 @@
   publisher = {O'Reilly},
   title     = {Generatives Deep Learning},
   year      = {2020},
-  groups    = {Grundlagen},
+  groups    = {Grundlagen, Basics},
 }
 
 @Book{Mitchell1997machinelearning,
@@ -109,7 +109,7 @@
   publisher = {McGraw Hill},
   title     = {Machine Learning},
   year      = {1997},
-  groups    = {Grundlagen},
+  groups    = {Grundlagen, Basics},
 }
 
 @Misc{Lu2024syntheticdatareview,
@@ -301,7 +301,7 @@
   year          = {2015},
   archiveprefix = {arXiv},
   eprint        = {1511.08458},
-  groups        = {Grundlagen},
+  groups        = {Convolutional Neural Networks},
   primaryclass  = {cs.NE},
   url           = {https://arxiv.org/abs/1511.08458},
 }
@@ -390,12 +390,63 @@
   url           = {https://arxiv.org/abs/2206.00384},
 }
 
+@Misc{LeCun1989cnnbackprop,
+  author    = {LeCun, Yann and Boser, Bernhard and Denker, John and Henderson, Donnie and Howard, R. and Hubbard, Wayne and Jackel, Lawrence},
+  title     = {Handwritten Digit Recognition with a Back-Propagation Network},
+  year      = {1989},
+  booktitle = {Advances in Neural Information Processing Systems},
+  editor    = {D. Touretzky},
+  groups    = {Convolutional Neural Networks},
+  publisher = {Morgan-Kaufmann},
+  url       = {https://proceedings.neurips.cc/paper_files/paper/1989/file/53c3bce66e43be4f209556518c2fcb54-Paper.pdf},
+  volume    = {2},
+}
+
+@Misc{Srivastava2014dropout,
+  author  = {Nitish Srivastava and Geoffrey Hinton and Alex Krizhevsky and Ilya Sutskever and Ruslan Salakhutdinov},
+  title   = {Dropout: A Simple Way to Prevent Neural Networks from Overfitting},
+  year    = {2014},
+  groups  = {Grundlagen, Overfitting},
+  journal = {Journal of Machine Learning Research},
+  number  = {56},
+  pages   = {1929--1958},
+  url     = {http://jmlr.org/papers/v15/srivastava14a.html},
+  volume  = {15},
+}
+
+@Article{Shorten2019dataaugmentation,
+  author  = {Shorten, Connor and Khoshgoftaar, Taghi},
+  journal = {Journal of Big Data},
+  title   = {A survey on Image Data Augmentation for Deep Learning},
+  year    = {2019},
+  month   = {07},
+  volume  = {6},
+  doi     = {10.1186/s40537-019-0197-0},
+  groups  = {Grundlagen, Datenaugmentation},
+}
+
+@Misc{Hendrycks2018baselineooddetection,
+  author        = {Dan Hendrycks and Kevin Gimpel},
+  title         = {A Baseline for Detecting Misclassified and Out-of-Distribution Examples in Neural Networks},
+  year          = {2018},
+  archiveprefix = {arXiv},
+  eprint        = {1610.02136},
+  groups        = {OOD-Detection},
+  primaryclass  = {cs.NE},
+  url           = {https://arxiv.org/abs/1610.02136},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}
 
 @Comment{jabref-meta: grouping:
 0 AllEntriesGroup:;
 1 StaticGroup:Fraunhofer-IPK\;0\;1\;0x99ccccff\;\;\;;
 1 StaticGroup:Grundlagen\;0\;1\;0x0000ffff\;\;\;;
+2 StaticGroup:Basics\;0\;1\;0x0000ffff\;\;\;;
+2 StaticGroup:Convolutional Neural Networks\;0\;0\;0x0000e5ff\;\;\;;
+2 StaticGroup:Overfitting\;0\;1\;0x0000ffff\;\;\;;
+2 StaticGroup:Datenaugmentation\;0\;1\;0x0000ffff\;\;\;;
+2 StaticGroup:OOD-Detection\;0\;1\;0x0000ffff\;\;\;;
 1 StaticGroup:Synthetische Daten\;0\;1\;0x4d8080ff\;\;\;;
 2 StaticGroup:Diffusion Models\;0\;1\;0x008080ff\;\;\;;
 2 StaticGroup:DALL-E\;0\;1\;0x008080ff\;\;\;;
