@@ -115,4 +115,5 @@ if __name__ == "__main__":
         else:
             dist = "id"
         class_name = dataset.classes[abs(label)]
-        image.save(f"{args.output_dir}/{i}_{class_name}_{dist}.png")
+        os.makedirs(os.path.abspath(os.path.join(args.output_dir, class_name)), exist_ok=True)
+        image.save(f"{args.output_dir}/{class_name}/{i}_{dist}.png")

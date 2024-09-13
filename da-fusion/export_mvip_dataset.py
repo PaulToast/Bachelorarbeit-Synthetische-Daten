@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from semantic_aug.datasets import MVIPDataset
+from semantic_aug.datasets.mvip import MVIPDataset
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Export MVIPDataset.")
@@ -55,7 +55,9 @@ if __name__ == "__main__":
         examples_per_class=args.examples_per_class,
         image_size=(args.resolution, args.resolution),
     )
+    print("length: ", len(dataset))
 
     for i, (image, label) in enumerate(dataset):
         class_name = dataset.class_names[label]
-        image.save(f"{args.output_dir}/{i}_{class_name}.png")
+        os.makedirs(os.path.abspath(os.path.join(args.output_dir, class_name)), exist_ok=True)
+        image.save(f"{args.output_dir}/{class_name}/{i}.png")
