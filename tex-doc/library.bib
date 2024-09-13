@@ -73,7 +73,7 @@
   year          = {2023},
   archiveprefix = {arXiv},
   eprint        = {2302.07944},
-  groups        = {Synthetische Daten},
+  groups        = {DA-Fusion},
   primaryclass  = {id='cs.CV' full_name='Computer Vision and Pattern Recognition' is_active=True alt_name=None in_archive='cs' is_general=False description='Covers image processing, computer vision, pattern recognition, and scene understanding. Roughly includes material in ACM Subject Classes I.2.10, I.4, and I.5.'},
 }
 
@@ -162,7 +162,7 @@
   year          = {2021},
   archiveprefix = {arXiv},
   eprint        = {2102.12092},
-  groups        = {DALL-E},
+  groups        = {Diffusion Models},
   primaryclass  = {cs.CV},
   url           = {https://arxiv.org/abs/2102.12092},
 }
@@ -318,7 +318,7 @@
   volume  = {313},
   doi     = {10.1126/science.1127647},
   eprint  = {https://www.science.org/doi/pdf/10.1126/science.1127647},
-  groups  = {Synthetische Daten},
+  groups  = {(Variational) Autoencoder},
   url     = {https://www.science.org/doi/abs/10.1126/science.1127647},
 }
 
@@ -332,7 +332,7 @@
   pages   = {533--536},
   volume  = {323},
   doi     = {10.1038/323533a0},
-  groups  = {Synthetische Daten},
+  groups  = {(Variational) Autoencoder},
   refid   = {Rumelhart1986},
   url     = {https://doi.org/10.1038/323533a0},
 }
@@ -343,7 +343,7 @@
   year          = {2022},
   archiveprefix = {arXiv},
   eprint        = {1312.6114},
-  groups        = {Synthetische Daten},
+  groups        = {(Variational) Autoencoder},
   primaryclass  = {stat.ML},
   url           = {https://arxiv.org/abs/1312.6114},
 }
@@ -354,7 +354,7 @@
   year          = {2014},
   archiveprefix = {arXiv},
   eprint        = {1406.2661},
-  groups        = {Synthetische Daten},
+  groups        = {GANs},
   primaryclass  = {stat.ML},
   url           = {https://arxiv.org/abs/1406.2661},
 }
@@ -376,7 +376,7 @@
   year          = {2022},
   archiveprefix = {arXiv},
   eprint        = {2204.06125},
-  groups        = {DALL-E},
+  groups        = {Diffusion Models},
   primaryclass  = {cs.CV},
   url           = {https://arxiv.org/abs/2204.06125},
 }
@@ -470,6 +470,70 @@
   url    = {https://fordatis.fraunhofer.de/handle/fordatis/358},
 }
 
+@Misc{Karras2022elucidatingdiffusionmodels,
+  author        = {Tero Karras and Miika Aittala and Timo Aila and Samuli Laine},
+  title         = {Elucidating the Design Space of Diffusion-Based Generative Models},
+  year          = {2022},
+  archiveprefix = {arXiv},
+  eprint        = {2206.00364},
+  groups        = {Diffusion Models},
+  primaryclass  = {cs.CV},
+  url           = {https://arxiv.org/abs/2206.00364},
+}
+
+@Misc{Chang2023designfundamentalsdiffusionmodels,
+  author        = {Ziyi Chang and George Alex Koulieris and Hubert P. H. Shum},
+  title         = {On the Design Fundamentals of Diffusion Models: A Survey},
+  year          = {2023},
+  archiveprefix = {arXiv},
+  eprint        = {2306.04542},
+  groups        = {Diffusion Models},
+  primaryclass  = {cs.LG},
+  url           = {https://arxiv.org/abs/2306.04542},
+}
+
+@Article{Croitoru2023diffusionmodelsinvision,
+  author    = {Croitoru, Florinel-Alin and Hondru, Vlad and Ionescu, Radu Tudor and Shah, Mubarak},
+  journal   = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  title     = {Diffusion Models in Vision: A Survey},
+  year      = {2023},
+  issn      = {1939-3539},
+  month     = sep,
+  number    = {9},
+  pages     = {10850–10869},
+  volume    = {45},
+  doi       = {10.1109/tpami.2023.3261988},
+  groups    = {Diffusion Models},
+  publisher = {Institute of Electrical and Electronics Engineers (IEEE)},
+  url       = {http://dx.doi.org/10.1109/TPAMI.2023.3261988},
+}
+
+@Article{Kingma_2019,
+  author    = {Kingma, Diederik P. and Welling, Max},
+  journal   = {Foundations and Trends® in Machine Learning},
+  title     = {An Introduction to Variational Autoencoders},
+  year      = {2019},
+  issn      = {1935-8245},
+  number    = {4},
+  pages     = {307–392},
+  volume    = {12},
+  doi       = {10.1561/2200000056},
+  groups    = {(Variational) Autoencoder},
+  publisher = {Now Publishers},
+  url       = {http://dx.doi.org/10.1561/2200000056},
+}
+
+@Misc{Radford2021learningtransferablevisualmodels,
+  author        = {Alec Radford and Jong Wook Kim and Chris Hallacy and Aditya Ramesh and Gabriel Goh and Sandhini Agarwal and Girish Sastry and Amanda Askell and Pamela Mishkin and Jack Clark and Gretchen Krueger and Ilya Sutskever},
+  title         = {Learning Transferable Visual Models From Natural Language Supervision},
+  year          = {2021},
+  archiveprefix = {arXiv},
+  eprint        = {2103.00020},
+  groups        = {Contrastive Learning},
+  primaryclass  = {cs.CV},
+  url           = {https://arxiv.org/abs/2103.00020},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}
 
 @Comment{jabref-meta: grouping:
@@ -482,8 +546,10 @@
 2 StaticGroup:Datenaugmentation\;0\;1\;0x0000ffff\;\;\;;
 2 StaticGroup:OOD-Detection\;0\;1\;0x0000ffff\;\;\;;
 1 StaticGroup:Synthetische Daten\;0\;1\;0x4d8080ff\;\;\;;
-2 StaticGroup:Diffusion Models\;0\;1\;0x008080ff\;\;\;;
-2 StaticGroup:DALL-E\;0\;1\;0x008080ff\;\;\;;
+2 StaticGroup:(Variational) Autoencoder\;0\;1\;0x008080ff\;\;\;;
+2 StaticGroup:GANs\;0\;0\;0x008080ff\;\;\;;
+2 StaticGroup:Diffusion Models\;0\;0\;0x008080ff\;\;\;;
+1 StaticGroup:DA-Fusion\;0\;1\;0xdb3b3bff\;\;\;;
 1 StaticGroup:Contrastive Learning\;0\;0\;0xff0000ff\;\;\;;
 1 StaticGroup:Verwandte Arbeiten\;0\;1\;0xffff00ff\;\;\;;
 }

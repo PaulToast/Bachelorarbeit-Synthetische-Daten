@@ -1,21 +1,14 @@
 % !TEX root = Bachelorarbeit Synthetische Daten.tex
 \chapter{Methodisches Vorgehen}
 
-In diesem Kapitel wird das methodische Vorgehen der Arbeit beschrieben. Es wird auf die Forschungsfragen und Hypothesen eingegangen, der verwendete Datensatz vorgestellt und die Implementierung der Modelle DA-Fusion und Supervised Contrastive Learning erläutert. Anschließend wird die synthetische Datengenerierung mit DA-Fusion und die Trainings- und Testdurchläufe mit Supervised Contrastive Learning beschrieben. Abschließend werden die Evaluationsmethoden und Metriken vorgestellt, die zur Analyse der Ergebnisse verwendet werden.
+In diesem Kapitel wird das methodische Vorgehen der Arbeit beschrieben.
 
 \section{MVIP-Datensatz} \label{sec:dataset}
 
 % EIBA-Artikel: \parencite{ReziProK2019eiba}
 % MVIP-Datensatz: \parencite{Koch2023mvip}
 
-Grundlage der Forschungsarbeit ist ein am Fraunhofer-IPK entstandener Datensatz von Gebrauchsgegenständen, darunter hauptsächlich Autoteile und Komponenten. Er wurde im Rahmen des Projekts “Sensorische Erfassung, automatisierte Identifikation und Bewertung von Altteilen anhand von Produktdaten sowie Informationen über bisherige Lieferungen” (EIBA) erstellt, das von 2019 bis 2023 lief und von der Circular Economy Solutions GmbH koordiniert und in Kooperation mit der Technischen Universität Berlin und der deutschen Akademie der Technikwissenschaften durchgeführt wurde.
-
-% Multimodalität
-Der Datensatz ist multimodal, d.h. er besteht aus verschiedenen Datenquellen, die unterschiedliche Informationen über die Gegenstände enthalten. Neben herkömmlichen RGB-Bildern aus verschiedenen Perpektiven und weiteren Bilddaten, wie z.B. Objektmasken, gibt es auch Metadaten, etwa das Gewicht, oder Beschreibungen der Objekte in natürlicher Sprache durch verschiedene Stichwörter ("CarComponent", "cylinder", "rusty", usw.).
-
-% Details: Klassen und Anzahl der Bilder insgesamt, Verteilung der Klassen
-
-% Beispielbilder, -masken, -metadaten
+...
 
 \subsection{Teildatensatz} \label{sec:subdataset}
 
@@ -23,6 +16,14 @@ Der Datensatz ist multimodal, d.h. er besteht aus verschiedenen Datenquellen, di
 Um die Rechenzeit zu reduzieren und die Experimente auf eine bestimmte Objektkategorie zu beschränken, wurde ein Teildatensatz des EIBA-Datensatzes verwendet. Dabei wurden zufällig 20 Klassen aus der super class "CarComponent" ausgewählt. Es wurden außerdem nur die RGB-Bilder verwendet, allerdings kommen auch die Objektmasken im Pre-Processing der Daten zum Einsatz. ...
 
 % Details: Klassen und Anzahl der Bilder in Teildatensatz
+Der Teildatensatz enthält insgesamt ... Bilder, die in ... Klassen eingeteilt sind. Die Klassen sind ungleichmäßig verteilt, wobei einige Klassen nur wenige Bilder enthalten, während andere sehr viele Bilder haben. ...
+
+% Beispielbilder, -masken
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{figure_data_augmentation.png}
+	\caption{Beispielbilder aus dem MVIP-Teildatensatz.}
+\end{figure}
 
 \subsection{Vorverarbeitung} \label{sec:preprocessing}
 
@@ -79,7 +80,7 @@ Auch hier muss eine eigene Klasse für den MVIP-Teildatensatz erstellt werden, d
 
 ...
 
-\section{Generierung der Augmentationen mit DA-Fusion} \label{sec:synt-gen-da-fusion}
+\section{Synthetische Datengenerierung mit DA-Fusion} \label{sec:synt-gen-da-fusion}
 
 % ID-Augmentationen, OOD-Augmentationen
 % Trial and Error, um Parameter zu bestimmen, Validierung ist schwierig
