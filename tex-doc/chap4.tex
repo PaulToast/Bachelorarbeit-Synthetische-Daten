@@ -19,12 +19,6 @@ Dieses Kapitel präsentiert die Ergebnisse der Arbeit. Es wird auf die generiert
 	% Teilweise questionable
 ...
 
-\begin{figure}[]
-	\centering
-	\includegraphics[width=6cm]{logo_haw}
-	\caption{Beispieltext}
-\end{figure}
-
 \subsection{Near Out-of-Distribution}
 
 % Konfiguration von DA-Fusion
@@ -43,12 +37,56 @@ Dieses Kapitel präsentiert die Ergebnisse der Arbeit. Es wird auf die generiert
 % Mit ID-Augmentationen und OOD-Augmentationen für hard-negative mining
 ...
 
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-pre_avg-train-loss.png}%
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-pre_avg-val-loss.png}
+	\caption{Beispieltext}
+\end{figure}
+
+...
+
 \subsection{Lineare Klassifikation}
 
 % Nur reale Daten
 % Mit ID-Augmentationen
 % Mit ID-Augmentationen und Contrastive Pre-Training mit OOD-Augmentationen
 ...
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-train-loss.png}%
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-val-loss.png}
+	\caption{Beispieltext 1}
+\end{figure}
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-train-acc.png}%
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-val-acc.png}
+	\caption{Beispieltext 2}
+\end{figure}
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-id-conf.png}%
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-ood-conf.png}
+	\caption{Beispieltext 3}
+\end{figure}
+
+...
+
+\begin{table}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		\textbf{Versuch} & \textbf{Accuracy (\%)} & \textbf{ID-Confidence} & \textbf{OOD-Confidence} & \textbf{$\Delta$ ID-/OOD-Confidence} \\
+		\hline
+		1 & 71.4 & 0.69 & 0.62 & 0.07 \\
+		2 & 77.5 & 0.76 & 0.65 & 0.11 \\
+		3 & 75.3 & 0.40 & 0.35 & 0.05 \\
+		\hline
+	\end{tabular}
+	\caption{Testergebnisse der linearen Klassifikation.}
+\end{table}
 
 \section{Vergleich der Ergebnisse mit und ohne synthetische In-Distribution-Daten}
 
