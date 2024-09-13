@@ -423,15 +423,14 @@ Im überwachten Kontext bieten sich auch neue Möglichkeiten zur Weiterentwicklu
 	% Zusätzliche Einschränkung des Negative Samplings für Auswahl von Hard Negatives (Nähe im Repräsentationsraums)
 Eine weitere Methode zur Verbesserung des Supervised Contrastive Learning ist \textbf{SCL with Hard Negatives} \parencite{Jiang2024supconhardnegatives}. Hier wird eine zusätzliche Einschränkung des Negative Samplings vorgenommen, um Hard Negatives zu selektieren. Diese sind Beispiele, die zwar unähnlich zum Anchor-Beispiel sind, aber dennoch nah genug im Repräsentationsraum, um die Repräsentationen zu verbessern. Diese Strategie hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit der Modelle zu verbessern.
 
-\section{Forschungslücke} \label{sec:research-gap}
+\section{Integration von DA-Fusion und Supervised Contrastive Learning} \label{sec:da-fusion-supcon}
 
 % Einleitung für den vorzustellenden Ansatz
-In den vorherigen Abschnitten wurden verschiedene Methoden zur Verbesserung der Generalisierungsfähigkeit und Robustheit von Modellen vorgestellt. Während die synthetische Datengenerierung bzw. Datenaugmentation und das Contrastive Learning vielversprechende Ergebnisse erzielen, gibt es noch einige Herausforderungen, die es zu bewältigen gilt. Im Folgenden sollen diese Herausforderungen genauer beleuchtet und ein neuer Ansatz vorgestellt werden, der in dieser Arbeit untersucht wird.
+In den vorherigen Abschnitten wurden verschiedene Methoden zur Verbesserung der Generalisierungsfähigkeit und Robustheit von Modellen vorgestellt. Sowohl die synthetische Datengenerierung bzw. Datenaugmentation als auch das Contrastive Learning konnten jeweils vielversprechende Ergebnisse erzielen. In dieser Arbeit wird nun ein Ansatz zur Kombination beider Methoden vorgestellt, welcher eine neuartige Verwendung von synthetischen Daten im Contrastive Learning ermöglichen soll.
 
 \subsection{Herausforderungen bei der Generierung synthetischer Daten} \label{sec:challenges-synt-data}
 
-% Anwendungsfall, Praktikum, ...
-Der Anwendungsfall, der schon in der Einleitung angesprochen wurde, stellt eine besondere Herausforderung für die Generierung synthetischer Daten dar:
+Zunächst soll auf eine Reihe von Herausforderungen bei der Generierung synthetischer Daten aufmerksam gemacht werden, insbesondere im Kontext des vorgestellten Anwendungsfalls. Die Klassifikationsaufgabe bezieht sich auf Gebrauchsgegenstände und industrielle Komponenten \parencite{Koch2023mvip}. Für herkömmliche Methoden zur Bildgenerierung, wie GANs oder Diffusionsmodelle, ergeben sich dabei spezifische Herausforderungen:
 
 % Herausforderungen
 \begin{itemize}
@@ -460,9 +459,8 @@ Die bisherigen Erfolge von Contrastive Learning, insbesondere von SimCLR, zeigen
 	% Außerdem: Unsupervised
 
 % Was wenn: Anstatt Negatives aus Nähe im Darstellungsraum zu samplen, Near OOD-Augmentationen aus Anchor-Klasse?
-...
 
-\subsection{Integration von DA-Fusion und Supervised Contrastive Learning} \label{sec:da-fusion-scl}
+...
 
 % DA-Fusion zur Generierung von ID- und Near OOD-Daten
 
@@ -479,4 +477,20 @@ Die bisherigen Erfolge von Contrastive Learning, insbesondere von SimCLR, zeigen
 		% OOD-Detection profitiert von einer guten Repräsentation der Daten, um die Distanz zwischen In-Distribution und OOD-Daten zu maximieren
 % Potenzielle Herausforderungen
 	% ...
-...
+
+\subsection{Forschungsfragen und Hypothesen} \label{sec:research-questions}
+
+% Einleitung; Forschungslücken aus vorherigem Kapitel
+Im vorherigen Kapitel wurden Forschungslücken identifiziert, die sich aus der Verwendung von DA-Fusion im Supervised Contrastive Learning und der Verwendung von Near OOD-Augmentationen für das Negative Sampling ergeben. Um diese Lücken zu schließen, werden die folgenden Forschungsfragen und Hypothesen formuliert:
+
+\textbf{Forschungsfrage 1:} Kann DA-Fusion für den EIBA-Datensatz synthetische Augmentationen erzeugen, die die Generalisierungsfähigkeit im Supervised Contrastive Learning verbessern?
+
+Durch Beantwortung dieser Frage soll festgestellt werden, ob sich DA-Fusion grundsätzlich eignet, um die Herausforderungen der synthetischen Datengenerierung in Anwendungsfällen wie dem EIBA-Datensatz zu bewältigen (genaueres zum Datensatz in Abschnitt \ref{sec:eiba}). Dazu wird DA-Fusion auf "normale" Weise verwendet, d.h. es werden synthetische In-Distribution Daten generiert, die die Repräsentationen der realen Daten verbessern sollen. Es wird untersucht, ob die Verwendung der Augmentationen im Supervised Contrastive Learning dazu beiträgt, die Leistung des Modells für zuvor ungesehene Daten zu verbessern.
+
+% Hypothese
+
+\textbf{Forschungsfrage 2:} Trägt die Verwendung von Out-of-Distribution (OOD) Augmentationen im Supervised Contrastive Learning dazu bei, die Robustheit des Modells gegenüber OOD-Daten zu erhöhen und die Repräsentationen von In-Distribution-Daten zu verbessern?
+
+Im Rahmen dieser Frage wird untersucht, ob Near OOD-Augmentationen \textemdash also synthetische Daten, welche aus den echten Objekten abgeleitet sind, diese aber nicht akkurat darstellen müssen \textemdash im Supervised Contrastive Learning einen Mehrwert bieten, indem sie die Repräsentationen der In-Distribution-Daten verbessern und die Robustheit gegenüber OOD-Daten erhöhen. Dazu wird eine neue Negative Sampling-Strategie für das Supervised Contrastive Learning verwendet, die es ermöglicht, für jeden Anchor genau die Near OOD-Augmentationen als negativ-Beispiele heranzuziehen, die aus einem Beispiel der Anchor-Klasse generiert wurden. Es wird untersucht, ob so die Generalisierungsfähigkeit und die Robustheit gegenüber OOD-Daten noch weiter gesteigert werden kann.
+
+% Hypothese
