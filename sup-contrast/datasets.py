@@ -8,10 +8,14 @@ from torchvision import transforms
 from PIL import Image
 from scipy.ndimage import maximum_filter
 
+SUPER_CLASS = "CarComponent"
+NUM_CLASSES = 20
+
 
 class MVIPDataset(Dataset):
     def __init__(
         self,
+        seed=0,
         split="train",
         aug_mode=None, # None, "with_id", "with_both", "id_only", "ood_only"
         aug_dir_id=None,
@@ -21,6 +25,8 @@ class MVIPDataset(Dataset):
         image_size=224,
         transform=None,
     ):
+        np.random.seed(seed)
+
         self.data_root = "/mnt/HDD/MVIP/sets"
         self.split = split
         
@@ -31,7 +37,7 @@ class MVIPDataset(Dataset):
         self.aug_ex_ood = aug_ex_ood
 
         # Define classes & collect dataset
-        self._initialize_classes(num_classes=20, super_class="CarComponent")
+        self._initialize_classes(num_classes=NUM_CLASSES, super_class=SUPER_CLASS)
         self._collect_dataset()
 
         # Set image transform
@@ -47,7 +53,6 @@ class MVIPDataset(Dataset):
             ])
 
         # Shuffle dataset
-        np.random.seed(0)
         shuffle_idx = np.random.permutation(self._length)
         self.all_images = [self.all_images[i] for i in shuffle_idx]
         self.all_masks = [self.all_masks[i] for i in shuffle_idx]

@@ -1,5 +1,6 @@
 import argparse
 import os
+import torchvision.transforms as T
 
 from datasets import MVIPDataset
 
@@ -20,7 +21,7 @@ def parse_args():
     parser.add_argument(
         "--aug_mode",
         type=str,
-        default=None, # None, "with_id", "with_both", "id_only", "ood_only"
+        default="with_both", # None, "with_id", "with_both", "id_only", "ood_only"
     )
     parser.add_argument(
         '--aug_output_name',
@@ -42,6 +43,11 @@ def parse_args():
     )
     parser.add_argument(
         "--aug_ex_id",
+        type=int,
+        default=-1, # -1 for all
+    )
+    parser.add_argument(
+        "--aug_ex_ood",
         type=int,
         default=-1, # -1 for all
     )
@@ -105,15 +111,18 @@ if __name__ == "__main__":
         aug_dir_id=args.aug_dir_id,
         aug_dir_ood=args.aug_dir_ood,
         aug_ex_id=args.aug_ex_id,
-        aug_ex_ood=-args.augs_ex_ood,
+        aug_ex_ood=-args.aug_ex_ood,
         image_size=args.resolution,
     )
+    print("length: ", len(dataset))
 
+    transform = T.ToPILImage()
     for i, (image, label) in enumerate(dataset):
+        image = transform(image)
         if label < 0:
             dist = "ood"
         else:
             dist = "id"
-        class_name = dataset.classes[abs(label)]
+        class_name = dataset.class_names[abs(label)]
         os.makedirs(os.path.abspath(os.path.join(args.output_dir, class_name)), exist_ok=True)
         image.save(f"{args.output_dir}/{class_name}/{i}_{dist}.png")
