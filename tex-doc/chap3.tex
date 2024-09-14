@@ -1,33 +1,41 @@
 % !TEX root = Bachelorarbeit Synthetische Daten.tex
 \chapter{Methodisches Vorgehen}
 
-In diesem Kapitel wird das methodische Vorgehen der Arbeit beschrieben.
+In diesem Kapitel wird das methodische Vorgehen der Arbeit beschrieben. Als Basis für die Untersuchung der Forschungsfragen wird zunächst der MVIP-Datensatz vorgestellt, auf dem die Experimente durchgeführt werden. Anschließend wird die Implementierung der Modelle DA-Fusion und Supervised Contrastive Learning erläutert, die für die synthetische Datengenerierung und die Klassifikationsaufgabe verwendet werden. Es wird auch auf die Anpassungen eingegangen, die vorgenommen werden mussten, um den eigenen Ansatz zu testen. Danach wird die Herangehensweise zur Generierung synthetischer Daten mit DA-Fusion und die Trainings- und Testdurchläufe mit Supervised Contrastive Learning definiert. Abschließend werden die Evaluationsmethoden und Metriken vorgestellt, die zur Auswertung der Experimente verwendet werden.
 
 \section{MVIP-Datensatz} \label{sec:dataset}
 
 % EIBA-Artikel: \parencite{ReziProK2019eiba}
 % MVIP-Datensatz: \parencite{Koch2023mvip}
 
-...
+Grundlage der Forschungsarbeit ist der im Rahmen des EIBA-Projekts entstandene MVIP-Datensatz \parencite{Koch2023mvip}, wobei MVIP für \textit{Multi-View Industrial Parts} steht. Die Bilddaten stammen aus Intel RealSense D435 und D415 Tiefenkameras, die die Objekte gleichzeitig aus verschiedenen Perspektiven aufnehmen. Darüber hinaus gibt es auch Metadaten, etwa zum Gewicht des Objekts, oder Beschreibungen in natürlicher Sprache durch verschiedene Stichwörter ("StarterMotor", "used", "rusty", usw.).
+
+% Details: Klassen und Anzahl der Bilder insgesamt, Verteilung der Klassen
+Der Datensatz enthält 308 Klassen , welche wiederum in 18 verschiedene Oberklassen (Super Classes) eingeteilt sind. Insgesamt gibt es etwa 71.276 Sets an Bildern, welche jeweils RGB- und Tiefendaten, sowie Segmentierungsmasken enthalten.
+
+% Beispielbilder, -masken, -metadaten
+\begin{figure}
+	\centering
+	%\includegraphics[width=\textwidth]{figure_mvip_ex_cropped_1.png}
+	\includegraphics[width=\textwidth]{figure_mvip_ex_cropped_2.png}
+	\caption{Beispielbilder aus dem MVIP-Datensatz \parencite{Koch2023mvip},\\
+	die auf die Region of Interest (ROI) zugeschnitten wurden.}
+	\label{fig:mvip-examples}
+\end{figure}
 
 \subsection{Teildatensatz} \label{sec:subdataset}
 
 % Wahl eines Teildatensatzes mit 20 "CarComponent" Klassen
-Um die Rechenzeit zu reduzieren und die Experimente auf eine bestimmte Objektkategorie zu beschränken, wurde ein Teildatensatz des EIBA-Datensatzes verwendet. Dabei wurden zufällig 20 Klassen aus der super class "CarComponent" ausgewählt. Es wurden außerdem nur die RGB-Bilder verwendet, allerdings kommen auch die Objektmasken im Pre-Processing der Daten zum Einsatz. ...
+Um die Rechenzeit zu reduzieren und die Experimente auf eine bestimmte Objektkategorie zu beschränken, wurde ein Teildatensatz des EIBA-Datensatzes verwendet.
 
-% Details: Klassen und Anzahl der Bilder in Teildatensatz
-Der Teildatensatz enthält insgesamt ... Bilder, die in ... Klassen eingeteilt sind. Die Klassen sind ungleichmäßig verteilt, wobei einige Klassen nur wenige Bilder enthalten, während andere sehr viele Bilder haben. ...
+Konkret wurden zufällig 20 Klassen aus der Oberklasse "CarComponent" ausgewählt. Für die Experimente wurden außerdem ausschließlich die RGB-Bilder verwendet, wobei die Objektmasken im Pre-Processing der Daten zum Einsatz kommen. Insgesamt enthält der Teildatensatz ... Bilder.
 
-% Beispielbilder, -masken
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{figure_data_augmentation.png}
-	\caption{Beispielbilder aus dem MVIP-Teildatensatz.}
-\end{figure}
+% Beispielbilder, -masken ???
+...
 
 \subsection{Vorverarbeitung} \label{sec:preprocessing}
 
-% Verwendung der Objektmasken, um die Bilder zu croppen
+% Weil Masking nicht direkt implementiert ist: Verwendung der Objektmasken, um die Bilder zu croppen
 	% Bounding Box
 	% Quadratischer Output
 	% Weniger Aufmerksamkeit auf gleichbleibenden Hintergrund

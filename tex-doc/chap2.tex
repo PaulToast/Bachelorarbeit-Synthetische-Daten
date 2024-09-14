@@ -156,7 +156,7 @@ Bei der Datenaugmentation werden unterschiedliche Transformationen auf die vorha
 Wenn ein KI-Modell mit Daten konfrontiert wird, die außerhalb des Bereichs liegen, den es während des Trainings gesehen hat, spricht man von Out-of-Distribution (OOD) Daten. Es handelt sich also um Datenpunkte oder Muster, die sich signifikant von den Trainingsdaten unterscheiden. Dies kann zu Problemen führen, da das Modell möglicherweise nicht in der Lage ist, angemessene Vorhersagen oder Entscheidungen für diese Daten zu treffen. Die Erkennung von OOD-Daten ist daher ein wichtiges Forschungsgebiet im maschinellen Lernen, da sie dazu beitragen kann, die Zuverlässigkeit und Sicherheit von KI-Systemen zu verbessern.
 
 % Schwellenwert
-Idealerweise sollte ein neuronales Netz höhere Softmax-Wahrscheinlichkeiten für In-Distribution-Daten und niedrigere Wahrscheinlichkeiten für OOD-Daten ausgeben. Tatsächlich sind die Wahrscheinlichkeiten für OOD-Daten fast immer sehr hoch, meist reicht aber der Abstand zwischen In-Distribution und OOD-Daten aus, um einen Schwellenwert festzulegen und OOD-Instanzen frühzeitig zu identifizieren \parencite{Hendrycks2018baselineooddetection}.
+Idealerweise gibt ein neuronales Netz höhere Softmax-Wahrscheinlichkeiten für In-Distribution-Daten und niedrigere Wahrscheinlichkeiten für OOD-Daten aus. Tatsächlich sind die Wahrscheinlichkeiten für OOD-Daten fast immer sehr hoch, meist reicht aber der Abstand zwischen In-Distribution und OOD-Daten aus, um einen Schwellenwert festzulegen und OOD-Instanzen frühzeitig zu identifizieren \parencite{Hendrycks2018baselineooddetection}.
 
 % Andere Ansätze
 Oftmals ist die OOD-Detektion aber weniger trivial, etwa wenn sich In-Distribution und OOD-Daten sehr ähnlich sind. Es wird daher stets nach alternativen Ansätzen gesucht, um die OOD-Detektion zu verbessern. In \parencite{Hendrycks2018baselineooddetection} wird dabei ein Klassifikator erweitert, um Rekonstruktionen der Eingabedaten zu erstellen und den Fehler zwischen den Original- und Rekonstruktionsdaten zu messen. Ein hoher Rekonstruktionsfehler kann auf OOD-Daten hinweisen. Auch das Temperature Scaling \parencite{Guo2017tempscaling}, welches die Softmax-Wahrscheinlichkeiten kalibriert, kann zusammen mit kleinen Störungen in den Eingabedaten für zuverlässigere Wahrscheinlichkeitswerte und bessere OOD-Detektion sorgen \parencite{Liang2020odin}.
@@ -260,8 +260,8 @@ Ein Autoencoder ist eine spezielle Art von KI-Modell, das entwickelt wurde, um D
 Autoencoder bestehen aus zwei Hauptkomponenten \parencite{Foster2020gendeeplearning}:
 
 \begin{itemize}
-	\item einem \textbf{Encoder}, der hochdimensionale Eingabedaten in einem niederdimensionalen Darstellungsvektor komprimiert, und
-	\item einem \textbf{Decoder}, der einen gegebenen Darstellungsvektor zurück in den ursprünglichen hochdimensionalen Raum umwandelt
+	\item \textbf{Encoder}: Der Encoder komprimiert hochdimensionale Eingabedaten in einem niederdimensionalen Darstellungsvektor.
+	\item \textbf{Decoder}: Der Decoder nimmt einen gegebenen Darstellungsvektor und wandelt ihn zurück in den ursprünglichen hochdimensionalen Raum um.
 \end{itemize}
 
 Der Darstellungsvektor repräsentiert das Originalbild als Punkt in einem mehrdimensionalen latenten Raum, wobei jede Dimension eine bestimmte Eigenschaft des Bildes kodiert. Es handelt sich beim Autoencoder deshalb um eine Form des \textit{Representation Learning}.
@@ -402,7 +402,8 @@ In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine auf Stable Diffusion ba
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{figure_da-fusion_vs_baseline.png}
-	\caption{Vergleich zwischen semantischen Augmentationen aus Baseline-Methode und DA-Fusion \parencite{Trabucco2023dafusion}.}
+	\caption{Vergleich zwischen semantischen Augmentationen aus Baseline-Methode\\
+	und DA-Fusion \parencite{Trabucco2023dafusion}.}
 	\label{fig:da-fusion}
 \end{figure}
 
@@ -415,7 +416,8 @@ Anschließend können die Bilder augmentiert werden, indem ihnen eine geringe Me
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{figure_da-fusion_architecture.png}
-	\caption{Überblick über den Prozess zur Datenaugmentation mit DA-Fusion \parencite{Trabucco2023dafusion}.}
+	\caption{Überblick über den Prozess zur Datenaugmentation mit\\
+	DA-Fusion \parencite{Trabucco2023dafusion}.}
 	\label{fig:da-fusion-process}
 \end{figure}
 
@@ -426,31 +428,38 @@ Ein Vorteil von DA-Fusion ist die Möglichkeit, den Grad der Augmentation durch 
 
 % Ein paar Details zur Implementierung
 
-\section{Integration von DA-Fusion und Supervised Contrastive Learning} \label{sec:da-fusion-supcon}
+\section{Klassifikation von Gebrauchsgegenständen für die Recyclingwirtschaft} \label{sec:recycling-classification} %Integration von DA-Fusion und Supervised Contrastive Learning
 
-% Einleitung für den vorzustellenden Ansatz
-In den vorherigen Abschnitten wurden verschiedene Methoden zur Verbesserung der Generalisierungsfähigkeit und Robustheit von Modellen vorgestellt. Sowohl die synthetische Datengenerierung bzw. Datenaugmentation als auch das Contrastive Learning konnten jeweils vielversprechende Ergebnisse erzielen. In dieser Arbeit wird nun ein Ansatz zur Kombination beider Methoden vorgestellt, welcher eine neuartige Verwendung von synthetischen Daten im Contrastive Learning ermöglichen soll.
+Der Anwendungsfall, auf den sich diese Arbeit bezieht, ist die Klassifikation verschiedener industrieller Objekte und Gebrauchsgegenstände für die Recyclingwirtschaft. Grundlage dafür ist das Forschungsprojekt “Sensorische \textbf{E}rfassung, automatisierte \textbf{I}dentifikation und \textbf{B}ewertung von \textbf{A}ltteilen anhand von Produktdaten sowie Informationen über bisherige Lieferungen” (EIBA), das im Rahmen der Fördermaßnahme "Ressourceneffiziente Kreislaufwirtschaft \textemdash Innovative Produktkreisläufe (ReziProK)" des Bundesministeriums für Bildung und Forschung entstand \parencite{Wagner2022reziprok}. Neben dem Fraunhofer-IPK waren auch die Technische Universität Berlin, die Deutsche Akademie der Technikwissenschaften (acatech), sowie die Circular Economy Solutions GmbH beteiligt.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Das Ziel des Projekts war die Entwicklung eines KI-gestützten Systems, welches Daten aus verschiedenen digitalen Sensoren, sowie Kontextdaten aus dem Geschäftsprozess verarbeitet, um bei der Identifikation, Inspektion und Sortierung von Altteilen zu unterstützen. Dabei betont das Projekt die Rolle der KI zur \textit{Unterstützung} des Menschen, nicht zur vollständigen Automatisierung \parencite{Wagner2022reziprok}. In Abbildung \ref{fig:eiba-process} wird veranschaulicht, wie sich das System in die genannten Prozesse integriert.
 
-Grundlage der Forschungsarbeit ist der am Fraunhofer-IPK entstandene MVIP-Datensatz \parencite{Koch2023mvip}, wobei MVIP für \textit{Multiview Industrial Parts} steht. Der Datensatz beinhaltet Bilder und andere Sensordaten zu verschiedenen industriellen Objekten, darunter hauptsächlich Autoteile. Er wurde im Rahmen des Projekts “Sensorische Erfassung, automatisierte Identifikation und Bewertung von Altteilen anhand von Produktdaten sowie Informationen über bisherige Lieferungen” (EIBA) erstellt, indem ... \parencite{ReziProK2019eiba}.
-
-% Multimodalität
-Der Datensatz ist multimodal, d.h. er besteht aus verschiedenen Datenquellen, die unterschiedliche Informationen über die Gegenstände enthalten. Neben herkömmlichen RGB-Bildern aus verschiedenen Perpektiven und weiteren Bilddaten, wie z.B. Objektmasken, gibt es auch Metadaten, etwa das Gewicht, oder Beschreibungen der Objekte in natürlicher Sprache durch verschiedene Stichwörter ("StarterMotor", "used", "rusty", usw.).
-
-% Details: Klassen und Anzahl der Bilder insgesamt, Verteilung der Klassen
-Insgesamt enthält der MVIP-Datensatz ... Bilder, die in ... Klassen eingeteilt sind. Die Klassen sind ungleichmäßig verteilt, wobei einige Klassen nur wenige Bilder enthalten, während andere sehr viele Bilder haben. ...
-
-% Beispielbilder, -masken, -metadaten
-\begin{figure}
+\begin{figure}[h]
 	\centering
-	\includegraphics[width=\textwidth]{figure_data_augmentation.png}
-	\caption{Beispielbilder aus dem MVIP-Datensatz \parencite{Koch2023mvip}.}
+	\includegraphics[width=\textwidth]{figure_eiba_process.png}
+	\caption{Integration des in EIBA entwickelten KI-gestützten Systems\\
+	in den Prozess der Indentifikation, Inspektion und Sortierung\\
+	von Altteilen \parencite{Wagner2022reziprok}.}
+	\label{fig:eiba-process}
 \end{figure}
+
+Viele der Altteile sind sehr ähnlich und erfordern Expertenwissen, um sie korrekt zu identifizieren und den Beschädigungsgrad zu bewerten. Die Beschriftungen und Barcodes sind oft nicht mehr lesbar, sodass die Identifikation rein visuell erfolgen muss \parencite{Wagner2022reziprok}. Hier setzt das KI-System an, um den Menschen zu unterstützen. Es werden dafür multimodale Sensordaten verwendet, unter anderem Tiefenkameras (RGB-D) und eine Waage zur Erfassung des Gewichts zum Einsatz. In Abbildung \ref{fig:eiba-interface} ist die Mensch-Maschine-Schnittstelle einer mobilen Teststation des Systems dargestellt.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{figure_eiba_interface.png}
+	\caption{Die Mensch-Maschine-Schnittstelle des Systems \parencite{Wagner2022reziprok}.}
+	\label{fig:eiba-interface}
+\end{figure}
+
+% Ergebnisse vielversprechend, aber vorerst nur im Labor; Generalisierung verbessern
+Das System wurde am Beispiel von gebrauchten Fahrzeugteilen entwickelt und konnte bei Tests basierend auf Bilddaten von ca. 1.400 Altteilen über 98\% Accuracy erreichen \parencite{ReziProK2019eiba}. Da die Tests jedoch unter Laborbedingungen stattfanden, wird weiterhin nach Möglichkeiten gesucht, die Generalisierungsfähigkeit des Modells zu verbessern. Insbesondere die Klassifikation von Objekten in verschiedenen Gebrauchszuständen, wie z.B. beschädigte oder verschmutzte Teile, stellt eine Herausforderung dar.
+
+In den vorherigen Abschnitten wurden verschiedene Methoden zur Verbesserung der Generalisierungsfähigkeit und Robustheit von Modellen vorgestellt. Sowohl das Contrastive Learning als auch die synthetische Datengenerierung bzw. Datenaugmentation konnten jeweils vielversprechende Ergebnisse erzielen. In dieser Arbeit wird nun ein Ansatz zur Kombination beider Methoden vorgestellt, welcher eine neuartige Verwendung von synthetischen Daten im Contrastive Learning ermöglichen könnte.
 
 \subsection{Herausforderungen bei der Generierung synthetischer Daten} \label{sec:challenges-synt-data}
 
-Zunächst soll auf eine Reihe von Herausforderungen bei der Generierung synthetischer Daten aufmerksam gemacht werden, insbesondere im Kontext des vorgestellten Anwendungsfalls. Die Klassifikationsaufgabe bezieht sich auf Gebrauchsgegenstände und industrielle Komponenten \parencite{Koch2023mvip}. Für herkömmliche Methoden zur Bildgenerierung, wie GANs oder Diffusionsmodelle, ergeben sich dabei spezifische Herausforderungen:
+Zunächst soll auf eine Reihe von Herausforderungen bei der Generierung synthetischer Daten aufmerksam gemacht werden, insbesondere im Kontext des vorgestellten Anwendungsfalls. Für herkömmliche Methoden zur Bildgenerierung, wie GANs oder Diffusionsmodelle, ergeben sich hier nämlich spezielle Herausforderungen:
 
 % Herausforderungen
 \begin{itemize}
@@ -480,7 +489,7 @@ Die bisherigen Erfolge von Contrastive Learning, insbesondere von SimCLR, zeigen
 
 % Was wenn: Anstatt Negatives aus Nähe im Darstellungsraum zu samplen, Near OOD-Augmentationen aus Anchor-Klasse?
 
-...
+\subsection{Integration von DA-Fusion und Supervised Contrastive Learning} \label{sec:da-fusion-supcon}
 
 % DA-Fusion zur Generierung von ID- und Near OOD-Daten
 ...
@@ -498,22 +507,3 @@ Die bisherigen Erfolge von Contrastive Learning, insbesondere von SimCLR, zeigen
 		% OOD-Detection profitiert von einer guten Repräsentation der Daten, um die Distanz zwischen In-Distribution und OOD-Daten zu maximieren
 % Potenzielle Herausforderungen
 	% ...
-
-\subsection{Forschungsfragen und Hypothesen} \label{sec:research-questions}
-
-% Einleitung; Forschungslücken aus vorherigem Kapitel
-Im vorherigen Kapitel wurden Forschungslücken identifiziert, die sich aus der Verwendung von DA-Fusion im Supervised Contrastive Learning und der Verwendung von Near OOD-Augmentationen für das Negative Sampling ergeben. Um diese Lücken zu schließen, werden die folgenden Forschungsfragen und Hypothesen formuliert:
-
-\textbf{Forschungsfrage 1:} Kann DA-Fusion für den EIBA-Datensatz synthetische Augmentationen erzeugen, die die Generalisierungsfähigkeit im Supervised Contrastive Learning verbessern?
-
-Durch Beantwortung dieser Frage soll festgestellt werden, ob sich DA-Fusion grundsätzlich eignet, um die Herausforderungen der synthetischen Datengenerierung in Anwendungsfällen wie dem EIBA-Datensatz zu bewältigen (genaueres zum Datensatz in Abschnitt \ref{sec:eiba}). Dazu wird DA-Fusion auf "normale" Weise verwendet, d.h. es werden synthetische In-Distribution Daten generiert, die die Repräsentationen der realen Daten verbessern sollen. Es wird untersucht, ob die Verwendung der Augmentationen im Supervised Contrastive Learning dazu beiträgt, die Leistung des Modells für zuvor ungesehene Daten zu verbessern.
-
-% Hypothese
-...
-
-\textbf{Forschungsfrage 2:} Trägt die Verwendung von Out-of-Distribution (OOD) Augmentationen im Supervised Contrastive Learning dazu bei, die Robustheit des Modells gegenüber OOD-Daten zu erhöhen und die Repräsentationen von In-Distribution-Daten zu verbessern?
-
-Im Rahmen dieser Frage wird untersucht, ob Near OOD-Augmentationen \textemdash also synthetische Daten, welche aus den echten Objekten abgeleitet sind, diese aber nicht akkurat darstellen müssen \textemdash im Supervised Contrastive Learning einen Mehrwert bieten, indem sie die Repräsentationen der In-Distribution-Daten verbessern und die Robustheit gegenüber OOD-Daten erhöhen. Dazu wird eine neue Negative Sampling-Strategie für das Supervised Contrastive Learning verwendet, die es ermöglicht, für jeden Anchor genau die Near OOD-Augmentationen als negativ-Beispiele heranzuziehen, die aus einem Beispiel der Anchor-Klasse generiert wurden. Es wird untersucht, ob so die Generalisierungsfähigkeit und die Robustheit gegenüber OOD-Daten noch weiter gesteigert werden kann.
-
-% Hypothese
-...
