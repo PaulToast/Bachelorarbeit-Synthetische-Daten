@@ -22,6 +22,7 @@ class MVIPDataset(FewShotDataset):
     # Go through all classes & check the metadata
     # If the class is of the selected super_class, add it to class_names
     class_names = []
+    class_descriptions = []
 
     for class_name in [f for f in os.listdir(MVIP_DIR) if os.path.isdir(os.path.join(MVIP_DIR, f))]:
         meta_file = open(os.path.join(MVIP_DIR, class_name, "meta.json"))
@@ -29,6 +30,7 @@ class MVIPDataset(FewShotDataset):
 
         if SUPER_CLASS in meta_data['super_class']:
             class_names.append(class_name)
+            class_descriptions.append(meta_data['description'])
 
         meta_file.close()
 
