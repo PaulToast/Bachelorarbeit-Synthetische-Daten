@@ -76,12 +76,17 @@ Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Mo
 \begin{figure}[h]
 	\centering
 	\vspace*{4mm}
-	%\includegraphics[width=12cm]{figure_mp-neuron.png} % https://commons.wikimedia.org/w/index.php?curid=224561
-	\includegraphics[width=12cm]{figure_mp-neuron_nd.png} % https://commons.wikimedia.org/wiki/File:ArtificialNeuronModel.png
+	%\includegraphics[width=12cm]{figure_mp-neuron.png}
+		% Mit Beschriftung
+		% https://commons.wikimedia.org/w/index.php?curid=224561
+	\includegraphics[width=12cm]{figure_mp-neuron_nd.png}
+		% Ohne Beschriftung
+		% https://commons.wikimedia.org/wiki/File:ArtificialNeuronModel.png
 	\vspace*{2mm}
-	\caption{Das McCulloch-Pitts-Modell eines Neurons.}
+	\caption[Abbildung des McCulloch-Pitts-Modells eines Neurons.]{Abbildung des McCulloch-Pitts-Modells eines Neurons \parencite{WikiNeuronModel}.} % \footnotemark
 	\label{fig:neuron}
 \end{figure}
+%\footnotetext{Lizensiert unter der Creative Commons Attribution-Share Alike 3.0 Unported Lizenz: \url{https://creativecommons.org/licenses/by-sa/3.0/deed.en}}
 
 Jedes Neuron empfängt eine Reihe von Eingaben $x_{1 \dots n}$, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es zugehörige Gewichtungen (Weights) $w_{1j \dots nj}$, welche die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingaben auf das Neuron $j$ bestimmen. Das Neuron berechnet dann die gewichtete Summe $net_j$ aller Eingaben und falls ein bestimmter Schwellenwert (Bias) $\theta$ überschritten wurde, wird das Neuron aktiviert. Die Aktivierung $o_j$ des Neurons kann dementsprechend folgendermaßen beschrieben werden:
 
@@ -117,7 +122,7 @@ Es gibt eine Reihe von sogenannten Hyperparametern, welche einen großen Einflus
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{figure_cnn.png} % https://towardsdatascience.com/a-comprehensive-guide-to-convolutional-neural-networks-the-eli5-way-3bd2b1164a53
-	\caption{Aufbau eines Convolutional Neural Networks (CNN)}
+	\caption{Aufbau eines Convolutional Neural Networks (CNN).}
 	\label{fig:cnn}
 \end{figure}
 
@@ -318,7 +323,7 @@ Der Trainingsprozess eines GANs ist in Abbildung \ref{fig:gan} dargestellt und k
 
 \begin{figure}[h]
 	\includegraphics[width=\textwidth]{figure_gan.pdf}
-	\caption{Überblick über die GAN-Struktur. Quelle: Google for Developers}
+	\caption{Überblick über die GAN-Struktur.}
 	% https://developers.google.com/machine-learning/gan/gan_structure?hl=de
 	\label{fig:gan}
 \end{figure}
@@ -402,7 +407,7 @@ In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine auf Stable Diffusion ba
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{figure_da-fusion_vs_baseline.png}
-	\caption{Vergleich zwischen semantischen Augmentationen aus Baseline-Methode\\
+	\caption[Vergleich zwischen semantischen Augmentationen aus Baseline-Methode und DA-Fusion]{Vergleich zwischen semantischen Augmentationen aus Baseline-Methode\\
 	und DA-Fusion \parencite{Trabucco2023dafusion}.}
 	\label{fig:da-fusion}
 \end{figure}
@@ -416,7 +421,7 @@ Anschließend können die Bilder augmentiert werden, indem ihnen eine geringe Me
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{figure_da-fusion_architecture.png}
-	\caption{Überblick über den Prozess zur Datenaugmentation mit\\
+	\caption[Überblick über den Prozess zur Datenaugmentation mit DA-Fusion.]{Überblick über den Prozess zur Datenaugmentation mit\\
 	DA-Fusion \parencite{Trabucco2023dafusion}.}
 	\label{fig:da-fusion-process}
 \end{figure}
@@ -437,7 +442,7 @@ Das Ziel des Projekts war die Entwicklung eines KI-gestützten Systems, welches 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{figure_eiba_process.png}
-	\caption{Integration des in EIBA entwickelten KI-gestützten Systems\\
+	\caption[Integration des in EIBA entwickelten KI-gestützten Systems in den Prozess der Indentifikation, Inspektion und Sortierung von Altteilen.]{Integration des in EIBA entwickelten KI-gestützten Systems\\
 	in den Prozess der Indentifikation, Inspektion und Sortierung\\
 	von Altteilen \parencite{Wagner2022reziprok}.}
 	\label{fig:eiba-process}
@@ -448,7 +453,7 @@ Viele der Altteile sind sehr ähnlich und erfordern Expertenwissen, um sie korre
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{figure_eiba_interface.png}
-	\caption{Die Mensch-Maschine-Schnittstelle des Systems \parencite{Wagner2022reziprok}.}
+	\caption[Die Mensch-Maschine-Schnittstelle des Systems.]{Die Mensch-Maschine-Schnittstelle des Systems \parencite{Wagner2022reziprok}.}
 	\label{fig:eiba-interface}
 \end{figure}
 

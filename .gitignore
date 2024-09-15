@@ -175,3 +175,4 @@ tex-doc/*
 !tex-doc/*.png
 !tex-doc/*.jpg
 !tex-doc/*.webp
+!tex-doc/*.py

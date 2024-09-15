@@ -4,33 +4,32 @@
 % Bücher und Artikel ausgegeben, die in der Arbeit auch zitiert werden.
 \printbibliography
 
-% markiert den Anfang des Anhangs
+% Anfang des Anhangs
 \appendix
 
-% ein Kapitel, das nicht numeriert, aber trotzdem ins Inhaltsverzeichnis
-% aufgenommen wird
+% Nicht numeriert, aber trotzdem ins Inhaltsverzeichnis aufgenommen
 \addchap{Anhang}
 
-Hier beginnt der Anhang.  Siehe die Anmerkungen zur Sinnhaftigkeit eines
-Anhangs in Abschnitt~\ref{sec-app} auf Seite~\pageref{sec-app}.
+% DA-Fusion
+\lstinputlisting[language=python,caption={Begrenzung des Datensatzes auf die 20 "CarComponent" Klassen
+in der "MVIPDataset"-Klasse.},label=code:da-fusion-mvip-classes]{code_da-fusion_mvip-class-selection.py}
+%\lstinputlisting[language=python,caption={Auslesen der Bilder und Masken in der "MVIPDataset"-Klasse.},label=code:da-fusion-mvip-parsing]{code_da-fusion_mvip-parsing.py}
+\lstinputlisting[language=python,caption={Funktion zum Zuschneiden eines Objekts in der "MVIPDataset"-Klasse.},label=code:da-fusion-crop-object]{code_da-fusion_crop-object.py}
 
-Der Anhang kann wie das eigentliche Dokument in Kapitel und Abschnitte
-unterteilt werden.  Der Befehl \verb|\appendix| sorgt im Wesentlichen nur für
-eine andere Nummerierung.
+%\lstinputlisting[language=python,caption={Python-Skript für das Textual Inversion Finetuning in DA-Fusion.},label=code:da-fusion-finetune]{../da-fusion/fine_tune_upstream.py}
+%\lstinputlisting[language=python,caption={Python-Skript zum Merging der gelernten Text-Embeddings.},label=code-da-fusion-aggregate]{../da-fusion/aggregate_embeddings.py}
+%\lstinputlisting[language=python,caption={Python-Skript zur Generierung der Augmentationen mit DA-Fusion.},label=code:da-fusion-generate]{../da-fusion/generate_augmentations.py}
 
-% neue Seite
 \clearpage
 
-% keine Seitenzahl
+% Keine Seitenzahl
 \thispagestyle{empty}
-
-% keine Nummerierung, keine Aufnahme ins Inhaltsverzeichnis
+% Keine Nummerierung, keine Aufnahme ins Inhaltsverzeichnis
 \section*{Eigenständigkeitserklärung}
 
-% Hier müssen Sie natürlich den Titel der Arbeit sowie Ort und Datum ersetzen:
 Hiermit versichere ich, dass ich die vorliegende Bachelorarbeit mit dem Titel
 \begin{center}
-  \textbf{Viele zufällige Zahlen}
+  \textbf{Contrastive Learning mit Stable Diffusion-basierter Datenaugmentation}
 \end{center}
 selbstständig und nur mit den angegebenen Hilfsmitteln verfasst habe.  Alle
 Passagen, die ich wörtlich aus der Literatur oder aus anderen Quellen wie
@@ -39,4 +38,4 @@ der Quelle kenntlich gemacht.
 
 \vspace{2cm}
 
-Hamburg, 21.\ Dezember 1940
+Hamburg, 20.\ September 2024
