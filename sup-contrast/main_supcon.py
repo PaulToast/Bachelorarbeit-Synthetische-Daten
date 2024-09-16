@@ -16,7 +16,7 @@ from util import set_optimizer, save_model
 from networks.resnet_big import SupConResNet
 from losses import SupConLoss
 
-from datasets import MVIPDataset
+from mvip import MVIPDataset
 
 from diffusers.utils import check_min_version, is_wandb_available
 if is_wandb_available():

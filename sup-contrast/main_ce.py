@@ -17,7 +17,7 @@ from util import adjust_learning_rate, warmup_learning_rate, accuracy
 from util import set_optimizer, save_model
 from networks.resnet_big import SupCEResNet
 
-from datasets import MVIPDataset
+from mvip import MVIPDataset
 
 try:
     import apex
