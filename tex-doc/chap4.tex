@@ -1,16 +1,16 @@
 % !TEX root = Bachelorarbeit Synthetische Daten.tex
-\chapter{Ergebnisse}
+\chapter{Ergebnisse} \label{sec:results}
 
 Dieses Kapitel präsentiert die Ergebnisse der Arbeit. Es wird auf die generierten synthetischen Daten eingegangen und die Trainings- und Testergebnisse der Modelle beschrieben. Anschließend wird die Klassifikations-Performance der Modelle verglichen und die Out-of-Distribution-Detektion analysiert.
 
-\section{Die generierten synthetischen Daten}
+\section{Die generierten synthetischen Daten} \label{sec:da-fusion-results}
 
 % Einleitung/Überblick
 % Gemeinsames Stable Diffusion-Finetuning
     % Validation Images; stetiges Verbessern
 ...
 
-\subsection{In-Distribution}
+\subsection{In-Distribution} \label{sec:da-fusion-id-results}
 
 % Konfiguration von DA-Fusion
 % Beispiele
@@ -27,18 +27,18 @@ Dieses Kapitel präsentiert die Ergebnisse der Arbeit. Es wird auf die generiert
 	\label{fig:id-augs-detail}
 \end{figure}
 
-\subsection{Near Out-of-Distribution}
+\subsection{Near Out-of-Distribution} \label{sec:da-fusion-ood-results}
 
 % Konfiguration von DA-Fusion
 % Beispiele
 % Menschliche Evaluierung (eigene)
 ...
 
-\section{Trainings- und Testergebnisse mit Supervised Contrastive Leraning}
+\section{Trainings- und Testergebnisse} \label{sec:supcon-results}
 
 ...
 
-\subsection{Contrastive Pre-Training}
+\subsection{Contrastive Pre-Training} \label{sec:supcon-pre-results}
 
 % Nur reale Daten
 % Mit ID-Augmentationen
@@ -55,7 +55,7 @@ Dieses Kapitel präsentiert die Ergebnisse der Arbeit. Es wird auf die generiert
 
 ...
 
-\subsection{Lineare Klassifikation}
+\subsection{Lineare Klassifikation} \label{sec:supcon-lin-results}
 
 % Nur reale Daten
 % Mit ID-Augmentationen
@@ -101,10 +101,14 @@ Dieses Kapitel präsentiert die Ergebnisse der Arbeit. Es wird auf die generiert
 	\label{tab:supcon-lin-results}
 \end{table}
 
-\section{Vergleich der Ergebnisse mit und ohne synthetische In-Distribution-Daten}
+\section{Vergleich der Ergebnisse} \label{sec:results-comparison}
 
 ...
 
-\section{Vergleich der Ergebnisse mit und ohne synthetische Near Out-of-Distribution-Daten}
+\subsection{Mit und ohne In-Distribution-Augmentationen} \label{sec:results-comparison-id}
+
+...
+
+\subsection{Mit und ohne Near Out-of-Distribution-Augmentationen} \label{sec:results-comparison-ood}
 
 ...

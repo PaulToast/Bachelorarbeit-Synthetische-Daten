@@ -1,5 +1,5 @@
 % !TEX root = Bachelorarbeit Synthetische Daten.tex
-\chapter{Methodisches Vorgehen}
+\chapter{Methodisches Vorgehen} \label{sec:methodology}
 
 In diesem Kapitel wird das methodische Vorgehen der Arbeit beschrieben. Als Basis für die Untersuchung der Forschungsfragen wird zunächst der MVIP-Datensatz vorgestellt, auf dem die Experimente durchgeführt werden. Anschließend wird die Implementierung der Modelle DA-Fusion und Supervised Contrastive Learning erläutert, sowie die Herangehensweise zur Generierung synthetischer Daten mit DA-Fusion und die Trainings- und Testdurchläufe mit Supervised Contrastive Learning definiert. Zuletzt werden die Evaluationsmethoden und Metriken vorgestellt, die zur Auswertung der Experimente verwendet werden.
 
@@ -9,7 +9,7 @@ Grundlage der Forschungsarbeit ist der im Rahmen des EIBA-Projekts entstandene M
 
 Die Bilddaten stammen aus Intel RealSense D435 und D415 Tiefenkameras, die die Objekte gleichzeitig aus verschiedenen Perspektiven aufnehmen. Darüber hinaus gibt es auch Metadaten, etwa zum Gewicht des Objekts, oder Beschreibungen in natürlicher Sprache durch verschiedene Stichwörter ("StarterMotor", "Used", "Rusty", usw.).
 
-% Beispielbilder, -masken, -metadaten
+% Beispielbilder
 \begin{figure}[]
 	\centering
 	%\includegraphics[width=\textwidth]{figure_mvip_ex_cropped_1.png}
@@ -62,16 +62,10 @@ Insgesamt enthält der Teildatensatz ... Bilder. In Tabelle \ref{tab:subdataset}
 
 \subsection{Vorverarbeitung} \label{sec:preprocessing}
 
-% Verwendung der Objektmasken, um die Bilder zu croppen
-	% Bounding Box
-	% Quadratischer Output
-	% Weniger Aufmerksamkeit auf gleichbleibenden Hintergrund
+% Maske -> Bounding Box -> Quadratischer ROI Crop
 Die Vorverarbeitung der Bilder unterscheidet sich nur leicht zwischen den beiden Modellen DA-Fusion und Supervised Contrastive Learning. In beiden Fällen werden die Bilder auf die Region of Interest (ROI) zugeschnitten, um den Fokus auf die Objekte zu legen und den Hintergrund zu minimieren. Dazu werden die Segmentierungsmasken verwendet, um die Bounding Box der Objekte zu bestimmen und die Bilder entsprechend zuzuschneiden. Die Ausgabe ist ein quadratisches Bild, das die Objekte in der Mitte enthält.
 
-% Verschiedene "klassische" Augmentationen
-	% Rotation
-	% ColorJitter
-	% Normalisierung
+% "Klassische" Augmentationen; Rotation, ColorJitter, Normalisierung
 Zusätzlich werden verschiedene "klassische" Augmentationen angewendet, um die Daten zu erweitern und die Modelle robuster zu machen. Dazu gehören z.B. Rotation, ColorJitter und Normalisierung. Die Parameter für die Augmentationen wurden eher konservativ gewählt, damit die feinen Unterschiede zwischen den Klassen nicht verwischt werden.
 
 \section{Implementierung} \label{sec:implementation}
@@ -81,24 +75,29 @@ Zur Vorbereitung und Durchführung der Experimente wurde seitens des Fraunhofer-
 
 % Implementierung von DA-Fusion und Supervised Contrastive Learning
 Dabei stützt sich diese Arbeit größtenteils auf die Implementierungen von DA-Fusion aus \parencite{Trabucco2024dafusiongithub} und Supervised Contrastive Learning aus \parencite{Tian2023supcongithub}. Die grundlegende Funktionsweise dieser Implementierungen, sowie die Anpassungen, die im Rahmen des untersuchten Ansatzes vorgenommen wurden, sollen nun genauer erläutert werden.
+% Dabei stützt sich diese Arbeit größtenteils auf die Implementierungen von DA-Fusion\footnote{GitHub Repository: \url{https://github.com/brandontrabucco/da-fusion} [Aufgerufen: 16.09.2024]} und Supervised Contrastive Learning\footnote{GitHub Repository: \url{https://github.com/HobbitLong/SupContrast} [Aufgerufen: 16.09.2024]}, die im Rahmen der Forschungsarbeiten von den jeweiligen Autoren entwickelt wurden. Die grundlegende Funktionsweise dieser Implementierungen, sowie die Anpassungen, die im Rahmen des untersuchten Ansatzes vorgenommen wurden, sollen nun genauer erläutert werden.
 
-\subsection{DA-Fusion} \label{sec:impl-da-fusion}
+\subsection{DA-Fusion} \label{sec:da-fusion-implementation}
 
 % Datensatz
-Die Implementierung von DA-Fusion kann weitgehend unverändert angewendet werden, um synthetische Daten für den MVIP-Teildatensatz zu generieren. Allerdings muss dieser zunächst als eigene Klasse mit den Methoden \lstinline{get_image_by_idx(idx)} und \lstinline{get_label_by_idx(idx)} implementiert werden. Insbesondere musste die Auswahl der 20 "CarComponent" Klassen sichergestellt werden, wofür die JSON-Dateien der Objekt-Metadaten ausgelesen wurden (siehe Anhang \ref{code:da-fusion-mvip-classes}). Anschließend wird über eine Methode das Laden der entsprechenden Bilder und Masken ermöglicht. Der Rest der Klasse entspricht dem Aufbau der anderen Datensatz-Klassen, die in dem Repository zu finden sind.
+Die Implementierung von DA-Fusion kann weitgehend unverändert angewendet werden, um synthetische Daten für den MVIP-Teildatensatz zu generieren. Allerdings musste dieser zunächst als eigene Klasse mit den Methoden \lstinline{get_image_by_idx(idx)} und \lstinline{get_label_by_idx(idx)} implementiert werden. Insbesondere musste die Auswahl der 20 "CarComponent" Klassen sichergestellt werden, wofür die JSON-Dateien der Objekt-Metadaten ausgelesen werden (siehe Anhang \ref{code:da-fusion-mvip-classes}). Anschließend wird über eine Methode das Laden der entsprechenden Bilder und Masken ermöglicht. Der Rest der Klasse entspricht dem Aufbau der anderen Datensatz-Klassen, die in dem Repository zu finden sind.
 
 % Rundown der Anwendung
-Mit der implementierten Klasse kann das Skript \lstinline{fine_tune.py} mit den entsprechenden Argumenten zur Wahl des Datensatzes und der Hyperparameter (siehe Abschnitt \ref{sec:synt-gen-da-fusion}) aufgerufen werden, um mit Textual Inversion ein vortrainiertes Stable Diffusion-Modell feinabzustimmen. Die gelernten Text-Embeddings werden dabei als .pt-Dateien gespeichert und anschließend mit dem Skript \lstinline{aggregate_embeddings.py} zusammengeführt, um ein klassenagnostisches Template zu erstellen, das in den nachfolgenden Schritten verwendet wird.
+Mit der implementierten Klasse kann das Skript \lstinline{fine_tune_upstream.py} aufgerufen werden, um mit den entsprechenden Argumenten zur Wahl des Datensatzes und der Hyperparameter (siehe Abschnitt \ref{sec:da-fusion-setup}) Textual Inversion zum Finetuning eines vortrainierten Stable Diffusion-Modells anzuwenden. Dabei werden Text-Prompts verwendet, die zuvor in einer Liste definiert wurden. Für die Experimente wurde die Liste leicht angepasst, vor allem um weniger angemessene Formulierungen wie \lstinline|"a rendering of a {}"| und \lstinline|"a photo of a cool {}"| zu entfernen.
 
-Um schließlich die Augmentationen zu generieren, wird das Skript \lstinline{generate_augmentations.py} ausgeführt. Hier werden die Bilder des Datensatzes genommen, Rauschen hinzugefügt und unter Konditionierung auf den entsprechenden Token wiederhergestellt (siehe Anhang \ref{}). Je nachdem, wie viel Rauschen hinzugefügt wurde, entstehen so mehr oder weniger stark veränderte Bilder, die als synthetische Daten verwendet werden können.
+Während des Trainings werden außerdem mit der Funktion \lstinline{log_validation(...)} Validierungsbilder generiert, welche den \lstinline{validation_prompt} verwenden, der als Argument übergeben wird. Diese Bilder sind nicht mit den später generierten Augmentationen vergleichbar, da sie von Grund auf neu generiert werden, bieten aber eine Möglichkeit, den Verlauf des Trainings zu überwachen. % \lstinline{imagenet_templates_small}
 
-\subsection{Supervised Contrastive Learning} \label{sec:impl-supcon}
+Die gelernten Text-Embeddings werden als .pt-Dateien gespeichert und anschließend mit dem Skript \lstinline{aggregate_embeddings.py} zusammengeführt, um ein klassenagnostisches Template zu erstellen, das im nachfolgenden Schritt verwendet wird.
+
+Um schließlich die Augmentationen zu generieren, wird das Skript \lstinline{generate_augmentations.py} ausgeführt. Hier wird eine Stable Diffusion Image-to-Image-Pipeline\footnote{Die Pipeline verwendet das \textbf{SDEdit}-Framework, das in \parencite{Meng2022sdedit} vorgeschlagen wurde.} verwendet, um den Bildern des Datensatzes Rauschen hinzuzufügen und unter Konditionierung auf den gelernten Text-Embeddings wiederherzustellen. Der genaue Prompt kann als Argument übergeben werden, wobei \lstinline|"a photo of a {}"| als Standardwert verwendet wird. Das \lstinline{strength}-Argument entscheidet, wie viel Rauschen hinzugefügt wird und an welchen Timestep das Bild in das Denoising-Modul eingesetzt wird, wodurch mehr oder weniger stark veränderte Bilder entstehen.
+
+\subsection{Supervised Contrastive Learning} \label{sec:supcon-implementation}
 
 % Kurze Einführung in die bestehende Implementierung
 Die Implementierung von Supervised Contrastive Learning verwendet zwei Trainings-Skripte; eins für das Pre-Training der latenten Repräsentationen und eins für die lineare Klassifikation der Repräsentationen.
 
 % Klasse zum Laden des MVIP-Teildatensatzes und der Augmentationen
-Auch hier muss ersteinmal eine eigene Klasse für den MVIP-Teildatensatz erstellt werden. Die Klasse muss nun auch Parameter bereitstellen, die die Verwendung der synthetischen Daten steuern, z.B. ob keine Augmentationen, ausschließlich ID-Augmentationen oder auch OOD-Augmentationen verwendet werden sollen. ...
+Zunächst wird die Klasse für den MVIP-Teildatensatz, die für die Implementierung von DA-Fusion verwendet wurde, größtenteils übernommen und in die Trainingsskripte integriert. Die Klasse musste nun allerdings um einige Parameter und Funktionen erweitert werden, um die Verwendung der synthetischen Augmentationen aus DA-Fusion zu steuern. So steuert der Parameter \lstinline{aug_mode}, ob keine Augmentationen, ausschließlich ID-Augmentationen oder auch OOD-Augmentationen verwendet werden sollen. ... % aug_mode=None, # None, "with_id", "with_both", "id_only", "ood_only"
 
 % Parameter für Konfiguration der Verwendung der Augmentationen
 
@@ -108,13 +107,17 @@ Auch hier muss ersteinmal eine eigene Klasse für den MVIP-Teildatensatz erstell
 	% Accuracy
 	% ID- und OOD-Confidence
 
-\section{Synthetische Datengenerierung mit DA-Fusion} \label{sec:synt-gen-da-fusion}
+\section{Versuchsaufbau} \label{sec:experiment-setup}
+
+...
+
+\subsection{Synthetische Datengenerierung} \label{sec:da-fusion-setup}
 
 % ID-Augmentationen, OOD-Augmentationen
 % Trial and Error, um Parameter zu bestimmen, Validierung ist schwierig
 ...
 
-\section{Trainings- und Testdurchläufe mit Supervised Contrastive Learning} \label{sec:train-test-supcon}
+\subsection{Trainings- und Testdurchläufe} \label{sec:supcon-setup}
 
 % Drei Versuche; jeweils Contrastive Pre-Training & Lineare Klassifikation
 Die Trainings- und Testdurchläufe mit Supervised Contrastive Learning sind in drei Versuchsreihen unterteilt. In jedem Versuch wird zunächst das Pre-Training der latenten Repräsentationen durchgeführt, gefolgt von der linearen Klassifikation der Repräsentationen. Die Versuchsreihen unterscheiden sich in der Verwendung der synthetischen Augmentationen:
