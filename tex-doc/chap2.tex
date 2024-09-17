@@ -121,10 +121,11 @@ Es gibt eine Reihe von sogenannten Hyperparametern, welche einen großen Einflus
 % CNN als Beispiel eines Deep Learning-Modells
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=\textwidth]{figure_cnn.png} % https://towardsdatascience.com/a-comprehensive-guide-to-convolutional-neural-networks-the-eli5-way-3bd2b1164a53
-	\caption{Aufbau eines Convolutional Neural Networks (CNN).}
+	\includegraphics[width=\textwidth]{figure_cnn.png}
+	\caption[Architektur eines Convolutional Neural Networks.]{Architektur eines Convolutional Neural Networks \parencite{Saha2018cnnfigure}.}
 	\label{fig:cnn}
 \end{figure}
+%\footnotetext{Quelle: \url{} [Aufgerufen: 17.09.2024]}
 
 % CNN als Deep Learning-Beispiel eines NN
 Deep Learning mit neuronalen Netzen kann gut am Beispiel des Convolutional Neural Networks (CNN) veranschaulicht werden, welches speziell für die Verarbeitung von Bildern entwickelt wurde (siehe Abbildung \ref{fig:cnn}). Ein CNN besteht aus mehreren Schichten, darunter Convolutional Layers, Pooling Layers und Fully Connected Layers. Die Convolutional Layers extrahieren sogenannte \textit{Feature Maps} aus den Eingabebildern, indem sie Faltungskerne über das Bild schieben und die gewichteten Summen der Pixel berechnen. Die Pooling Layers reduzieren die Dimensionalität der Feature Maps, indem sie die Größe der Merkmale reduzieren. Die Fully Connected Layers kombinieren die extrahierten Merkmale, um die endgültige Klassifikation vorzunehmen.
@@ -323,10 +324,10 @@ Der Trainingsprozess eines GANs ist in Abbildung \ref{fig:gan} dargestellt und k
 
 \begin{figure}[h]
 	\includegraphics[width=\textwidth]{figure_gan.pdf}
-	\caption{Überblick über die GAN-Struktur.}
-	% https://developers.google.com/machine-learning/gan/gan_structure?hl=de
+	\caption[Überblick über die GAN-Struktur.]{Überblick über die GAN-Struktur \parencite{GoogleDev2022ganfigure}.}
 	\label{fig:gan}
 \end{figure}
+%\footnotetext{Quelle: \url{https://developers.google.com/machine-learning/gan/gan_structure?hl=de} [Aufgerufen: 17.09.2024]}
 
 % Details zum Training
 Im Detail wird der Generator durch Minimierung der Log-Wahrscheinlichkeit, dass der Diskriminator die generierten Daten als echt klassifiziert, trainiert. Der Diskriminator wird durch Maximierung dieser Wahrscheinlichkeit trainiert. Dies führt zu einem Gleichgewichtszustand, in dem der Generator realistische Daten erzeugt, die den echten Daten ähneln, und der Diskriminator nicht in der Lage ist, zwischen echten und generierten Daten zu unterscheiden.
@@ -352,10 +353,10 @@ Diffusionsmodelle haben in den letzten Jahren zu einem enormen Fortschritt in de
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=12cm]{figure_stable-diffusion_image.jpg}
-	% https://medium.com/@steinsfu/stable-diffusion-clearly-explained-ed008044e07e
-	\caption{Darstellung des Vorwärts- und Rückwärtsdiffusion\\in einem Diffusionsmodell.}
+	\caption[Darstellung der Vorwärts- und Rückwärtsdiffusion in einem Diffusionsmodell.]{Darstellung der Vorwärts- und Rückwärtsdiffusion\\in einem Diffusionsmodell.}
 	\label{fig:regular-diffusion}
 \end{figure}
+%\footnotetext{Quelle: \url{https://medium.com/@steinsfu/stable-diffusion-clearly-explained-ed008044e07e} [Aufgerufen: 17.09.2024]}
 
 Das Training von Diffusionsmodelle teilt sich in zwei Phasen auf, die Vorwärts- und die Rückwärtsdiffusion, welche beide als Markov-Ketten modelliert werden können. Markov-Ketten sind stochastische Prozesse, bei denen die zukünftige Entwicklung eines Systems nur von seinem aktuellen Zustand abhängt. Im Bezug auf Diffusionsmodelle repräsentiert jeder Schritt in der Markov-Kette einen Zeitschritt $t$ und die Zustände $x^{(t)}$ sind die Bilder zu diesem Zeitpunkt.
 
@@ -392,12 +393,12 @@ Ein besonders einflussreiches Diffusionsmodell ist \textbf{Stable Diffusion} \pa
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{figure_stable-diffusion_merged.png}
-	% https://medium.com/@steinsfu/stable-diffusion-clearly-explained-ed008044e07e
-	\caption{Darstellung des Vorwärts- und Rückwärtsdiffusion in Stable Diffusion:\\
+	\caption[Darstellung des Vorwärts- und Rückwärtsdiffusion in Stable Diffusion: Die Diffusionsprozesse werden auf die latenten Darstellungen der Bilder angewendet (rechts), welche vorher mit einem VAE erstellt wurden (links).]{Darstellung des Vorwärts- und Rückwärtsdiffusion in Stable Diffusion:\\
 		Die	Diffusionsprozesse werden auf die latenten Darstellungen der Bilder\\
 		angewendet (rechts), welche vorher mit einem VAE erstellt wurden (links).}
 	\label{fig:stable-diffusion}
 \end{figure}
+%\footnotetext{Quelle: \url{https://medium.com/@steinsfu/stable-diffusion-clearly-explained-ed008044e07e} [Aufgerufen: 17.09.2024]}
 
 \subsection{DA-Fusion} \label{sec:da-fusion}
 
@@ -407,7 +408,7 @@ In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine auf Stable Diffusion ba
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{figure_da-fusion_vs_baseline.png}
-	\caption[Vergleich zwischen semantischen Augmentationen aus Baseline-Methode und DA-Fusion]{Vergleich zwischen semantischen Augmentationen aus Baseline-Methode\\
+	\caption[Vergleich zwischen semantischen Augmentationen aus Baseline-Methode und DA-Fusion.]{Vergleich zwischen semantischen Augmentationen aus Baseline-Methode\\
 	und DA-Fusion \parencite{Trabucco2023dafusion}.}
 	\label{fig:da-fusion}
 \end{figure}
