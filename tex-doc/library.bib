@@ -23,7 +23,7 @@
   title     = {Natural Language Processing mit Transformern},
   year      = {2023},
   isbn      = {978-3-96010-713-2},
-  groups    = {Grundlagen, Basics},
+  groups    = {Basics},
 }
 
 @Misc{Keshtmand2022contrastood,
@@ -52,6 +52,7 @@
   title         = {Classification Accuracy Score for Conditional Generative Models},
   year          = {2019},
   archiveprefix = {arXiv},
+  comment-paul  = {CAS als TSTR-Approach; Zeigt, dass synt. Daten auf naive Weise ins Training zu integrieren, die Accuracy verschlechtern kann; GANs schneiden bei Tests deutlich schlechter ab als VQ-VAE-2 und HAMs},
   eprint        = {1905.10887},
   groups        = {Synthetische Daten},
   primaryclass  = {id='cs.LG' full_name='Machine Learning' is_active=True alt_name=None in_archive='cs' is_general=False description='Papers on all aspects of machine learning research (supervised, unsupervised, reinforcement learning, bandit problems, and so on) including also robustness, explanation, fairness, and methodology. cs.LG is also an appropriate primary category for applications of machine learning methods.'},
@@ -94,7 +95,7 @@
   title     = {Machine Learning},
   year      = {2021},
   isbn      = {978-981-15-1967-3},
-  groups    = {Grundlagen, Basics},
+  groups    = {Basics},
 }
 
 @Book{Foster2020gendeeplearning,
@@ -102,7 +103,7 @@
   publisher = {O'Reilly},
   title     = {Generatives Deep Learning},
   year      = {2020},
-  groups    = {Grundlagen, Basics},
+  groups    = {Basics},
 }
 
 @Book{Mitchell1997machinelearning,
@@ -110,7 +111,7 @@
   publisher = {McGraw Hill},
   title     = {Machine Learning},
   year      = {1997},
-  groups    = {Grundlagen, Basics},
+  groups    = {Basics},
 }
 
 @Misc{Lu2024syntheticdatareview,
@@ -118,6 +119,7 @@
   title         = {Machine Learning for Synthetic Data Generation: A Review},
   year          = {2024},
   archiveprefix = {arXiv},
+  comment-paul  = {Stellt Kategorien für die Evaluation synt. Daten vor; Herausforderungen sind Qualität der synt. Daten, Knappheit realer Daten, Datenschutz},
   eprint        = {2302.04062},
   groups        = {Synthetische Daten},
   primaryclass  = {cs.LG},
@@ -129,6 +131,7 @@
   title         = {Scaling Laws of Synthetic Images for Model Training ... for Now},
   year          = {2023},
   archiveprefix = {arXiv},
+  comment-paul  = {CLIP Training mit synt. Daten schneidet OK ab, Training von Supervised Image Classifiers aber signifikant schlechter; Off-the-shelf Modelle zur T2I-Generierung scheitern beim Generierung spezifischer Konzepte; Synt. Daten dennoch effektiv, wenn etwa Validierungsdaten sich deutlich von Trainingsdaten unterscheiden können},
   eprint        = {2312.04567},
   groups        = {Synthetische Daten},
   primaryclass  = {cs.CV},
@@ -140,6 +143,7 @@
   title         = {Synthetic data, real errors: how (not) to publish and use synthetic data},
   year          = {2023},
   archiveprefix = {arXiv},
+  comment-paul  = {Synt. Daten auf naive Weise ins Training zu integrieren kann Performance schaden},
   eprint        = {2305.09235},
   groups        = {Synthetische Daten},
   primaryclass  = {cs.LG},
@@ -185,7 +189,7 @@
   year          = {2023},
   archiveprefix = {arXiv},
   eprint        = {2306.00984},
-  groups        = {Verwandte Arbeiten},
+  groups        = {Fragestellung},
   primaryclass  = {cs.CV},
   url           = {https://arxiv.org/abs/2306.00984},
 }
@@ -196,7 +200,7 @@
   year          = {2024},
   archiveprefix = {arXiv},
   eprint        = {2209.00078},
-  groups        = {Verwandte Arbeiten},
+  groups        = {Fragestellung},
   primaryclass  = {cs.LG},
   url           = {https://arxiv.org/abs/2209.00078},
 }
@@ -207,7 +211,7 @@
   year          = {2023},
   archiveprefix = {arXiv},
   eprint        = {2312.17742},
-  groups        = {Verwandte Arbeiten},
+  groups        = {Fragestellung},
   primaryclass  = {cs.CV},
   url           = {https://arxiv.org/abs/2312.17742},
 }
@@ -229,7 +233,7 @@
   year          = {2022},
   archiveprefix = {arXiv},
   eprint        = {2106.05258},
-  groups        = {Verwandte Arbeiten},
+  groups        = {Fragestellung},
   primaryclass  = {cs.CV},
   url           = {https://arxiv.org/abs/2106.05258},
 }
@@ -240,7 +244,7 @@
   year          = {2020},
   archiveprefix = {arXiv},
   eprint        = {2010.01028},
-  groups        = {Verwandte Arbeiten},
+  groups        = {Fragestellung},
   primaryclass  = {cs.CV},
   url           = {https://arxiv.org/abs/2010.01028},
 }
@@ -409,7 +413,7 @@
   author  = {Nitish Srivastava and Geoffrey Hinton and Alex Krizhevsky and Ilya Sutskever and Ruslan Salakhutdinov},
   title   = {Dropout: A Simple Way to Prevent Neural Networks from Overfitting},
   year    = {2014},
-  groups  = {Grundlagen, Overfitting},
+  groups  = {Overfitting},
   journal = {Journal of Machine Learning Research},
   number  = {56},
   pages   = {1929--1958},
@@ -418,14 +422,15 @@
 }
 
 @Article{Shorten2019dataaugmentation,
-  author  = {Shorten, Connor and Khoshgoftaar, Taghi},
-  journal = {Journal of Big Data},
-  title   = {A survey on Image Data Augmentation for Deep Learning},
-  year    = {2019},
-  month   = {07},
-  volume  = {6},
-  doi     = {10.1186/s40537-019-0197-0},
-  groups  = {Grundlagen, Datenaugmentation},
+  author       = {Shorten, Connor and Khoshgoftaar, Taghi},
+  journal      = {Journal of Big Data},
+  title        = {A survey on Image Data Augmentation for Deep Learning},
+  year         = {2019},
+  month        = {07},
+  volume       = {6},
+  comment-paul = {Vorstellung verschiedener Datenaugmentations-Techniken},
+  doi          = {10.1186/s40537-019-0197-0},
+  groups       = {Datenaugmentation},
 }
 
 @Misc{Hendrycks2018baselineooddetection,
@@ -433,6 +438,7 @@
   title         = {A Baseline for Detecting Misclassified and Out-of-Distribution Examples in Neural Networks},
   year          = {2018},
   archiveprefix = {arXiv},
+  comment-paul  = {Baseline für OOD-Detektion durch unterschiedliche Softmax-Wahrscheinlichkeiten},
   eprint        = {1610.02136},
   groups        = {OOD-Detection},
   primaryclass  = {cs.NE},
@@ -444,6 +450,7 @@
   title         = {On Calibration of Modern Neural Networks},
   year          = {2017},
   archiveprefix = {arXiv},
+  comment-paul  = {Temperature Scaling},
   eprint        = {1706.04599},
   groups        = {OOD-Detection},
   primaryclass  = {cs.LG},
@@ -455,6 +462,7 @@
   title         = {Enhancing The Reliability of Out-of-distribution Image Detection in Neural Networks},
   year          = {2020},
   archiveprefix = {arXiv},
+  comment-paul  = {Bessere OOD-Detektion durch Temperature Scaling zusammen mit kleinen Störungen in den Eingabedaten},
   eprint        = {1706.02690},
   groups        = {OOD-Detection},
   primaryclass  = {cs.LG},
@@ -621,5 +629,5 @@
 1 StaticGroup:DA-Fusion\;0\;1\;0xdb3b3bff\;\;\;;
 1 StaticGroup:Contrastive Learning\;0\;0\;0xff0000ff\;\;\;;
 1 StaticGroup:GitHub-Repos\;0\;1\;0xff0000ff\;\;\;;
-1 StaticGroup:Verwandte Arbeiten\;0\;1\;0xffff00ff\;\;\;;
+1 StaticGroup:Fragestellung\;0\;1\;0xffff00ff\;\;\;;
 }
