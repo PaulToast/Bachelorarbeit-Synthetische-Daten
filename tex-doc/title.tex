@@ -76,22 +76,13 @@
 % Abstract
 \section*{Zusammenfassung}
 
-Der Arbeit beginnt mit einer kurzen Beschreibung ihrer zentralen Inhalte, in
-der die Thematik und die wesentlichen Resultate skizziert werden.  Diese
-Beschreibung muss sowohl in deutscher als auch in englischer Sprache vorliegen
-und sollte eine Länge von etwa 150 bis 250 Wörtern haben.  Beide Versionen
-zusammen sollten nicht mehr als eine Seite umfassen.  Die Zusammenfassung
-dient u.\,a.\ der inhaltlichen Verortung im Bibliothekskatalog.
+Diese Bachelorarbeit untersucht die Verbesserung der Bildklassifikation durch synthetische Daten im Supervised Contrastive Learning (SCL). Ziel ist es, die Eignung von DA-Fusion, einer Stable Diffusion-basierten Methode zur Datenaugmentation, für die Generierung synthetischer Daten in einem Anwendungsfall aus der Recyclingwirtschaft zu evaluieren. Darüber hinaus wird untersucht, wie generierte Near Out-of-Distribution (OOD)-Daten in das Supervised Contrastive Learning integriert werden können, um als negativ-Beispiele zu dienen und die Repräsentationen der In-Distribution-Daten weiter zu verbessern. Die Ergebnisse zeigen, dass DA-Fusion geeignete In-Distribution-Augmentationen liefert, welche die Klassifikationsleistung verbessern. Jedoch führte die Integration von Near OOD-Daten im SCL zu einer Verschlechterung der Modellgenauigkeit, da die Beispiele oft zu weit von den In-Distribution-Daten entfernt waren. Die Arbeit hebt die Herausforderungen bei der Generierung und Nutzung synthetischer Daten hervor und bietet Ansätze zur Optimierung von Contrastive Learning in diesem Kontext.
 
 % In Englisch
 {
   \begin{otherlanguage}{english}
     \section*{Abstract}
 
-    The thesis begins with a brief summary of its main contents, outlining the
-    subject matter and the essential findings.  This summary must be provided
-    in German and in English and should range from 150 to 250 words in length.
-    Both versions combined should not comprise more than one page.  Among
-    other things, the abstract is used for library classification.
+      This bachelor thesis investigates how image classification can be improved using synthetic data for Supervised Contrastive Learning (SCL). The aim is to evaluate the suitability of DA-Fusion, a stable diffusion-based data augmentation method, for generating synthetic data in a use case from the recycling industry. It also investigates how synthetic near out-of-distribution (OOD) images can be integrated into supervised contrastive learning to serve as negative examples in order to further improve the representation of in-distribution data. The results show that DA-Fusion provides suitable in-distribution augmentations that improve classification performance. However, the integration of near OOD data in SCL led to a deterioration of model accuracy, as the examples were often too dissimilar from the in-distribution data. The thesis highlights the challenges of generating and using synthetic data and offers approaches to optimise contrastive learning in this context.
   \end{otherlanguage}
 }
