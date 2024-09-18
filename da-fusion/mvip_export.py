@@ -20,7 +20,7 @@ def parse_args():
     parser.add_argument(
         "--examples_per_class",
         type=int,
-        default=-1, # -1 for full dataset
+        default=None, # -1 for full dataset
     )
     parser.add_argument(
         "--resolution",
@@ -53,11 +53,21 @@ if __name__ == "__main__":
         split=args.split,
         seed=args.seed,
         examples_per_class=args.examples_per_class,
-        image_size=(args.resolution, args.resolution),
+        image_size=(args.resolution, args.resolution)
     )
-    print("length: ", len(dataset))
+    print(f"length: {len(dataset)}")
 
-    for i, (image, label) in enumerate(dataset):
+    for idx, description in enumerate(dataset.class_descriptions):
+        print(f"{dataset.class_names[idx]}: {description}")
+        print()
+
+    for idx in range(len(dataset)):
+        image = dataset.get_image_by_idx(idx)
+        label = dataset.get_label_by_idx(idx)
         class_name = dataset.class_names[label]
+
         os.makedirs(os.path.abspath(os.path.join(args.output_dir, class_name)), exist_ok=True)
-        image.save(f"{args.output_dir}/{class_name}/{i}.png")
+        image.save(f"{args.output_dir}/{class_name}/{idx}.png")
+    
+    for class_name in [f for f in os.listdir(args.output_dir) if os.path.isdir(os.path.join(args.output_dir, f))]:
+        print(f"{class_name}: ")
