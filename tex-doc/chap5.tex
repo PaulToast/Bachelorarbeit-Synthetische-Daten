@@ -1,32 +1,47 @@
 % !TEX root = Bachelorarbeit Synthetische Daten.tex
-\chapter{Diskussion} \label{sec:discussion}
+\chapter{Diskussion} \label{ch:discussion}
 
-...
-
-% Sonstiges
-    % Validierung hätte besser sein können; Objekte mit Gebrauchsspuren
+% Einleitung
+In diesem Kapitel werden die Ergebnisse dieser Arbeit interpretiert und im Kontext der Forschungsfragen diskutiert. Dabei wird auf die Eignung von DA-Fusion zur Generierung synthetischer Daten sowie auf die Wirksamkeit von Near Out-of-Distribution-Augmentationen im Supervised Contrastive Learning eingegangen.
 
 \section{Eignung von DA-Fusion für die synthetische Datengenerierung} \label{sec:da-fusion-discussion}
 
-% Augmentationen
-    % Viel besser als Perfusion aus Praktikum
-    % Random-Auswahl der Prompts womöglich etwas zu random?
+% Vielversprechend
+Die Ergebnisse zeigen, dass die Anwendung von DA-Fusion zur Generierung synthetischer Daten vielversprechend ist. Die erzeugten Augmentationen wiesen, wie in \autoref{subsec:da-fusion-id-results} beschrieben, eine hohe visuelle Qualität auf, insbesondere ... . Im Vergleich zur Methode Perfusion ist DA-Fusion in der Lage, die Gebrauchszustände akkurat darzustellen und dennoch die Variation innerhalb der Daten zu erhöhen. Der einstellbare Grad der Variation ermöglicht es, die synthetischen Daten an die spezifischen Anforderungen des Anwendungsfalls anzupassen.
 
-    % Testergebnisse
-    % Bessere Generalisierung als ohne synthetische Daten
-    % Auch OOD-Detektion profitiert
-...
+% Metriken (Visualisierung fehlt)
+Die Steigerung der Accuracy von 71.4\% auf 77.5\% zeigt, dass die synthetischen Daten einen positiven Einfluss auf die Generalisierung haben können. Dass der Abstand zwischen ID- und OOD-Confidence-Werten vergrößert wurde, deutet darauf hin, dass die synthetischen Daten die Klassifikationsentscheidungen des Modells robuster gemacht haben. Dies könnte darauf hindeuten, dass die synthetischen Daten die Repräsentationen der In-Distribution-Daten verbessert haben, sodass das Modell besser zwischen verschiedenen Klassen unterscheiden kann. Um dies genauer zu untersuchen, könnte eine Visualisierung des erlernten Repräsentationsraums mittels t-SNE \parencite{Vandermaaten2008tsne} oder UMAP \parencite{Mcinnes2020umap} hilfreich sein, was jedoch über den Rahmen dieser Arbeit hinausgeht.
+
+% Laborbedingungen
+Auf Grund der Tatsache, dass die Validierungsbilder die selben Laborbedingungen abbilden wie die Trainingsbilder, bleibt jedoch die Frage offen, wie sich das Training mit den synthetischen Daten auf die Generalisierung auf neue, reale Szenarien auswirkt.
+
+% Rechen- und Zeitaufwand
+Ein Nachteil von DA-Fusion ist der Rechen- und Zeitaufwand, der sich aus dem Fine-tuning des Stable Diffusion-Modells mit neuen Text-Embeddings für jede Klasse ergibt. Dabei ist auch die Anpassung der Hyperparameter nicht trivial und erfordert eine sorgfältige Abstimmung.
+
+% Synthetische Daten vs. Augmentationen
+Des Weiteren ist zu beachten, dass DA-Fusion primär als Methode zur Datenaugmentation entwickelt wurde. Der Fokus dieser Arbeit richtete sich ausgehend von dem Anwendungsfall allerdings vor allem auf die synthetische Datengenerierung, um den MVIP-Datensatz erweitern. Im Kontext des Contrastive Learning wäre es interessant zu untersuchen, wie sich das Lernen der Repräsentationen verhält, wenn die unterschiedlichen Ansichten eines Bildes aus DA-Fusion generiert werden, anstatt herkömmliche Augmentationen zu verwenden.
+
+% Zusammenfassung
+Zusammenfassend lässt sich festhalten, dass DA-Fusion eine vielversprechende Methode zur Generierung synthetischer Daten ist, die die Generalisierungsfähigkeit von Modellen verbessern kann. Die Anwendung von DA-Fusion im Contrastive Learning könnte ein interessantes Forschungsfeld darstellen, um die Repräsentationen von Bildern weiter zu verbessern.
 
 \section{Wirksamkeit von Near Out-of-Distribution-Augmentationen im Supervised Contrastive Learning} \label{sec:ood-discussion}
 
-% Eher schlechte Ergebnisse
+% Schlechtere Ergebnisse
+Während die In-Distribution-Augmentationen eine positive Wirkung auf die Klassifikationsleistung hatten, zeigte sich ein gegenteiliger Effekt bei den Near Out-of-Distribution-Augmentationen. Die Top-1 Accuracy sank von 77.5\% auf 75.3\%, und auch die Confidence-Werte (ID und OOD) verschlechterten sich signifikant. 
 
-% OOD-Daten schlecht generiert: Far OOD & unrealistisch
+Die Ergebnisse könnten auf mehrere Faktoren zurückzuführen sein: 1) die Qualität der synthetisch erzeugten OOD-Daten, 2) die Komprimierung der Repräsentationen der ID-Daten und 3) die Implementierung der Near OOD-Augmentationen im Supervised Contrastive Learning.
 
-% Implementierung der Near OOD-Augmentationen nicht wirklich gelungen
-    % Viele verschiedene Ansätze ausprobiert
-        % ...
-    % Bester Ansatz: ...
-    % Die korrekte Anpassung der Loss-Funktion war anspuchsvoll
-    % Schlussendlich haben die Near OODs scheinbar nicht effektiv als Hard Negatives gewirkt
-...
+% 1) Qualität der synthetisch erzeugten OOD-Daten
+Die Qualität der synthetisch erzeugten OOD-Daten war oft mangelhaft, mit deutlichen Artefakten oder sogar vollständiger Entkopplung vom ursprünglichen Konzept. Diese Daten können als „Far OOD“ klassifiziert werden, da sie zu weit von den In-Distribution-Daten entfernt sind, um als Hard Negatives zu fungieren. Es ist allerdings schwierig zu evaluieren, welche der OOD-Daten tatsächlich als Hard Negatives fungiert haben und welche nicht.
+
+% 2) Komprimierung der Repräsentationen der ID-Daten
+Die Verwendung dieser ungenauen OOD-Daten könnte die Repräsentationen der ID-Daten negativ beeinflusst haben. Das Modell könnte gelernt haben, zwischen den synthetischen OOD-Daten und den ID-Daten zu unterscheiden, anstatt zwischen den Klassen. Dies könnte dazu geführt haben, dass die Repräsentationen der ID-Daten "in die Mitte" des Repräsentationsraums komprimiert wurden, was es für das Modell schwieriger machte, zwischen den Klassen zu unterscheiden.
+
+% 3) Implementierung der Near OOD-Augmentationen nicht wirklich gelungen
+Auch die Implementierung der Near OOD-Augmentationen im Supervised Contrastive Learning war eine Herausforderung. Die richtige Anpassung der Loss-Funktion, um Near OOD-Daten als Hard Negatives effektiv zu nutzen, erwies sich als komplex. Im gewählten Ansatz wurden sowohl ID- als auch OOD-Augmentationen unter die normalen Trainingsbilder gemischt. Die Maskierung der kontrastiven Paare stellte zwar sicher, dass nur die ID-Augmentationen als Positives und die OOD-Augmentationen als Negatives verwendet wurden, jedoch unterscheidet sich somit auch die Anzahl der tatsächlich verwendeten Paare für jedes Batch. Dies könnte zu einer Verzerrung der Loss-Funktion geführt haben und sich auf unerwünschte Weise auf das Training ausgewirkt haben.
+
+% Verbesserungsmöglichkeiten
+Um die Wirksamkeit von Near OOD-Augmentationen zu verbessern, könnten verschiedene Ansätze verfolgt werden. Zum einen könnte die Qualität der synthetisch erzeugten OOD-Daten verbessert werden, indem beispielsweise andere Augmentationsstärken ausprobiert werden. Zum anderen könnte die Implementierung der Near OOD-Augmentationen im Supervised Contrastive Learning überdacht werden, um die Repräsentationen der ID-Daten nicht zu beeinträchtigen. Eine Möglichkeit wäre eine Hard Negative Sampling-Strategie wie in \parencite{Jiang2024supconhardnegatives}, bei der nur negativ-Beispiele aus einer gewissen Nähe im Repräsentationsraum ausgewählt werden.
+
+% Zusammenfassung
+Zusammenfassend lässt sich festhalten, dass die Near OOD-Augmentationen im Supervised Contrastive Learning nicht den gewünschten Effekt hatten. Die Ergebnisse deuten darauf hin, dass die Qualität der synthetisch erzeugten OOD-Daten und die Implementierung der Near OOD-Augmentationen im Supervised Contrastive Learning verbessert werden müssen, um die Robustheit des Modells gegenüber OOD-Daten zu erhöhen.
