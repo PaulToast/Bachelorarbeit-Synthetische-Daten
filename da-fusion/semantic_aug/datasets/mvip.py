@@ -36,6 +36,7 @@ class MVIPDataset(FewShotDataset):
 
         # Select only a certain number of the classes
         del class_names[NUM_CLASSES:]
+        del class_descriptions[NUM_CLASSES:]
 
     num_classes: int = len(class_names)
 
@@ -65,8 +66,7 @@ class MVIPDataset(FewShotDataset):
         for class_name in self.class_names:
             root = os.path.join(image_dir, class_name, split_dir[split])
 
-            # Go through every set + orientation + cam
-            # Select only the rgb images
+            # Go through every set + orientation + cam, get rgb images & masks
             for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
                 for orientation in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
                     for cam in [f for f in os.listdir(os.path.join(root, set, orientation)) if os.path.isdir(os.path.join(root, set, orientation, f))]:
@@ -104,28 +104,30 @@ class MVIPDataset(FewShotDataset):
             self.class_names) for _ in self.class_to_images[key]]
         
         # Set transforms
-        if use_randaugment: train_transform = transforms.Compose([
-            transforms.Resize(image_size),
-            transforms.RandAugment(),
-            #transforms.ToTensor(),
-            #transforms.ConvertImageDtype(torch.float),
-            #transforms.Lambda(lambda x: x.expand(3, *image_size)),
-            #transforms.Normalize(mean=[0.5, 0.5, 0.5], 
-            #                      std=[0.5, 0.5, 0.5])
-        ])
-        else: train_transform = transforms.Compose([
-            #transforms.Resize(image_size),
-            transforms.RandomResizedCrop(image_size, scale=(0.8, 1.), ratio=(1., 1.)), # ratio=(1., 1.)
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.RandomRotation(degrees=15.0),
-            transforms.RandomApply([transforms.ColorJitter(0.1, 0.1, 0.1, 0.1)], p=0.2),
-            #transforms.RandomGrayscale(p=0.2),
-            #transforms.ToTensor(),
-            #transforms.ConvertImageDtype(torch.float),
-            #transforms.Lambda(lambda x: x.expand(3, *image_size)),
-            #transforms.Normalize(mean=[0.4213, 0.4252, 0.4242],
-            #                      std=[0.1955, 0.1923, 0.1912])
-        ])
+        if use_randaugment:
+            train_transform = transforms.Compose([
+                transforms.Resize(image_size),
+                transforms.RandAugment(),
+                #transforms.ToTensor(),
+                #transforms.ConvertImageDtype(torch.float),
+                #transforms.Lambda(lambda x: x.expand(3, *image_size)),
+                #transforms.Normalize(mean=[0.5, 0.5, 0.5], 
+                #                      std=[0.5, 0.5, 0.5])
+            ])
+        else:
+            train_transform = transforms.Compose([
+                #transforms.Resize(image_size),
+                transforms.RandomResizedCrop(image_size, scale=(0.8, 1.), ratio=(1., 1.)), # ratio=(1., 1.)
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.RandomRotation(degrees=15.0),
+                transforms.RandomApply([transforms.ColorJitter(0.1, 0.1, 0.1, 0.1)], p=0.2),
+                #transforms.RandomGrayscale(p=0.2),
+                #transforms.ToTensor(),
+                #transforms.ConvertImageDtype(torch.float),
+                #transforms.Lambda(lambda x: x.expand(3, *image_size)),
+                #transforms.Normalize(mean=[0.4213, 0.4252, 0.4242],
+                #                      std=[0.1955, 0.1923, 0.1912])
+            ])
         val_transform = transforms.Compose([
             transforms.Resize(image_size),
             #transforms.ToTensor(),
@@ -152,7 +154,8 @@ class MVIPDataset(FewShotDataset):
 
         return dict(
             name=self.class_names[self.all_labels[idx]],
-            mask=np.array(Image.open(self.all_masks[idx]).convert('L'))
+            mask=np.array(Image.open(self.all_masks[idx]).convert('L')),
+            description=self.class_descriptions[self.all_labels[idx]]
         )
 
 def crop_object(image, mask):
