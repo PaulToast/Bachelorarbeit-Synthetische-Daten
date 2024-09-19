@@ -83,10 +83,9 @@ Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Mo
 		% Ohne Beschriftung
 		% https://commons.wikimedia.org/wiki/File:ArtificialNeuronModel.png
 	\vspace*{2mm}
-	\caption[Abbildung des McCulloch-Pitts-Modells eines Neurons.]{Abbildung des McCulloch-Pitts-Modells eines Neurons \parencite{WikiNeuronModel}.} % \footnotemark
+	\caption[Abbildung des McCulloch-Pitts-Modells eines Neurons.]{Abbildung des McCulloch-Pitts-Modells eines Neurons \parencite{WikiNeuronModel}.}
 	\label{fig:neuron}
 \end{figure}
-%\footnotetext{Lizensiert unter der Creative Commons Attribution-Share Alike 3.0 Unported Lizenz: \url{https://creativecommons.org/licenses/by-sa/3.0/deed.en}}
 
 Jedes Neuron empfängt eine Reihe von Eingaben $x_{1 \dots n}$, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es zugehörige Gewichtungen (Weights) $w_{1j \dots nj}$, welche die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingaben auf das Neuron $j$ bestimmen. Das Neuron berechnet dann die gewichtete Summe $net_j$ aller Eingaben und falls ein bestimmter Schwellenwert (Bias) $\theta$ überschritten wurde, wird das Neuron aktiviert. Die Aktivierung $o_j$ des Neurons kann dementsprechend folgendermaßen beschrieben werden:
 
@@ -132,20 +131,19 @@ Deep Learning mit neuronalen Netzen kann gut am Beispiel des Convolutional Neura
 
 Mit Backpropagation trainierte CNNs wurden erstmals in \parencite{LeCun1990cnnbackprop} behandelt, bilden aber auch heute noch die Grundlage von zahlreichen Deep Learning-Anwendungen und Methoden. Sie sind vor allem deshalb so erfolgreich in der Bildverarbeitung, weil sie die räumliche Struktur von Bildern berücksichtigen und dadurch eine hohe Genauigkeit bei der Klassifikation erreichen können.
 
-\subsection{Overfitting} \label{subsec:overfitting}
-
-Wenn ein Modell so stark an die Trainingsdaten angepasst wird, dass es nicht in der Lage ist, auf neuen, unbekannten Daten zu generalisieren, spricht man von Overfitting \parencite{Goodfellow2016deeplearning}. Statt die zugrundeliegenden Muster zu lernen, speichert das Modell auch zufällige Rauschsignale und Fehler. Dies führt dazu, dass das Modell auf den Trainingsdaten eine hohe Genauigkeit erreicht, aber auf neuen Daten eine schlechtere Leistung zeigt. Man verwendet daher neben den Trainingsdaten auch Validierungsdaten zur Überwachung des Overfittings.
-
-Oftmals liegt das Problem in der Quantität und Qualität der Trainingsdaten. Sind nicht genügend Daten vorhanden, oder sind die Daten nicht divers genug, kann das Modell nicht generalisieren.
-
-Ein anderer Grund für Overfitting kann eine zu hohe Komplexität des Modells sein, wodurch die Trainingsdaten zu genau modelliert werden. Techniken zur Regularisierung zielen deshalb darauf ab, die optimale Komplexität eines Modells zu finden. Dropout \parencite{Srivastava2014dropout} ist eine solche Technik, bei der zufällig ausgewählte Neuronen während des Trainings deaktiviert werden, um zu verhindern, dass das Modell sich auf spezifische Merkmale verlässt. Als Early Stopping wird ein anderer Ansatz bezeichnet, bei dem das Training beendet wird, wenn die Leistung auf den Validierungsdaten beginnt, sich zu verschlechtern.
-
 \subsection{Datenaugmentation} \label{subsec:data-augmentation}
 
-% Definition und Zweck
-Datenaugmentation ist einer der wichtigsten Ansätze zur Vermeidung von Overfitting und findet in fast allen Methoden des Maschinellen Lernens Anwendung. Denn das Modell kann auch ohne völlig neue Daten zu beschaffen robuster gegenüber Variationen gemacht werden, indem es mit leicht veränderten Versionen der Trainingsdaten trainiert wird.
+% Overfitting
+Wenn ein Modell so stark an die Trainingsdaten angepasst wird, dass es nicht in der Lage ist, auf neuen, unbekannten Daten zu generalisieren, spricht man von Overfitting \parencite{Goodfellow2016deeplearning}. Statt die zugrundeliegenden Muster zu lernen, speichert das Modell auch zufällige Rauschsignale und Fehler. Dies führt dazu, dass das Modell auf den Trainingsdaten eine hohe Genauigkeit erreicht, aber auf neuen Daten eine schlechtere Leistung zeigt. Man verwendet daher neben den Trainingsdaten auch Validierungsdaten (Daten, die nicht zum Training des Modells verwendet werden) zur Überwachung des Overfittings.
 
-Bei der Datenaugmentation werden unterschiedliche Transformationen auf die vorhandenen Daten angewendet, z.B. Rotation, Skalierung, Verschiebung, Spiegelung, Helligkeitsanpassung oder Rauschen \parencite{Shorten2019dataaugmentation}. Die Transofrmationen werden meist mit zufälligen parametrisiert, um eine Vielzahl von Variationen zu erzeugen. Das Ziel ist es, das Modell zu zwingen, die zugrundeliegenden Muster der Daten zu lernen, anstatt sich auf spezifische Merkmale zu verlassen, die nur in den Trainingsdaten vorhanden sind. Einige Beispiele für Datenaugmentationstechniken sind in \autoref{fig:data-augmentation} dargestellt.
+Overfitting kann das Resultat einer zu hohen Komplexität des Modells sein, die dafür sorgt, dass die Trainingsdaten zu genau modelliert werden. Techniken zur Regularisierung zielen deshalb darauf ab, die optimale Komplexität eines Modells zu finden. Dropout \parencite{Srivastava2014dropout} ist eine solche Technik, bei der zufällig ausgewählte Neuronen während des Trainings deaktiviert werden, um zu verhindern, dass das Modell sich auf spezifische Merkmale verlässt. %Als Early Stopping wird ein anderer Ansatz bezeichnet, bei dem das Training beendet wird, wenn die Leistung auf den Validierungsdaten beginnt, sich zu verschlechtern.
+
+Oftmals liegt das Problem jedoch in der Quantität und Qualität der Trainingsdaten. Sind nicht genügend Daten vorhanden, oder sind die Daten nicht divers genug, kann das Modell nicht generalisieren.
+
+% Datenaugmentation
+Dabei kann das Modell auch ohne völlig neue Daten zu beschaffen robuster gegenüber Variationen gemacht werden, indem es mit leicht veränderten Versionen der Trainingsdaten trainiert wird. Bei der \emph{Datenaugmentation} werden unterschiedliche Transformationen auf die vorhandenen Daten angewendet, z.B. Rotation, Skalierung, Verschiebung, Spiegelung, Helligkeitsanpassung oder Rauschen \parencite{Shorten2019dataaugmentation}. Die Transofrmationen werden meist zufällig parametrisiert, um eine Vielzahl von Variationen zu erzeugen. Das Ziel ist es, das Modell zu zwingen, die zugrundeliegenden Muster der Daten zu lernen, anstatt sich auf spezifische Merkmale zu verlassen, die nur in den Trainingsdaten vorhanden sind. Einige Beispiele für Datenaugmentationstechniken sind in \autoref{fig:data-augmentation} dargestellt.
+
+Datenaugmentation wurde erstmals in \parencite{LeCun1998dataaugmentation} vorgestellt und hat sich seitdem als eine der wichtigsten Ansätze zur Vermeidung von Overfitting und zur Verbesserung der Generalisierungsfähigkeit von Modellen erwiesen. Sie findet in fast allen Methoden des Maschinellen Lernens Anwendung.
 
 % Beispiele
 \begin{figure}[h]
@@ -324,15 +322,15 @@ Ein besonders einflussreiches Diffusionsmodell ist \textbf{Stable Diffusion} \pa
 \subsection{DA-Fusion} \label{subsec:da-fusion}
 
 % Einleitung; Kurze Beschreibung, Versprechen der Methode
-In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine auf Stable Diffusion basierende Methode zur Datenaugmentation vorgestellt, die für diese Arbeit von besonderem Interesse ist. Der traditionelle Ansatz der Datenaugmentation, wie in \autoref{sec:data-augmentation} beschrieben, hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit von Modellen zu verbessern. Allerdings erfordert dieser Ansatz auch eine gute Intuition in Bezug auf den verwendeten Datensatz, um zu vermeiden, dass Transformationen gewählt werden, durch die Informationen verloren gehen, die für die Aufgabe des zu trainierenden Modells wichtig sind. Wenn beispielsweise Farbinformationen für die Klassifizierung von Blumen wichtig sind, könnte die Datenaugmentation durch zufällige Farbänderungen die Leistung des Modells verschlechtern. Ein weiteres Beispiel sind Objekte, die klein im Bild sind und durch zufällige Ausschnitte des Bildes aus der Sicht des Modells verschwinden können. DA-Fusion hingegen nutzt das Wissen eines vortrainierten Diffusionsmodelle, um den Bildinhalt semantisch zu verstehen und automatisch neue, realistische Variationen zu generieren.
+In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine auf Stable Diffusion basierende Methode zur Datenaugmentation vorgestellt, die für diese Arbeit von besonderem Interesse ist. Der traditionelle Ansatz der Datenaugmentation, wie in \autoref{subsec:data-augmentation} beschrieben, hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit von Modellen zu verbessern. Allerdings erfordert dieser Ansatz auch eine gute Intuition in Bezug auf den verwendeten Datensatz, um zu vermeiden, dass Transformationen gewählt werden, durch die Informationen verloren gehen, die für die Aufgabe des zu trainierenden Modells wichtig sind. Wenn beispielsweise Farbinformationen für die Klassifizierung von Blumen wichtig sind, könnte die Datenaugmentation durch zufällige Farbänderungen die Leistung des Modells verschlechtern. Ein weiteres Beispiel sind Objekte, die klein im Bild sind und durch zufällige Ausschnitte des Bildes aus der Sicht des Modells verschwinden können. DA-Fusion hingegen nutzt das Wissen eines vortrainierten Diffusionsmodelle, um den Bildinhalt semantisch zu verstehen und automatisch neue, realistische Variationen zu generieren.
 
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=\textwidth]{figure_da-fusion_vs_baseline.png}
-	\caption[Vergleich zwischen semantischen Augmentationen aus Baseline-Methode und DA-Fusion.]{Vergleich zwischen semantischen Augmentationen aus Baseline-Methode\\
-	und DA-Fusion \parencite{Trabucco2023dafusion}.}
-	\label{fig:da-fusion}
-\end{figure}
+%\begin{figure}[h]
+%	\centering
+%	\includegraphics[width=\textwidth]{figure_da-fusion_vs_baseline.png}
+%	\caption[Vergleich zwischen semantischen Augmentationen aus Baseline-Methode und DA-Fusion.]{Vergleich zwischen semantischen Augmentationen aus Baseline-Methode\\
+%	und DA-Fusion \parencite{Trabucco2023dafusion}.}
+%	\label{fig:da-fusion-baseline}
+%\end{figure}
 
 % Fine-tuning mit Textual Inversion
 Es wird zunächst die Methode Textual Inversion aus \parencite{Gal2022textualinversion} angewendet, um ein vortrainiertes Stable Diffusion-Modell auf den gegebenen Datensatz feinabzustimmen. Dazu wird für jedes Konzept bzw. für jede Klasse ein neues Text-Embedding $y$ als Platzhalter in das Modell integriert, das unter Verwendung von Trainings-Prompts wie "a photo of a <$y$>" und den zugehörigen Bilddaten trainiert wird. Entscheidend ist hier, dass nicht das ganze Diffusionsmodell neu trainiert wird, sondern lediglich neue wörter erlernt werden, welche die spezifischen Konzepte repräsentieren, sodass sich bei der Bildgenerierung weiterhin auf das vortrainierte semantische Wissens des Modells gestützt werden kann.
@@ -438,20 +436,20 @@ Eine weitere Methode zur Verbesserung des Supervised Contrastive Learning ist \t
 
 Der Anwendungsfall, auf den sich diese Arbeit bezieht, ist die Klassifikation verschiedener industrieller Objekte und Gebrauchsgegenstände für die Recyclingwirtschaft. Grundlage dafür ist das Forschungsprojekt “Sensorische \textbf{E}rfassung, automatisierte \textbf{I}dentifikation und \textbf{B}ewertung von \textbf{A}ltteilen anhand von Produktdaten sowie Informationen über bisherige Lieferungen” (EIBA), das im Rahmen der Fördermaßnahme "Ressourceneffiziente Kreislaufwirtschaft \textemdash Innovative Produktkreisläufe (ReziProK)" des Bundesministeriums für Bildung und Forschung entstand \parencite{Wagner2022reziprok}. Neben dem Fraunhofer-IPK waren auch die Technische Universität Berlin, die Deutsche Akademie der Technikwissenschaften (acatech), sowie die Circular Economy Solutions GmbH beteiligt.
 
-Das Ziel des Projekts war die Entwicklung eines KI-gestützten Systems, welches Daten aus verschiedenen digitalen Sensoren, sowie Kontextdaten aus dem Geschäftsprozess verarbeitet, um bei der Identifikation, Inspektion und Sortierung von Altteilen zu unterstützen. Dabei betont das Projekt die Rolle der KI zur \emph{Unterstützung} des Menschen, nicht zur vollständigen Automatisierung \parencite{Wagner2022reziprok}. In \autoref{fig:eiba-process} wird veranschaulicht, wie sich das System in die genannten Prozesse integriert.
+Das Ziel des Projekts war die Entwicklung eines KI-gestützten Systems, welches Daten aus verschiedenen digitalen Sensoren, sowie Kontextdaten aus dem Geschäftsprozess verarbeitet, um bei der Identifikation, Inspektion und Sortierung von Altteilen zu unterstützen. Dabei betont das Projekt die Rolle der KI zur \emph{Unterstützung} des Menschen, nicht zur vollständigen Automatisierung \parencite{Wagner2022reziprok}. %In \autoref{fig:eiba-process} wird veranschaulicht, wie sich das System in die genannten Prozesse integriert.
 
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=\textwidth]{figure_eiba_process.png}
-	\caption[Integration des in EIBA entwickelten KI-gestützten Systems in den Prozess der Indentifikation, Inspektion und Sortierung von Altteilen.]{Integration des in EIBA entwickelten KI-gestützten Systems\\
-	in den Prozess der Indentifikation, Inspektion und Sortierung\\
-	von Altteilen \parencite{Wagner2022reziprok}.}
-	\label{fig:eiba-process}
-\end{figure}
+%\begin{figure}[h]
+%	\centering
+%	\includegraphics[width=\textwidth]{figure_eiba_process.png}
+%	\caption[Integration des in EIBA entwickelten KI-gestützten Systems in den Prozess der Indentifikation, Inspektion und Sortierung von Altteilen.]{Integration des in EIBA entwickelten KI-gestützten Systems\\
+%	in den Prozess der Indentifikation, Inspektion und Sortierung\\
+%	von Altteilen \parencite{Wagner2022reziprok}.}
+%	\label{fig:eiba-process}
+%\end{figure}
 
 Viele der Altteile sind sehr ähnlich und erfordern Expertenwissen, um sie korrekt zu identifizieren und den Beschädigungsgrad zu bewerten. Die Beschriftungen und Barcodes sind oft nicht mehr lesbar, sodass die Identifikation rein visuell erfolgen muss \parencite{Wagner2022reziprok}. Hier setzt das KI-System an, um den Menschen zu unterstützen. Es werden dafür multimodale Sensordaten verwendet, unter anderem Tiefenkameras (RGB-D) und eine Waage zur Erfassung des Gewichts zum Einsatz. In \autoref{fig:eiba-interface} ist die Mensch-Maschine-Schnittstelle einer mobilen Teststation des Systems dargestellt.
 
-\begin{figure}[h]
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=\textwidth]{figure_eiba_interface.png}
 	\caption[Die Mensch-Maschine-Schnittstelle des Systems.]{Die Mensch-Maschine-Schnittstelle des Systems \parencite{Wagner2022reziprok}.}
@@ -461,17 +459,17 @@ Viele der Altteile sind sehr ähnlich und erfordern Expertenwissen, um sie korre
 % Ergebnisse vielversprechend, aber vorerst nur im Labor; Generalisierung verbessern
 Das System wurde am Beispiel von gebrauchten Fahrzeugteilen entwickelt und konnte bei Tests basierend auf Bilddaten von ca. 1.400 Altteilen über 98\% Accuracy erreichen \parencite{ReziProK2019eiba}. Da die Tests jedoch unter Laborbedingungen stattfanden, wird weiterhin nach Möglichkeiten gesucht, die Generalisierungsfähigkeit des Modells zu verbessern. Insbesondere die Klassifikation von Objekten in verschiedenen Gebrauchszuständen, wie z.B. beschädigte oder verschmutzte Teile, stellt eine Herausforderung dar.
 
-In den vorherigen Abschnitten wurden verschiedene Methoden zur Verbesserung der Generalisierungsfähigkeit und Robustheit von Modellen vorgestellt. Sowohl das Contrastive Learning als auch die synthetische Datengenerierung bzw. Datenaugmentation konnten jeweils vielversprechende Ergebnisse erzielen. In dieser Arbeit wird nun ein Ansatz zur Kombination beider Methoden vorgestellt, welcher eine neuartige Verwendung von synthetischen Daten im Contrastive Learning ermöglichen könnte.
+In den vorherigen Abschnitten wurden verschiedene Methoden zur Verbesserung der Generalisierungsfähigkeit und Robustheit von Modellen vorgestellt. Sowohl die synthetische Datengenerierung als auch das Contrastive Learning konnten jeweils vielversprechende Ergebnisse erzielen. In dieser Arbeit wird nun ein Ansatz zur Kombination beider Methoden vorgestellt, welcher eine neuartige Verwendung von synthetischen Daten im Contrastive Learning ermöglichen könnte.
 
 \subsection{Herausforderungen bei der Generierung synthetischer Daten} \label{subsec:challenges-synt-data}
 
-Zunächst soll auf eine Reihe von Herausforderungen bei der Generierung synthetischer Daten aufmerksam gemacht werden, insbesondere im Kontext des vorgestellten Anwendungsfalls. Für herkömmliche Methoden zur Bildgenerierung, wie GANs oder Diffusionsmodelle, ergeben sich hier nämlich spezielle Herausforderungen:
+Zunächst soll auf eine Reihe von Herausforderungen bei der Generierung synthetischer Daten im Kontext des vorgestellten Anwendungsfalls aufmerksam gemacht werden. Für herkömmliche Methoden zur Bildgenerierung, wie GANs oder Diffusionsmodelle, ergeben sich hier nämlich spezielle Herausforderungen:
 
 % Herausforderungen
 \begin{itemize}
-	\item Die Objekte weisen teilweise eine sehr hohe \textbf{Komplexität} auf, etwa bei Motoren oder Generatoren mit vielen Details. Auch moderne Methoden zur Bildgenerierung können daran scheitern, diese Details korrekt zu erlenrn und zu reproduzieren \textemdash insbesondere, wenn nur wenige Beispielbilder gegeben sind.
-	\item Es gibt oft nur \textbf{feine Unterschiede} zwischen den Klassen, die es zu berücksichtigen gilt. Sind die generierten Daten nicht akkurat genug, kann es zu Fehlklassifikationen kommen.
-	\item Auf Grund des Multiview-Setups haben die Bilder nur \textbf{wenig Variation}, vor allem in den Hintergründen. Auch die Objekte selbst sind zwar aus verschiedenen Perspektiven aufgenommen, bieten aber pro Klasse nicht viel Variation in Bezug auf die Beschaffenheit, die Farbe, usw.
+	\item Die Objekte weisen teilweise eine sehr hohe \emph{Komplexität} auf, etwa bei Motoren oder Generatoren mit vielen Details. Auch moderne Methoden zur Bildgenerierung können daran scheitern, diese Details korrekt zu erlenrn und zu reproduzieren \textemdash insbesondere, wenn nur wenige Beispielbilder gegeben sind.
+	\item Es gibt oft nur \emph{feine Unterschiede} zwischen den Klassen, die es zu berücksichtigen gilt. Sind die generierten Daten nicht akkurat genug, kann es zu Fehlklassifikationen kommen.
+	\item Auf Grund des Multiview-Setups haben die Bilder nur \emph{wenig Variation}, vor allem in den Hintergründen. Auch die Objekte selbst sind zwar aus verschiedenen Perspektiven aufgenommen, bieten aber pro Klasse nicht viel Variation in Bezug auf die Beschaffenheit, die Farbe, usw.
 \end{itemize}
 
 % Anforderungen
@@ -494,24 +492,27 @@ Um effektiv als Hard Negatives zu wirken, dürften die synthetischen Daten also 
 		% Zu ähnlich; feine Unterschiede
 	% Auch die gleichbleibenden Hintergründe sind fatal
 	% Außerdem: Unsupervised
+Synthetische Daten aus Diffusionsmodellen wurden bereits in \parencite{Tian2023stablerep} im Contrastive Learning verwendet, jedoch nur als normale ID-Beispiele. Die Autoren stellten fest, dass Stable Diffusion "off-the-shelf" oftmals nicht in der Lage ist, spezifische Konzepte akkurat wiederzugeben. Zudem handelt es sich um ein unüberwachtes Verfahren, das nicht von den Label-Informationen profitiert, die im verwendeten Datensatz vorhanden sind.
 
 % Was wenn: Anstatt Negatives aus Nähe im Darstellungsraum zu samplen, Near OOD-Augmentationen aus Anchor-Klasse?
 
 \subsection{Integration von DA-Fusion und Supervised Contrastive Learning} \label{subsec:da-fusion-supcon}
 
 % DA-Fusion zur Generierung von ID- und Near OOD-Daten
-...
+In dieser Arbeit wird ein Ansatz vorgestellt, der die Generierung von synthetischen Daten durch DA-Fusion mit dem Supervised Contrastive Learning kombiniert. DA-Fusion ermöglicht es, sowohl ID- als auch Near OOD-Daten zu generieren, die als Hard Negatives im Contrastive Learning verwendet werden können.
 
 % Einfach den strength-Parameter der DA-Fusion-Augmentationen erhöhen
-
-% Bei der Generierung die Maske verwenden, damit die Hintergründe gleich bleiben
+Um die synthetischen Daten als Near OOD-Daten zu generieren, wird der Parameter für die Augmentationsstärke in DA-Fusion erhöht. Dadurch werden die Daten stärker verändert, sodass sie sich von den echten Daten unterscheiden.
 
 % Supervised Contrastive Learning mit eigener Sampling-Strategie für Near OOD-Negatives
+Im Contrastive Learning wird eine eigene Sampling-Strategie für die Near OOD-Negatives eingeführt. Diese sollen sich von den ID-Beispielen unterscheiden, aber dennoch nah genug sein, um als Hard Negatives zu wirken. Die synthetischen Near OOD-Daten werden dabei als Negativ-Beispiele für die ID-Daten verwendet.
 
 % Potenzielle Vorteile
 	% Bessere Generalisierung trotz Limitationen in der Datengenerierung
 		% OOD-Augmentationen müssen an sich keine spezifischen Klassen akkurat repräsentieren, sind aber dennoch nah genug an den echten Daten, um dessen Repräsentationen zu verbessern
 	% Bessere OOD-Detektion
 		% OOD-Detection profitiert von einer guten Repräsentation der Daten, um die Distanz zwischen In-Distribution und OOD-Daten zu maximieren
+Als potenzielle Vorteile dieser Methode werden eine bessere Generalisierungsfähigkeit der Modelle trotz Limitationen in der Datengenerierung erwartet. Die OOD-Detection könnte ebenfalls verbessert werden, da die synthetischen Near OOD-Daten die Distanz zwischen den ID- und OOD-Daten maximieren.
+
 % Potenzielle Herausforderungen
-	% ...
+Heruasforderungen könnten sich jedoch aus der Wahl der Augmentationsstärke ergeben. Wenn die synthetischen Daten zu stark verändert werden, könnten sie sich zu sehr von den echten Daten unterscheiden und als schlechte Negativ-Beispiele wirken. Es gilt also, den "sweet spot" für die Augmentationsstärke zu finden.

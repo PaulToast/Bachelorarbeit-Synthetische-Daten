@@ -1,15 +1,15 @@
 % !TEX root = Bachelorarbeit Synthetische Daten.tex
 \begin{titlepage}
   % Andere Seitenränder als im Rest der Arbeit
-  \newgeometry{lmargin=2cm,tmargin=7mm,rmargin=5mm,bmargin=1cm}
+  \newgeometry{lmargin=2cm,tmargin=10mm,rmargin=15mm,bmargin=1cm}
   % Hausfarbe der HAW; diese und die folgenden Einstellungen sind lokal und gelten nur innerhalb der Umgebung "titlepage"
   \color{haw}
   % Blocksatz für die Titelseite deaktivieren
   \raggedright
   % Logos rechtsbündig setzen
-  \hfill\includegraphics[width=5.5cm]{logo_haw.jpg}\\
-  \vspace{0.5cm}
-  \hspace{\fill}\advance\rightskip1.5mm\includegraphics[width=5.0cm]{logo_fraunhofer-ipk.png}\\
+  \hspace{\fill}\includegraphics[width=5.00cm]{logo_haw.jpg}\\
+  \vspace{0.4cm}
+  \hspace{\fill}\includegraphics[width=4.30cm]{logo_fraunhofer-ipk.png}\\
 
   \vspace{5cm}
 
@@ -24,15 +24,13 @@
 
   % Titel der Arbeit
   \begin{minipage}{0.8\linewidth}
-    % Haupttitel mit der zweiten Hausschrift der HAW
-    \setmainfont{Martel Heavy}
-    \LARGE
+    % Haupttitel
+    \setmainfont{Martel Heavy} \LARGE
     Contrastive Learning\\[1mm] % [1mm] für etwas größeren Durchschuss
     mit Stable Diffusion-basierter\\[1mm]
     Datenaugmentation\\[4mm]
-    % Untertitel wieder mit der ersten Hausschrift der HAW
-    \setmainfont{Open Sans}
-    \Large
+    % Untertitel
+    \setmainfont{Open Sans} \Large
     Verbesserung der Bildklassifikation\\[1mm]
     durch synthetische Daten\\[1mm]
     % Horizontaler Strich
@@ -55,7 +53,8 @@
     \end{tabular}\\
 	
 	% Horizontaler Strich
-    \,\rule{9mm}{1mm}\\[1.5mm]
+    %\,\rule{9mm}{1mm}\\[1.5mm]
+    \vspace{5mm}
 	
 	% Anschrift HAW
 	\begin{tabular}{@{} p{0.75\linewidth} ll} %{p{0.3\linewidth}p{0.3\linewidth}}
