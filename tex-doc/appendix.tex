@@ -10,8 +10,11 @@
 % Nicht numeriert, aber trotzdem ins Inhaltsverzeichnis aufgenommen
 \addchap{Anhang}
 
+% Abbildungen & Tabellen nicht mehr ins Abbildungs- & Tabellenverzeichnis aufnehmen
+\captionsetup[figure]{justification=centering, list=no}
+\captionsetup[table]{justification=centering, list=no}
+
 \begin{table}
-	%\centering
 	\caption{Auswahl der 20 Klassen aus der Oberklasse "CarComponent" für den MVIP-Teildatensatz.}
 	\begin{tabular}{|l|l|l|l|}
 		\hline
@@ -37,7 +40,6 @@
 		\detokenize{Hella_8EA_011_610_221} & 'Iron' & 'Metallic', 'Shiny' & 'Used' \\
 		\detokenize{eiba_7_19} & 'Iron' & 'hard', 'rough' & 'Dirty', 'Old', 'Rusty' \\
 		\detokenize{821128} & 'Iron' & 'Metallic', 'Stains' & 'Dirty' \\
-
 		\hline
 	\end{tabular}
 	\label{app:subdataset}
