@@ -1,35 +1,18 @@
 % !TEX root = Bachelorarbeit Synthetische Daten.tex
 
-% Für diese Vorlage wurde die Klasse "scrreprt" von KOMA-Script gewählt,
-% die in etwa der Standardklasse "report" entspricht, allerdings wesentlich
-% mehr Möglichkeiten bietet und im gewissen "moderner" ist.
-%
-% Eine sehr ausführliche Dokumentation
-% zu KOMA-Script findet man unter der folgenden Adresse:
-% http://mirrors.ctan.org/macros/latex/contrib/koma-script/doc/scrguide.pdf
+% Für diese Vorlage wurde die Klasse "scrreprt" von KOMA-Script gewählt, die in etwa der Standardklasse "report" entspricht, allerdings wesentlich mehr Möglichkeiten bietet und im gewissen "moderner" ist.
+% Ausführliche Dokumentation: http://mirrors.ctan.org/macros/latex/contrib/koma-script/doc/scrguide.pdf
 \documentclass[
-  % die Schriftgröße - sollten Sie nicht ändern
   fontsize=12pt,
-  % das Papierformat, also DIN A4
   paper=A4,
-  % Literaturverzeichnis ins Inhaltsverzeichnis
-  bibliography=totoc,
-  % andere Verzeichnisse ebenfalls ins Inhaltsverzeichnis
-  listof=totoc,
-  % abgesetzte Formeln linksbündig
-  fleqn,
-  % für die Satzspiegelkonstruktion - siehe KOMA-Doku
-  DIV=12,
-  % Bindekorrektur (linker Rand) - evtl. anpassen
-  BCOR=1mm,
-  % die im Text verwendeten Sprachen (u.a. für das Paket babel); die
-  % letztgenannte (!) Sprache ist die Standardsprache; "n"german steht für die
-  % neue Rechtschreibung
-  english,ngerman,
-  % weil (s.u.) das Paket geometr verwendet wird
-  usegeometry,
-  % wie Absätze gesetzt werden: ohne Einzug, halbe Zeile Abstand
-  parskip=half-
+  bibliography=totoc, % Literaturverzeichnis ins Inhaltsverzeichnis
+  listof=totoc, % Andere Verzeichnisse ebenfalls ins Inhaltsverzeichnis
+  %fleqn, % Abgesetzte Formeln linksbündig
+  DIV=12, % Für die Satzspiegelkonstruktion - siehe KOMA-Doku
+  BCOR=1mm, % Bindekorrektur (linker Rand) - evtl. anpassen
+  english,ngerman, % Die im Text verwendeten Sprachen (u.a. für das Paket babel); die letztgenannte (!) Sprache ist die Standardsprache; "n"german steht für die neue Rechtschreibung
+  usegeometry, % Weil (s.u.) das Paket geometr verwendet wird
+  parskip=half- % Absätze ohne Einzug, halbe Zeile Abstand
 ]{scrreprt}
 
 \usepackage{caption}
@@ -37,65 +20,60 @@
 \captionsetup[table]{justification=centering, list=yes}
 % Beschriftungen für Tabellen kommen linksbündig über die Tabelle
 \KOMAoption{captions}{tableheading,nooneline}
-\setcaptionalignment[figure]{c}
-\setcaptionalignment[table]{l}
+%\setcaptionalignment[figure]{c}
+%\setcaptionalignment[table]{l}
 
-% wird für die Titelseite benötigt
+% Für die Titelseite benötigt
 \usepackage{geometry}
 
 % Standardpaket für Lokalisation, siehe Option "ngerman" oben
 \usepackage{babel}
-% Laden von optimierten Trennmustern
+% Optimierten Trennmuster
 \babelprovide[hyphenrules=ngerman-x-latest]{ngerman}
 
-% Standardpaket für mathematische Zusatzfunktionen; wenn Sie keine
-% mathematischen Formeln brauchen, können Sie diese Zeile löschen
+% Standardpaket für mathematische Zusatzfunktionen
 \usepackage{amsmath}
 
-% die Hauptschrift Libertinus
+% Hauptschrift Libertinus
 \usepackage{libertinus-otf}
-% die "Schreibmaschinenschrift" Anonymous Pro, angepasst
+% "Schreibmaschinenschrift" Anonymous Pro, angepasst
 \usepackage{AnonymousPro}
 \setmonofont{AnonymousPro}[Scale=MatchLowercase,FakeStretch=0.85]
 
-% etwas größerer Zeilenabstand als im Buchsatz
+% Etwas größerer Zeilenabstand als im Buchsatz
 \linespread{1.1}
 
-% Paket für Feinkorrekturen an der Typographie, das für ein ausgewogeneres
-% Schriftbild sorgt
+% Paket für Feinkorrekturen an der Typographie für ausgewogeneres Schriftbild
 \usepackage{microtype}
 
 % Paket für kontextsensitive Anführungszeichen
 \usepackage{csquotes}
-% Shortcut, damit aus dem eigentlich falschen Zeichen " richtige
-% Anführungszeichen je nach Sprache werden
+% Shortcut, damit aus " richtige Anführungszeichen werden, je nach Sprache
 \MakeOuterQuote{"}
 
 % Paket, das den Befehl \includegraphics ermöglicht
 \usepackage{graphicx}
 
-% komfortablere Aufzählungen als in Standard-LaTeX; ein Beispiel findet man in
-% chap3.tex
+% Komfortablere Aufzählungen als in Standard-LaTeX
 \usepackage{enumitem}
 
-% Paket für mehr als die üblichen Standardfarben
+% Paket für eigene Farbdefinitionen
 \usepackage[dvipsnames]{xcolor}
-% Definition der "Hausfarben" der HAW
+% "Hausfarben" der HAW
 \definecolor{haw}{HTML}{003CA0}
 \definecolor{haw2}{HTML}{0096D2}
 \definecolor{haw3}{HTML}{A0BEDC}
-% Definition der Versuchsfarben
+% Farben für die Versuchsreihen
 \definecolor{exp1}{HTML}{7D54B2}
 \definecolor{exp2}{HTML}{479A5F}
 \definecolor{exp3}{HTML}{EDB732}
 
-% typographisch anspruchsvolle Tabellen; siehe chap3.tex
+% Typographisch anspruchsvolle Tabellen
 \usepackage{booktabs}
 
-% zum Erstellen des Literaturverzeichnisses; der gängige Stil APA ist hier
-% bereits eingestellt
+% Erstellen des Literaturverzeichnisses; Stil APA eingestellt
 \usepackage[style=apa]{biblatex}
-% eine Beispieldatei für ein Literaturverzeichnis
+% Bibtex-Datei mit den Literaturangaben
 \addbibresource{library.bib}
 
 % Erzeugung von Grafiken mit PGF/TikZ
@@ -104,8 +82,7 @@
 
 % Codeblöcke
 \usepackage{listings}
-% Anpassung des Erscheinungsbildes des Codeblocks; mehr dazu in der
-% Dokumentation des Pakets "listings"
+% Anpassung des Erscheinungsbildes des Codeblocks
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{gray!20},
     keywordstyle=\color{haw2},
@@ -124,16 +101,12 @@
 % Damit es "Codeblock" und nicht "Listing" heißt
 \renewcommand{\lstlistingname}{Codeblock}
 
-% für die Verlinkung innerhalb des PDF-Dokuments, für PDF-Lesezeichen und
-% PDF-Metadaten; dieses Paket sollte üblicherweise immer als letztes geladen
-% werden
+% Verlinkung innerhalb des PDF-Dokuments, für PDF-Lesezeichen und PDF-Metadaten; dieses Paket sollte üblicherweise immer als letztes geladen werden
 \usepackage[colorlinks=true,allcolors=haw,hyperfootnotes=false,pageanchor=true,linktoc=all]{hyperref}
 
-% für die Druckversion können Sie die obige Zeile durch die folgende ersetzen,
-% damit Links nicht blau dargestellt werden:
+% Für Druckversion obige Zeile durch folgende ersetzen, damit Links nicht blau dargestellt werden:
 % \usepackage[draft]{hyperref}
 
-% Metadaten des PDF-Dokumentes; setzen Sie hier Ihren eigenen Namen sowie den
-% Titel Ihrer Arbeit ein
+% Metadaten des PDF-Dokumentes
 \hypersetup{pdfauthor={Paul Hofmann}}
 \hypersetup{pdftitle={Contrastive Learning mit Stable Diffusion-basierter Datenaugmentation}}

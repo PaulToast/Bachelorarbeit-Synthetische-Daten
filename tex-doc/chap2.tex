@@ -41,24 +41,24 @@ In der Praxis werden oft auch hybride Ansätze genutzt, wie das semi-überwachte
 \subsection{Deep Learning} \label{subsec:deep-learning}
 
 % Eine Hierarchie von Konzepten
-Das Wissen, das ein Modell aus den Trainingsdaten lernt, wird in Form von sogenannten Features repräsentiert. Diese Features können einfache Konzepte wie Kanten oder Farben sein, oder komplexere Konzepte wie Gesichter oder Objekte. Unter Deep Learning (DL) versteht man eine tiefe, hierarchische Vernetzung dieser Konzepte, sodass komplexere Konzepte auf simpleren Konzepten aufbauen können. Visuell veranschaulicht entsteht ein Graph mit vielen Ebenen, oder \emph{Deep Layers} \parencite{Goodfellow2016deeplearning}.
+Das Wissen, das ein Modell aus den Trainingsdaten lernt, wird in Form von sogenannten Features repräsentiert. Diese Features können einfache Konzepte wie Kanten oder Farben sein, oder komplexere Konzepte wie Gesichter oder Objekte. Unter Deep Learning (DL) versteht man eine tiefe, hierarchische Vernetzung dieser Konzepte, sodass komplexere Konzepte auf simpleren Konzepten aufbauen können. Visuell veranschaulicht entsteht ein Graph mit vielen Ebenen \parencite{Goodfellow2016deeplearning}.
 
 % Unterkategorie des ML
 Deep Learning ist also eine Unterkategorie des Maschinellen Lernens (siehe \autoref{fig:ai-venn}), bei der die Eingabedaten mehrere Verarbeitungsschichten durchlaufen, um eine hierarchische Repräsentation zu ermöglichen. Jede Schicht transformiert die Eingabedaten in eine etwas abstraktere Darstellung. Aus diesem Grund fällt Deep Learning auch unter den Begriff des Representation Learning \parencite{Zhou2021machinelearning}.
 
 \begin{figure}[t]
 	\centering
-	\includegraphics[width=\textwidth]{figure_ai_venn-diagram.png}
-	\caption{Ein einfaches Venn-Diagramm, das die Beziehung zwischen KI, ML und DL veranschaulicht.}
+	\includegraphics[width=0.9\textwidth]{figure_ai_venn-diagram.png}
+	\caption{Ein einfaches Venn-Diagramm, das die Beziehung zwischen\\KI, ML und DL veranschaulicht.}
 	\label{fig:ai-venn}
 \end{figure}
 
-Heutzutage bilden Deep Learning-Modelle die Grundlage für viele Anwendungen der Künstlichen Intelligenz, darunter Bild- und Spracherkennung, maschinelle Übersetzung, medizinische Diagnose und autonomes Fahren. Die rasante Entwicklung in diesem Bereich ist vor allem auf die Verfügbarkeit großer Datenmengen und immer leistungsfähigere Hardware zurückzuführen \parencite{Goodfellow2016deeplearning}. %?
+Heutzutage bilden Deep Learning-Modelle die Grundlage für viele Anwendungen der Künstlichen Intelligenz, darunter Bild- und Spracherkennung, maschinelle Übersetzung, medizinische Diagnose und autonomes Fahren. Die rasante Entwicklung in diesem Bereich ist vor allem auf die Verfügbarkeit großer Datenmengen und immer leistungsfähigere Hardware zurückzuführen \parencite{Goodfellow2016deeplearning}.
 
 \subsection{Neuronale Netze} \label{subsec:neural-networks}
 
 % Einleitung und grundlegender Aufbau
-Während die rasante Entwicklung von Deep Learning vor allem in den vergangenen Jahren spürbar geworden ist, sind die zugrundeliegenden Algorithmen und Konzepte schon seit Jahrzehnten bekannt \parencite{Zhou2021machinelearning}. Dabei bildet das künstliche neuronale Netz (KNN) die Grundlage der allermeisten Deep-Learning-Modelle. Es ist inspiriert von der Struktur und Funktionsweise des menschlichen Gehirns und besteht aus einer Vielzahl von miteinander verbundenen Knoten (Neuronen), die in Schichten organisiert sind. Die Struktur eines neuronalen Netzes besteht aus einer Eingabeschicht (Input Layer), einer oder mehreren versteckten Schichten (Hidden Layers) und einer Ausgabeschicht (Output Layer). %, wie in \autoref{fig:ffn} dargestellt.
+Während die rasante Entwicklung von Deep Learning in den vergangenen Jahren besonders spürbar geworden ist, sind die zugrundeliegenden Algorithmen und Konzepte schon seit Jahrzehnten bekannt. Das Künstliche Neuronale Netz (KNN) bildet dabei die Grundlage der allermeisten Deep Learning-Modelle. Es ist inspiriert von der Struktur und Funktionsweise des menschlichen Gehirns und besteht aus einer Vielzahl von miteinander verbundenen Knoten (Neuronen), die in Schichten organisiert sind. Die Schichten teilen sich auf in eine Eingabeschicht (Input Layer), eine oder mehrere versteckte Schichten (Hidden Layers) und eine Ausgabeschicht (Output Layer).
 
 %\begin{figure}[t]
 %	\centering
@@ -68,7 +68,7 @@ Während die rasante Entwicklung von Deep Learning vor allem in den vergangenen 
 %\end{figure}
 
 % Einzelnes Neuron im Detail
-Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Modellierung des biologischen Neurons, das erstmals 1943 von Warren McCulloh und Walter Pitts vorgestellt wurde \parencite{Zhou2021machinelearning}. In \autoref{fig:neuron} ist das Modell dargestellt.
+Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind mathematische Modelle des biologischen Neurons. Sie wurden erstmals 1943 von Warren McCulloh und Walter Pitts vorgestellt, wobei sich die heute verwendeten Neuronenmodelle kaum unterscheiden \parencite{Zhou2021machinelearning}. In \autoref{fig:neuron} ist ein solches Neuronenmodell dargestellt.
 
 \begin{figure}[h]
 	\centering
@@ -76,43 +76,50 @@ Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind eine mathematische Mo
 	%\includegraphics[width=12cm]{figure_mp-neuron.png}
 		% Mit Beschriftung
 		% https://commons.wikimedia.org/w/index.php?curid=224561
-	\includegraphics[width=12cm]{figure_mp-neuron_nd.png}
-		% Ohne Beschriftung
+	\includegraphics[width=12cm]{figure_mp-neuron_nd_edited.png}
+		% Ohne Beschriftung, editiert
 		% https://commons.wikimedia.org/wiki/File:ArtificialNeuronModel.png
 	\vspace*{2mm}
-	\caption[Abbildung des McCulloch-Pitts-Modells eines Neurons.]{Abbildung des McCulloch-Pitts-Modells eines Neurons \parencite{WikiNeuronModel}.}
+	\caption[Schematische Abbildung eines künstlichen Neurons.]{Schematische Abbildung eines künstlichen Neurons \parencite{WikiNeuronModel}.}
 	\label{fig:neuron}
 \end{figure}
 
-Jedes Neuron empfängt eine Reihe von Eingaben $x_{1 \dots n}$, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es zugehörige Gewichtungen (Weights) $w_{1j \dots nj}$, welche die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingaben auf das Neuron $j$ bestimmen. Das Neuron berechnet dann die gewichtete Summe $net_j$ aller Eingaben und falls ein bestimmter Schwellenwert (Bias) $\theta$ überschritten wurde, wird das Neuron aktiviert. Die Aktivierung $o_j$ des Neurons kann dementsprechend folgendermaßen beschrieben werden:
+Jedes Neuron empfängt eine Reihe von Eingaben $x_{1 \dots n}$, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es zugehörige Gewichtungen (Weights) $w_{1 \dots n}$, welche die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingaben auf das Neuron bestimmen. Das Neuron berechnet dann die gewichtete Summe aller Eingaben und falls ein bestimmter Schwellenwert (Bias) $\theta$ überschritten wurde, wird das Neuron aktiviert. Die Aktivierung $y$ des Neurons kann dementsprechend wie in \autoref{eq:mp-neuron} beschrieben werden.
 
 \begin{equation}
-	o_j = \varphi \left( \sum_{i=1}^{n} w_{ij} x_i - \theta_j \right)
+	y = \varphi \left( \sum_{i=1}^{n} w_{i} x_i - \theta_j \right),
 	\label{eq:mp-neuron}
 \end{equation}
 
-% Aktivierungsfunktionen; Sigmoid & Softmax
-Die Aktivierungsfunktion $\varphi$ kann dabei unterschiedlich gewählt werden, um die Ausgabe des Neurons zu modellieren. Eine simples Beispiel ist die sogenannte Schwellenwertfunktion, die den Wert 1 zurückgibt, wenn die gewichtete Summe größer als der Schwellenwert ist, sonst 0. Eine häufig verwendete Aktivierungsfunktion ist jedoch die sogenannte Sigmoid-Funktion, die kontinuierlich und differenzierbar ist und somit die Optimierung des Netzwerks vereinfacht:
+wobei $\varphi(z)$ die Aktivierungsfunktion ist, die die Ausgabe des Neurons bestimmt. Häufig wird die sogenannte Sigmoid-Funktion (siehe \autoref{eq:sigmoid}) verwendet, die im Gegensatz zu einer einfachen Schwellenwertfunktion kontinuierlich und differenzierbar ist und somit die Optimierung des Netzwerks vereinfacht \parencite{Zhou2021machinelearning}.
 
 \begin{equation}
-	\text{Sigmoid}(x) = \frac{1}{1 + e^{-x}}
+	\text{Sigmoid}(z) = \frac{1}{1 + e^{-z}},
 	\label{eq:sigmoid}
 \end{equation}
 
-Während die Sigmoid-Funktion allerdings nur für binäre Klassifikationen geeignet ist, wird für die Klassifikation von mehreren Klassen die Softmax-Funktion verwendet, die die Wahrscheinlichkeitsverteilung über alle Klassen berechnet:
+Die Sigmoid-Funktion eignet sich allerdings nur für binäre Klassifikation, weshalb für die Klassifikation von mehreren Klassen die Softmax-Funktion (siehe \autoref{eq:softmax}) verwendet wird, die eine Wahrscheinlichkeitsverteilung über alle Klassen berechnet \parencite{Goodfellow2016deeplearning}.
 
 \begin{equation}
-	\text{Softmax}(x)_i = \frac{e^{x_i}}{\sum_{j=1}^{n} e^{x_j}}
+	\text{Softmax}(z)_i = \frac{e^{z_i}}{\sum_{j=1}^{n} e^{z_j}}
 	\label{eq:softmax}
 \end{equation}
 
-% Wie neuronale Netze lernen; Loss-Funktionen, Backpropagation, Stochastic Gradient Descent
-Im Training fließen die Eingabedaten in einer Vorwärtsausbreitung (Forward Propagation) durch das Netzwerk, um die Ausgabe zu berechnen. Es wird dann eine geeignete Verlustfunktion angewendet, um den Fehler (Loss) des Modells zu berechnen. Das Ziel des Trainings ist es, die Gewichtungen der Neuronen so anzupassen, dass der Fehler minimiert wird.
+% Wie neuronale Netze lernen
+Im Training fließen die Eingabedaten in einer Vorwärtsausbreitung (Forward Propagation) durch das Netzwerk, um die Ausgabe zu berechnen, welche sich aus der Aktivierung der Neuronen in der Ausgabeschicht ergibt. Es wird dann eine geeignete Verlustfunktion angewendet, um den Fehler (Loss) des Modells zu berechnen. Das Ziel des Trainings ist es, die Gewichtungen der Neuronen so anzupassen, dass der Fehler minimiert wird.
 
-Diese Optimierung geschieht durch eine Rückwärtsausbreitung (Backpropagation), welche den berechneten Fehler rückwärts durch das Netz propagiert, um die Gewichte und Schwellenwerte um einen geringen Wert in die Richtung anzupassen, die den Fehler minimieren würde. Die Richtung wird bestimmt, indem der Gradient der Verlustfunktion berechnet wird. So bewegt sich das Modell iterativ entlang des Gradienten hin zu einem lokalen Minimum der Verlustfunktion. Dieser Algorithmus wird als Gradient Descent (Gradientenabstieg) bezeichnet. Im Maschinellen Lernen kommt jedoch hauptsächlich der Stochastic Gradient Descent (SGD) zum Einsatz, der immer nur einen kleinen, zufällig ausgewählten Teil der Trainingsdaten (einen sogenannten Batch) verwendet, um den Gradienten zu berechnen. %Goodfellow2016deeplearning?
+% Cross Entropy
+Die Wahl der Verlustfunktion hängt von der Art des Problems ab, das gelöst werden soll. Für Klassifikationsprobleme wird häufig die Kreuzentropie (Cross Entropy) verwendet, die den Fehler zwischen den tatsächlichen und den vorhergesagten Wahrscheinlichkeiten berechnet (siehe \autoref{eq:loss-cross-entropy}). \parencite{}
 
-% Hyperparameter
-Es gibt eine Reihe von sogenannten Hyperparametern, welche einen großen Einfluss auf die Leistung des Modells haben und vorher manuell konfiguriert werden, oftmals durch Ausprobieren verschiedener Werte. Die Lernrate (Learning Rate) bestimmt beispielsweise, wie groß die Schritte sind, die entlang des Gradienten gemacht werden, während die Batch-Größe (Batch Size) die Anzahl der Trainingsdaten bestimmt, die in einem Schritt des SGD verwendet werden. Die Anzahl der Epochen gibt an, wie oft der gesamte Trainingsdatensatz durchlaufen wird. Andere Hyperparameter, wie die Anzahl der versteckten Schichten und Neuronen, bestimmen die Komplexität des Modells.
+\begin{equation}
+	Loss = -\frac{1}{m}\sum_{i=1}^{m} y_i \log(\hat{y}_i),
+	\label{eq:loss-cross-entropy}
+\end{equation}
+
+wobei $y_i$ die tatsächliche Wahrscheinlichkeit und $\hat{y}_i$ die vorhergesagte Wahrscheinlichkeit für Klasse $i$ ist.
+
+% Backpropagation und SGD
+Die Optimierung geschieht durch eine Rückwärtsausbreitung (Backpropagation), welche den berechneten Fehler rückwärts durch das Netz propagiert, um die Gewichte und Schwellenwerte um einen geringen Wert in die Richtung anzupassen, die den Fehler minimieren würde. Die Richtung wird bestimmt, indem der Gradient der Verlustfunktion berechnet wird. Die Lernrate (Learning Rate) bestimmt, wie groß die Schritte sind, die entlang des Gradienten gemacht werden. So bewegt sich das Modell iterativ entlang des Gradienten hin zu einem lokalen Minimum der Verlustfunktion. Dieser Algorithmus wird als Gradient Descent (Gradientenabstieg) bezeichnet. Im Maschinellen Lernen kommt hauptsächlich der Stochastic Gradient Descent (SGD) zum Einsatz, der immer nur einen kleinen, zufällig ausgewählten Teil der Trainingsdaten (einen sogenannten Batch) verwendet, um den Gradienten zu berechnen.
 
 % CNN als Beispiel eines Deep Learning-Modells
 \begin{figure}[h]
@@ -121,26 +128,24 @@ Es gibt eine Reihe von sogenannten Hyperparametern, welche einen großen Einflus
 	\caption[Architektur eines Convolutional Neural Networks.]{Architektur eines Convolutional Neural Networks \parencite{Saha2018cnnfigure}.}
 	\label{fig:cnn}
 \end{figure}
-%\footnotetext{Quelle: \url{} [Aufgerufen: 17.09.2024]}
 
 % CNN als Deep Learning-Beispiel eines NN
 Deep Learning mit neuronalen Netzen kann gut am Beispiel des Convolutional Neural Networks (CNN) veranschaulicht werden, welches speziell für die Verarbeitung von Bildern entwickelt wurde (siehe \autoref{fig:cnn}). Ein CNN besteht aus mehreren Schichten, darunter Convolutional Layers, Pooling Layers und Fully Connected Layers. Die Convolutional Layers extrahieren sogenannte \emph{Feature Maps} aus den Eingabebildern, indem sie Faltungskerne über das Bild schieben und die gewichteten Summen der Pixel berechnen. Die Pooling Layers reduzieren die Dimensionalität der Feature Maps, indem sie die Größe der Merkmale reduzieren. Die Fully Connected Layers kombinieren die extrahierten Merkmale, um die endgültige Klassifikation vorzunehmen.
 
-Mit Backpropagation trainierte CNNs wurden erstmals in \parencite{LeCun1990cnnbackprop} behandelt, bilden aber auch heute noch die Grundlage von zahlreichen Deep Learning-Anwendungen und Methoden. Sie sind vor allem deshalb so erfolgreich in der Bildverarbeitung, weil sie die räumliche Struktur von Bildern berücksichtigen und dadurch eine hohe Genauigkeit bei der Klassifikation erreichen können.
+Mit Backpropagation trainierte CNNs wurden erstmals in \parencite{LeCun1989cnnbackprop} behandelt, bilden aber auch heute noch die Grundlage von zahlreichen Deep Learning-Anwendungen und Methoden. Sie sind vor allem deshalb so erfolgreich in der Bildverarbeitung, weil sie die räumliche Struktur von Bildern berücksichtigen und dadurch effektiv Muster und Merkmale in den Daten erkennen können.
 
 \subsection{Datenaugmentation} \label{subsec:data-augmentation}
 
 % Overfitting
 Wenn ein Modell so stark an die Trainingsdaten angepasst wird, dass es nicht in der Lage ist, auf neuen, unbekannten Daten zu generalisieren, spricht man von Overfitting \parencite{Goodfellow2016deeplearning}. Statt die zugrundeliegenden Muster zu lernen, speichert das Modell auch zufällige Rauschsignale und Fehler. Dies führt dazu, dass das Modell auf den Trainingsdaten eine hohe Genauigkeit erreicht, aber auf neuen Daten eine schlechtere Leistung zeigt. Man verwendet daher neben den Trainingsdaten auch Validierungsdaten (Daten, die nicht zum Training des Modells verwendet werden) zur Überwachung des Overfittings.
 
-Overfitting kann das Resultat einer zu hohen Komplexität des Modells sein, die dafür sorgt, dass die Trainingsdaten zu genau modelliert werden. Techniken zur Regularisierung zielen deshalb darauf ab, die optimale Komplexität eines Modells zu finden. Dropout \parencite{Srivastava2014dropout} ist eine solche Technik, bei der zufällig ausgewählte Neuronen während des Trainings deaktiviert werden, um zu verhindern, dass das Modell sich auf spezifische Merkmale verlässt. %Als Early Stopping wird ein anderer Ansatz bezeichnet, bei dem das Training beendet wird, wenn die Leistung auf den Validierungsdaten beginnt, sich zu verschlechtern.
-
-Oftmals liegt das Problem jedoch in der Quantität und Qualität der Trainingsdaten. Sind nicht genügend Daten vorhanden, oder sind die Daten nicht divers genug, kann das Modell nicht generalisieren.
+% Overfitting kann das Resultat einer zu hohen Komplexität des Modells sein, die dafür sorgt, dass die Trainingsdaten zu genau modelliert werden. Techniken zur Regularisierung zielen deshalb darauf ab, die optimale Komplexität eines Modells zu finden. Dropout \parencite{Srivastava2014dropout} ist eine solche Technik, bei der zufällig ausgewählte Neuronen während des Trainings deaktiviert werden, um zu verhindern, dass das Modell sich auf spezifische Merkmale verlässt. Als Early Stopping wird ein anderer Ansatz bezeichnet, bei dem das Training beendet wird, wenn die Leistung auf den Validierungsdaten beginnt, sich zu verschlechtern.
+Während Overfitting auch das Resultat einer zu hohen Komplexität des Modells sein kann, die dafür sorgt, dass die Trainingsdaten zu genau modelliert werden, liegt das Problem oftmals in der Quantität und Qualität der Trainingsdaten selbst. Sind nicht genügend Daten vorhanden, oder sind die Daten nicht divers genug, kann das Modell nicht generalisieren.
 
 % Datenaugmentation
-Dabei kann das Modell auch ohne völlig neue Daten zu beschaffen robuster gegenüber Variationen gemacht werden, indem es mit leicht veränderten Versionen der Trainingsdaten trainiert wird. Bei der \emph{Datenaugmentation} werden unterschiedliche Transformationen auf die vorhandenen Daten angewendet, z.B. Rotation, Skalierung, Verschiebung, Spiegelung, Helligkeitsanpassung oder Rauschen \parencite{Shorten2019dataaugmentation}. Die Transofrmationen werden meist zufällig parametrisiert, um eine Vielzahl von Variationen zu erzeugen. Das Ziel ist es, das Modell zu zwingen, die zugrundeliegenden Muster der Daten zu lernen, anstatt sich auf spezifische Merkmale zu verlassen, die nur in den Trainingsdaten vorhanden sind. Einige Beispiele für Datenaugmentationstechniken sind in \autoref{fig:data-augmentation} dargestellt.
+Dabei kann das Modell auch ohne völlig neue Daten zu beschaffen robuster gegenüber Variationen gemacht werden, indem es mit leicht veränderten Versionen der Trainingsdaten trainiert wird. Bei der Datenaugmentation werden unterschiedliche Transformationen auf die vorhandenen Daten angewendet, z.B. Rotation, Skalierung, Verschiebung, Spiegelung, Helligkeitsanpassung oder Rauschen \parencite{Shorten2019dataaugmentation}. Die Transofrmationen werden meist zufällig parametrisiert, um eine Vielzahl von Variationen zu erzeugen. Das Ziel ist es, das Modell zu zwingen, die zugrundeliegenden Muster der Daten zu lernen, anstatt sich auf spezifische Merkmale zu verlassen, die nur in den Trainingsdaten vorhanden sind. Einige Beispiele für Datenaugmentationstechniken sind in \autoref{fig:data-augmentation} dargestellt.
 
-Datenaugmentation wurde erstmals in \parencite{LeCun1998dataaugmentation} vorgestellt und hat sich seitdem als eine der wichtigsten Ansätze zur Vermeidung von Overfitting und zur Verbesserung der Generalisierungsfähigkeit von Modellen erwiesen. Sie findet in fast allen Methoden des Maschinellen Lernens Anwendung.
+Datenaugmentation hat sich als eine der wichtigsten Ansätze zur Vermeidung von Overfitting und zur Verbesserung der Generalisierungsfähigkeit von Modellen erwiesen. Sie findet in fast allen Methoden des Maschinellen Lernens Anwendung.
 
 % Beispiele
 \begin{figure}[h]
@@ -157,93 +162,92 @@ Datenaugmentation wurde erstmals in \parencite{LeCun1998dataaugmentation} vorges
 Wenn ein KI-Modell mit Daten konfrontiert wird, die außerhalb des Bereichs liegen, den es während des Trainings gesehen hat, spricht man von Out-of-Distribution (OOD)-Daten. Es handelt sich also um Datenpunkte oder Muster, die sich signifikant von den Trainingsdaten unterscheiden. Dies kann zu Problemen führen, da das Modell möglicherweise nicht in der Lage ist, angemessene Vorhersagen oder Entscheidungen für diese Daten zu treffen. Die Erkennung von OOD-Daten ist daher ein wichtiges Forschungsgebiet im maschinellen Lernen, da sie dazu beitragen kann, die Zuverlässigkeit und Sicherheit von KI-Systemen zu verbessern.
 
 % Schwellenwert
-Idealerweise gibt ein neuronales Netz höhere Softmax-Wahrscheinlichkeiten für In-Distribution (ID)-Daten und niedrigere Wahrscheinlichkeiten für OOD-Daten aus. Tatsächlich sind die Wahrscheinlichkeiten für OOD-Daten fast immer sehr hoch, meist reicht aber der Abstand zwischen ID- und OOD-Daten aus, um einen Schwellenwert festzulegen und OOD-Instanzen frühzeitig zu identifizieren \parencite{Hendrycks2018baselineooddetection}.
+Im Idealfall gibt ein Neuronales Netz höhere Softmax-Wahrscheinlichkeiten für In-Distribution (ID)-Daten und niedrigere Wahrscheinlichkeiten für OOD-Daten aus. Tatsächlich sind die Wahrscheinlichkeiten für OOD-Daten fast immer sehr hoch, meist reicht aber der Abstand zwischen ID- und OOD-Daten aus, um OOD-Instanzen frühzeitig zu identifizieren \parencite{Hendrycks2018baselineooddetection}.
 
 % Andere Ansätze
-Oftmals ist die OOD-Detektion aber weniger trivial, etwa wenn sich ID- und OOD-Daten sehr ähnlich sind. Es wird daher stets nach alternativen Ansätzen gesucht, um die OOD-Detektion zu verbessern. In \parencite{Hendrycks2018baselineooddetection} wird dabei ein Klassifikator erweitert, um Rekonstruktionen der Eingabedaten zu erstellen und den Fehler zwischen den Original- und Rekonstruktionsdaten zu messen. Ein hoher Rekonstruktionsfehler kann auf OOD-Daten hinweisen. Auch das Temperature Scaling \parencite{Guo2017tempscaling}, welches die Softmax-Wahrscheinlichkeiten kalibriert, kann zusammen mit kleinen Störungen in den Eingabedaten für zuverlässigere Wahrscheinlichkeitswerte und bessere OOD-Detektion sorgen \parencite{Liang2020odin}.
+Oftmals ist die OOD-Detektion aber weniger trivial, etwa wenn sich ID- und OOD-Daten sehr ähnlich sind. Es wird daher stets nach alternativen Ansätzen gesucht, um die OOD-Detektion zu verbessern. In \parencite{Hendrycks2018baselineooddetection} wird dabei ein Klassifikator erweitert, um Rekonstruktionen der Eingabedaten zu erstellen und den Fehler zwischen den Original- und Rekonstruktionsdaten zu messen. Ein hoher Rekonstruktionsfehler kann auf OOD-Daten hinweisen. Auch das Temperature Scaling \parencite{Guo2017tempscaling}, welches die Softmax-Wahrscheinlichkeiten kalibriert und somit den Abstand zwischen ID- und OOD-Daten vergrößert, kann zusammen mit kleinen Störungen in den Eingabedaten für zuverlässigere OOD-Detektion sorgen \parencite{Liang2020odin}.
 
 \section{Synthetische Daten} \label{sec:synt-data}
 
 % Anschließend an Datenaugmentation; Problematik der Datensammlung
-Datenaugmentation wurde bereits als eine Möglichkeit vorgestellt, um die Menge und Vielfalt der Trainingsdaten zu erhöhen und damit die Generalisierungsfähigkeit des Modells zu verbessern. Allerdings kann die bloße Augmentation an ihre Grenzen stoßen, wenn die verfügbaren Trainingsdaten selbst nicht genügend Vielfalt aufweisen. In solchen Fällen können synthetische Daten eine nützliche Ergänzung sein. Anstatt einfache Transformationen auf die Eingangsdaten anzuwenden, werden völlig neue Datenpunkte generiert, die die zugrundeliegenden Muster der realen Daten nachahmen.
+Datenaugmentation wurde bereits als eine Möglichkeit vorgestellt, um die Menge und Vielfalt der Trainingsdaten zu erhöhen und damit die Generalisierungsfähigkeit des Modells zu verbessern. Allerdings kann die bloße Augmentation an ihre Grenzen stoßen, wenn die verfügbaren Trainingsdaten selbst nicht genügend Vielfalt aufweisen. In solchen Fällen können synthetische Daten eine nützliche Ergänzung sein. Anstatt einfache Transformationen auf die Eingangsdaten anzuwenden, werden völlig neue Datenpunkte generiert, die die zugrundeliegenden Muster der realen Daten nachahmen. Auch im Hinblick auf den Datenschutz sind synthetische Daten vielversprechend, da sie die Möglichkeit bieten, sensible und personenbezogene Informationen zu schützen.
 
 % Fortschritte in generativer Modellierung durch Deep Learning
-Während synthetische Daten auch manuell mit Hilfe von Simulationssoftware erstellt werden können, hat insbesondere die Entwicklung der generativen Modellierung in den letzten Jahren zu einer neuen Ära der synthetischen Datenerzeugung geführt. Diese Modelle sind in der Lage, komplexe Datenstrukturen zu lernen und realistische Daten zu generieren, die von echten Daten kaum zu unterscheiden sind. Diese Entwicklung ist vor allem auf die Fortschritte im Deep Learning zurückzuführen \parencite{Foster2020gendeeplearning}: Als Hierarchie der Mustererkennung können Deep Learning-Modelle das hohe Maß bedingter Abhängigkeiten zwischen Merkmalen in den Daten lernen und reproduzieren. Und als Form des Representation Learning erleichtert Deep Learning die Generierung von Daten, indem nur eine geeignete niedrigdimensionale Repräsentation gewählt werden muss, welches das Modell wieder zu einer realistischen Dateninstanz umwandeln soll.
+Während synthetische Daten auch manuell mit Hilfe von Simulationssoftware erstellt werden können, hat insbesondere die Entwicklung generativer KI-Modelle in den letzten Jahren zu einer neuen Ära der synthetischen Datenerzeugung geführt. Diese Modelle sind in der Lage, komplexe Datenstrukturen zu lernen und realistische Daten zu generieren, die von echten Daten kaum zu unterscheiden sind.
+% Diese Entwicklung der generativen Modellierung ergibt sich vor allem aus den Fortschritten im Deep Learning \parencite{Foster2020gendeeplearning}: Als Hierarchie der Mustererkennung können Deep Learning-Modelle das hohe Maß bedingter Abhängigkeiten zwischen Merkmalen in den Daten lernen und reproduzieren. Und als Form des Representation Learning erleichtert Deep Learning die Generierung von Daten, indem nur eine geeignete niedrigdimensionale Repräsentation gewählt werden muss, welches das Modell wieder zu einer realistischen Dateninstanz umwandeln soll.
 
 % Einleitung folgender Abschnitte
-Es sollen nun einige der wichtigsten generativen Modelle vorgestellt werden, um eine Grundlage für den aktuellen Stand der synthetischen Datengenerierung zu schaffen.
-
-% NeRF?
+Da sich diese Arbeit mit der Bildklassifikation beschäftigt, wird im Folgenden vor allem auf generative Modelle eingegangen, die darauf spezialisiert sind, Bilder zu generieren. Es sollen einige der wichtigsten Modelle vorgestellt werden, um eine Grundlage für den aktuellen Stand der synthetischen Datengenerierung zu schaffen.
 
 \subsection{Variational Autoencoder} \label{subsec:vae}
 
-Ein Autoencoder ist eine spezielle Art von KI-Modell, das entwickelt wurde, um Daten effizient zu komprimieren und anschließend zu rekonstruieren. Es wurde im Wesentlichen in \parencite{Hinton2006autoencoder} vorgestellt, die Grundideen gehen jedoch bis in die 1980er Jahre zurück, z.B. \parencite{Rumelhart1986backpropagation}, wo auch das Backpropagation-Verfahren zur Optimierung neuronaler Netze beschrieben wurde.
+Ein Autoencoder ist eine spezielle Art von KI-Modell, das entwickelt wurde, um Daten effizient zu komprimieren und anschließend zu rekonstruieren. Es wurde im Wesentlichen in \parencite{Hinton2006autoencoder} vorgestellt, die Grundideen gehen jedoch bis in die 1980er Jahre zurück, wie z.B. in \parencite{Rumelhart1986backpropagation}, wo auch das Backpropagation-Verfahren zur Optimierung neuronaler Netze beschrieben wurde.
 
-Autoencoder bestehen aus zwei Hauptkomponenten \parencite{Foster2020gendeeplearning}:
+Autoencoder bestehen aus zwei Hauptkomponenten; einem \emph{Encoder}, der die Eingabedaten in einen niedrigdimensionalen Darstellungsvektor komprimiert, und einem \emph{Decoder}, der den Darstellungsvektor wieder in die ursprünglichen Daten umwandelt. So wird das Originalbild als Punkt in einem mehrdimensionalen latenten Raum abgebildet, in dem jede Dimension eine bestimmte Eigenschaft des Bildes kodiert.
 
-\begin{itemize}
-	\item \textbf{Encoder}: Der Encoder komprimiert hochdimensionale Eingabedaten in einem niederdimensionalen Darstellungsvektor.
-	\item \textbf{Decoder}: Der Decoder nimmt einen gegebenen Darstellungsvektor und wandelt ihn zurück in den ursprünglichen hochdimensionalen Raum um.
-\end{itemize}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\textwidth]{figure_autoencoder.png}
+	\caption{Aufbau eines Autoencoders.}
+	\label{fig:autoencoder}
+\end{figure}
 
-Der Darstellungsvektor repräsentiert das Originalbild als Punkt in einem mehrdimensionalen latenten Raum, wobei jede Dimension eine bestimmte Eigenschaft des Bildes kodiert. Es handelt sich beim Autoencoder deshalb um eine Form des Representation Learning.
-
-Das Training eines Autoencoders erfolgt durch Minimierung des Rekonstruktionsfehlers, der die Differenz zwischen den ursprünglichen Eingabedaten und den rekonstruierten Ausgaben beschreibt. Eine gängige Verlustfunktion hierfür ist der Mean Squared Error (MSE):
+Das Training eines Autoencoders erfolgt durch Minimierung des Rekonstruktionsfehlers, der die Differenz zwischen den Eingabedaten und den Rekonstruktionen beschreibt. Eine gängige Verlustfunktion hierfür ist der Mean Squared Error (MSE), der in \autoref{eq:loss-mse} formuliert ist.
 
 \begin{equation}
 	Loss=\frac{1}{n}\sum_{i=1}^n (x_i-\hat{x}_i)^2,
 	\label{eq:loss-mse}
 \end{equation}
 
-wobei $x_i$ die Eingabedaten und $\hat{x}_i$ die rekonstruierten Ausgaben sind.
+wobei $x_i$ die Eingabedaten und $\hat{x}_i$ die Rekonstruktionen sind.
 
 % Weiterentwicklung durch VAE
-Für die synthetische Datengenerierung sind Autoencoders deshalb interessant, weil man theoretisch durch die Wahl eines beliebigen Punkts im latenten Raum neue Bilder erzeugen kann, indem man diesen Punkt durch den Decoder schickt, da der Decoder gelernt hat, wie man Punkte im latenten Raum in realistische Bilder umwandelt. \parencite{Foster2020gendeeplearning} In der herkömmlichen Form hat der Autoencoder in Bezug auf diese Aufgabe allerdings einige Schwachstellen. So lernt er einen festen Punkt im latenten Raum für jede Eingabe, was zu einem diskreten und unstrukturierten latenten Raum führt. Denn wenn zwei Punkte im latenten Raum nahe beieinander liegen, bedeutet das nicht unbedingt, dass die entsprechenden Bilder ähnlich sind, was die Wahl eines Punktes im latenten Raum für die Generierung neuer Daten erschwert. Da keine Modellierung der Datenverteilung im latenten Raum stattfindet, können dann auch keine realistischen Daten generiert werden, die nicht in den Trainingsdaten enthalten sind.
+Für die synthetische Datengenerierung sind Autoencoder deshalb interessant, weil man theoretisch durch Auswahl eines beliebigen Punktes im latenten Raum neue Bilder generieren kann, indem man den entsprechenden Darstellungsvektor durch den Decoder laufen lässt. In seiner herkömmlichen Form hat der Autoencoder jedoch einige Schwächen in Bezug auf diese Aufgabe \parencite{Foster2020gendeeplearning}: Da er immer nur einen festen Punkt im latenten Raum für jede Eingabe lernt, entsteht ein diskreter und unstrukturierter latenter Raum. Es ist weder die Kontinuierlichkeit zwischen den Punkten der Eingabedaten noch die Vollständigkeit des latenten Raums sichergestellt, sodass neue Stichproben aus dem latenten Raum nicht unbedingt realistische Daten erzeugen.
 
-In \parencite{Kingma2022vae} wird der \textbf{Variational Autoencoder} (VAE) vorgestellt. Er adressiert die Schwachstellen des Autoencoders und verwendet probabilistische Methoden, um die Datenverteilung im latenten Raum zu modellieren; An Stelle eines einzelnen, festen Punkt im latenten Raum wird für jede Eingabe eine Verteilung gelernt, aus der die latenten Variablen stammen. Dadurch entsteht ein strukturierteer und kontinuierlicher latenter Raum, der es ermöglicht, neue, realistische Daten zu generieren.
+Der \emph{Variational Autoencoder} (VAE) \parencite{Kingma2013vae} adressiert die Schwachstellen des Autoencoders und verwendet probabilistische Methoden, um die Datenverteilung im latenten Raum zu modellieren; anstelle eines einzelnen, festen Punktes im latenten Raum wird für jede Eingabe eine Verteilung $p(z)$ gelernt, aus der die latenten Variablen $z$ stammen.
 
-% Funktionsweise VAE
-Der Encoder des VAEs berechnet einerseits den Mittelwert und die Standardabweichung der latenten Verteilung, und erzeugt außerdem eine zufällige Stichprobe aus dieser Verteilung. Der Decoder nimmt diese Stichprobe und rekonstruiert die Eingabedaten. Neben dem Rekonstruktionsfehler wird die Verlustfunktion des VAEs auch durch den Kullback-Leibler-Divergenzterm (KL-Divergenz) erweitert, der die Ähnlichkeit der gelernten Verteilung zu einer Standardnormalverteilung misst:
+% Der Encoder berechnet einerseits den Mittelwert und die Standardabweichung von $p(z)$, und erzeugt außerdem eine zufällige Stichprobe $z$. Der Decoder nimmt diese Stichprobe und rekonstruiert die Eingabedaten.
 
-\begin{equation}
-	D_{KL}(P||Q) = \int_{-\infty}^{\infty} p(x) \log \frac{p(x)}{q(x)},
-	\label{eq:kl-divergence}
-\end{equation}
-
-wobei $P$ die tatsächliche Verteilung und $Q$ die approximierte Verteilung ist.
-
-Die Gesamtverlustfunktion des VAEs ist dann die Summe aus Rekonstruktionsfehler und KL-Divergenz:
+Die latente Verteilung $p(z)$ entspricht dabei einer einfachen, bekannten Verteilung, wie z.B. einer Normalverteilung $\mathcal{N}(0,1)$. Somit modelliert der VAE die tatsächliche Verteilung der Eingabedaten $p(x)$ als eine Mischung von Verteilungen im latenten Raum, wie in \autoref{eq:vae-px} beschrieben.
 
 \begin{equation}
-	Loss = \textit{Reconstruction Loss} + \textit{KL-Divergence}
-	\label{eq:loss-vae}
+	p(x) = \int_z p(x|z)p(z)dz,
+	\label{eq:vae-px}
 \end{equation}
+
+Eine analytische Berechnung ist jedoch auf Grund der Integration über den gesamten latenten Raum rechnerisch nicht möglich. Stattdessen wird in der Evidence-Lower-Bound (ELBO) maximiert, um die Verteilung $p(x)$ zu approximieren. Die ELBO wird in \autoref{eq:elbo} formuliert.
+
+\begin{equation}
+	\mathcal{L}_{ELBO} = \mathbb{E}{q(z|x)}[\log p(x|z)] - D_{KL}(q(z|x) || p(z))
+	\label{eq:elbo}
+\end{equation}
+
+Die ELBO setzt sich aus zwei Teilen zusammen: dem Rekonstruktionsfehler, der die Differenz zwischen den Eingabedaten und den Rekonstruktionen beschreibt, und der Kullback-Leibler-Divergenz (KL-Divergenz) zwischen der latenten Verteilung $q(z|x)$ und der Prior-Verteilung $p(z)$. Die KL-Divergenz ist ein Maß für die Ähnlichkeit zwischen zwei Wahrscheinlichkeitsverteilungen. % und wird in \autoref{eq:kl-divergence} formuliert
+
+%\begin{equation}
+%	D_{KL}(P||Q) = \int p(x) \log \frac{p(x)}{q(x)},
+%	\label{eq:kl-divergence}
+%\end{equation}
 
 % Vorteile und Anwendungen; DALL-E (1)
-VAEs kommen noch immer in einer Vielzahl von Anwendungen zum Einsatz, darunter Bildgenerierung, Textgenerierung, Anomalieerkennung und semantische Segmentierung. \parencite{}
-
+	% VAEs kommen noch immer in einer Vielzahl von Anwendungen zum Einsatz, darunter Bildgenerierung, Textgenerierung, Anomalieerkennung und semantische Segmentierung. \parencite{}
 % Nachteile und Herausforderungen
-Dennoch haben VAEs auch einige Nachteile, da ihre zugrundeliegende Architektur ein sogenanntes Bottleneck-Problem aufweist, bei dem alle Informationen in den latenten Variablen komprimiert werden müssen. Es gehen zwangsweise Informationen verloren, was zu einer ungenauen Rekonstruktion der Eingabedaten führen kann. Darüber hinaus kann die Modellierung der Datenverteilung im latenten Raum schwierig sein, insbesondere bei komplexen Datenstrukturen. \parencite{}
+Trotz ihres Erfolgs haben auch VAEs einige Nachteile, da ihre zugrundeliegende Architektur ein sogenanntes Bottleneck-Problem aufweist, bei dem alle Informationen in den latenten Variablen komprimiert werden müssen. Es gehen zwangsweise Informationen verloren, was zu einer ungenauen Rekonstruktion der Eingabedaten führen kann. Darüber hinaus kann die Modellierung der Datenverteilung im latenten Raum schwierig sein, insbesondere bei komplexen Datenstrukturen. \parencite{Zhou2021machinelearning} %?
 
 \subsection{Generative Adversarial Networks} \label{subsec:gan}
 
-Ein weiteres berühmtes KI-Modell ist das Generative Adversarial Network (GAN), das in \parencite{Goodfellow2014gan} vorgestellt wurde. GANs bestehen aus zwei neuralen Netzwerken, die gegeneinander antreten, um realistische synthetische Daten zu erzeugen. Diese Technologie hat sich als äußerst mächtig in der Bild- und Datengenerierung erwiesen.
+Ein weiteres berühmtes KI-Modell ist das Generative Adversarial Network (GAN), das in \parencite{Goodfellow2014gan} vorgestellt wurde. GANs bestehen aus einem \emph{Generator}- und einem \emph{Diskriminator}-Modell, die gegeneinander antreten, um realistische synthetische Daten zu erzeugen. 
 
-Auch GANs bestehen aus zwei Hauptkomponenten, die allerdings eine andere Funktionsweise haben als die des Autoencoders:
-
-\begin{itemize}
-	\item \textbf{Generator}: Das generative Netzwerk nimmt Zufallsrauschen als Eingabe und erzeugt daraus Daten, die möglichst realistisch wirken sollen. Der Generator versucht, die wahre Datenverteilung zu imitieren und realistische Beispiele zu erstellen.
-	\item \textbf{Diskriminator}: Das diskriminative Netzwerk erhält sowohl echte Daten aus dem Trainingsdatensatz als auch die vom Generator erzeugten Daten. Seine Aufgabe ist es, zwischen echten und künstlichen Daten zu unterscheiden. Der Diskriminator gibt eine Wahrscheinlichkeit aus, dass die Eingabedaten echt sind.
-\end{itemize}
-
-Der Trainingsprozess eines GANs ist in \autoref{fig:gan} dargestellt und kann als minimax-Spiel zwischen dem Generator und dem Diskriminator formuliert werden: Der Diskriminator wird trainiert, um echte Daten von generierten Daten zu unterscheiden. Dies geschieht durch eine binäre Klassifikation („echt“ oder „synthetisch“). Der Diskriminator passt seine Gewichte an, um die Unterscheidung zu verbessern. Der Generator wird trainiert, um den Diskriminator zu täuschen. Dies geschieht, indem der Generator seine erzeugten Daten durch den Diskriminator laufen lässt und die Rückmeldung (Gradienten) des Diskriminators verwendet, um seine eigenen Parameter zu optimieren. Ziel ist es, den Diskriminator zu überlisten, sodass er die generierten Daten als echt klassifiziert.
+Der Generator nimmt Zufallsrauschen als Eingabe und erzeugt daraus Daten, die möglichst realistisch wirken sollen. Der Diskriminator erhält sowohl echte Daten aus dem Trainingsdatensatz als auch die vom Generator erzeugten Daten. Seine Aufgabe ist es, zwischen echten und künstlichen Daten zu unterscheiden. Der Diskriminator gibt eine Wahrscheinlichkeit aus, dass die Eingabedaten echt sind.
 
 \begin{figure}[h]
+	\centering
 	\includegraphics[width=\textwidth]{figure_gan.pdf}
 	\caption[Überblick über die GAN-Struktur.]{Überblick über die GAN-Struktur \parencite{GoogleDev2022ganfigure}.}
 	\label{fig:gan}
 \end{figure}
-%\footnotetext{Quelle: \url{https://developers.google.com/machine-learning/gan/gan_structure?hl=de} [Aufgerufen: 17.09.2024]}
+
+Der Trainingsprozess eines GANs ist in \autoref{fig:gan} dargestellt und kann als minimax-Spiel zwischen dem Generator und dem Diskriminator formuliert werden: Der Diskriminator wird trainiert, um echte Daten von generierten Daten zu unterscheiden. Dies geschieht durch eine binäre Klassifikation („echt“ oder „synthetisch“). Der Diskriminator passt seine Gewichte an, um die Unterscheidung zu verbessern. Der Generator wird trainiert, um den Diskriminator zu täuschen. Dies geschieht, indem der Generator seine erzeugten Daten durch den Diskriminator laufen lässt und die Rückmeldung (Gradienten) des Diskriminators verwendet, um seine eigenen Parameter zu optimieren. Ziel ist es, den Diskriminator zu überlisten, sodass er die generierten Daten als echt klassifiziert.
 
 % Details zum Training
 Im Detail wird der Generator durch Minimierung der Log-Wahrscheinlichkeit, dass der Diskriminator die generierten Daten als echt klassifiziert, trainiert. Der Diskriminator wird durch Maximierung dieser Wahrscheinlichkeit trainiert. Dies führt zu einem Gleichgewichtszustand, in dem der Generator realistische Daten erzeugt, die den echten Daten ähneln, und der Diskriminator nicht in der Lage ist, zwischen echten und generierten Daten zu unterscheiden.
