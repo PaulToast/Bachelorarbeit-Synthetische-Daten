@@ -56,7 +56,7 @@ if __name__ == "__main__":
         image_size=(args.resolution, args.resolution)
     )
     print(f"length: {len(dataset)}")
-
+"""
     for idx, description in enumerate(dataset.class_descriptions):
         print(f"{dataset.class_names[idx]}: {description}")
         print()
@@ -71,3 +71,4 @@ if __name__ == "__main__":
     
     for class_name in [f for f in os.listdir(args.output_dir) if os.path.isdir(os.path.join(args.output_dir, f))]:
         print(f"{class_name}: ")
+"""
