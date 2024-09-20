@@ -204,35 +204,38 @@ wobei $x_i$ die Eingabedaten und $\hat{x}_i$ die Rekonstruktionen sind.
 % Weiterentwicklung durch VAE
 Für die synthetische Datengenerierung sind Autoencoder deshalb interessant, weil man theoretisch durch Auswahl eines beliebigen Punktes im latenten Raum neue Bilder generieren kann, indem man den entsprechenden Darstellungsvektor durch den Decoder laufen lässt. In seiner herkömmlichen Form hat der Autoencoder jedoch einige Schwächen in Bezug auf diese Aufgabe \parencite{Foster2020gendeeplearning}: Da er immer nur einen festen Punkt im latenten Raum für jede Eingabe lernt, entsteht ein diskreter und unstrukturierter latenter Raum. Es ist weder die Kontinuierlichkeit zwischen den Punkten der Eingabedaten noch die Vollständigkeit des latenten Raums sichergestellt, sodass neue Stichproben aus dem latenten Raum nicht unbedingt realistische Daten erzeugen.
 
-Der \emph{Variational Autoencoder} (VAE) \parencite{Kingma2013vae} adressiert die Schwachstellen des Autoencoders und verwendet probabilistische Methoden, um die Datenverteilung im latenten Raum zu modellieren; anstelle eines einzelnen, festen Punktes im latenten Raum wird für jede Eingabe eine Verteilung $p(z)$ gelernt, aus der die latenten Variablen $z$ stammen.
+Der \emph{Variational Autoencoder} (VAE) \parencite{Kingma2013vae} adressiert die Schwachstellen des Autoencoders und verwendet probabilistische Methoden, um die Datenverteilung im latenten Raum zu modellieren; anstelle eines einzelnen, festen Punktes im latenten Raum wird für jede Eingabe eine Verteilung gelernt, aus der die latenten Variablen stammen. Die Verteilung entspricht dabei einer einfachen, bekannten Verteilung, wie z.B. einer Normalverteilung $\mathcal{N}(0,1)$.
 
-% Der Encoder berechnet einerseits den Mittelwert und die Standardabweichung von $p(z)$, und erzeugt außerdem eine zufällige Stichprobe $z$. Der Decoder nimmt diese Stichprobe und rekonstruiert die Eingabedaten.
-
-Die latente Verteilung $p(z)$ entspricht dabei einer einfachen, bekannten Verteilung, wie z.B. einer Normalverteilung $\mathcal{N}(0,1)$. Somit modelliert der VAE die tatsächliche Verteilung der Eingabedaten $p(x)$ als eine Mischung von Verteilungen im latenten Raum, wie in \autoref{eq:vae-px} beschrieben.
+Um die Verteilungen zu lernen, berechnet der Encoder einerseits den Mittelwert $\mu$ und die Standardabweichung $\sigma$, und erzeugt außerdem eine zufällige Stichprobe der Verteilung. Der Decoder nimmt diese Stichprobe und rekonstruiert die Eingabedaten. Beim Training wird nicht nur der Rekonstruktionsfehler minimiert, sondern auch die sogenannte Kullback-Leibler-Divergenz (KL-Divergenz), welche die Ähnlichkeit zwischen zwei Wahrscheinlichkeitsverteilungen $q(x)$ und $p(x)$ misst (siehe \autoref{eq:kl-divergence}), in diesem Fall zwischen der latenten Verteilung und einer Normalverteilung (siehe \autoref{eq:kl-divergence-vae}) \parencite{Foster2020gendeeplearning}.
 
 \begin{equation}
-	p(x) = \int_z p(x|z)p(z)dz,
-	\label{eq:vae-px}
+	D_{KL}\left(q(x) || p(x)\right) = \int q(x) \log \frac{q(x)}{p(x)}dx
+	\label{eq:kl-divergence}
+\end{equation}
+\begin{equation}
+	D_{KL}\left(\mathcal{N}(\mu,\sigma) || \mathcal{N}(0,1)\right) = \frac{1}{2} \sum (1 + \log(\sigma^2) - \mu^2 - \sigma^2)
+	\label{eq:kl-divergence-vae}
 \end{equation}
 
-Eine analytische Berechnung ist jedoch auf Grund der Integration über den gesamten latenten Raum rechnerisch nicht möglich. Stattdessen wird in der Evidence-Lower-Bound (ELBO) maximiert, um die Verteilung $p(x)$ zu approximieren. Die ELBO wird in \autoref{eq:elbo} formuliert.
+Die finale Verlustfunktion setzt sich aus dem Rekonstruktionsfehler und der KL-Divergenz zusammen, wie in \autoref{eq:vae-loss} formuliert. Sie sorgt dafür, dass der so genannte Evidence Lower Bound (ELBO) maximiert wird, welche als Näherung der zu maximierenden Log-Likelihood der Daten $p(x)$ dient, also der Wahrscheinlichkeit, dass das Modell die Trainingsdaten richtig beschreibt.
 
 \begin{equation}
-	\mathcal{L}_{ELBO} = \mathbb{E}{q(z|x)}[\log p(x|z)] - D_{KL}(q(z|x) || p(z))
-	\label{eq:elbo}
+	Loss = \mathbb{E}{q(z|x)}[\log p(x|z)] - D_{KL}(q(z|x) || p(z))
+	\label{eq:vae-loss}
 \end{equation}
-
-Die ELBO setzt sich aus zwei Teilen zusammen: dem Rekonstruktionsfehler, der die Differenz zwischen den Eingabedaten und den Rekonstruktionen beschreibt, und der Kullback-Leibler-Divergenz (KL-Divergenz) zwischen der latenten Verteilung $q(z|x)$ und der Prior-Verteilung $p(z)$. Die KL-Divergenz ist ein Maß für die Ähnlichkeit zwischen zwei Wahrscheinlichkeitsverteilungen. % und wird in \autoref{eq:kl-divergence} formuliert
 
 %\begin{equation}
-%	D_{KL}(P||Q) = \int p(x) \log \frac{p(x)}{q(x)},
-%	\label{eq:kl-divergence}
+%	p(x) = \int_z p(x|z)p(z)dz,
+%	\label{eq:vae-px}
 %\end{equation}
-
+%
+% Die ELBO setzt sich aus zwei Teilen zusammen: dem Rekonstruktionsfehler, der die Differenz zwischen den Eingabedaten und den Rekonstruktionen beschreibt, und der Kullback-Leibler-Divergenz (KL-Divergenz) zwischen der latenten Verteilung $q(z|x)$ und der Prior-Verteilung $p(z)$. Die KL-Divergenz ist ein Maß für die Ähnlichkeit zwischen zwei Wahrscheinlichkeitsverteilungen. % und wird in \autoref{eq:kl-divergence} formuliert
+%
 % Vorteile und Anwendungen; DALL-E (1)
 	% VAEs kommen noch immer in einer Vielzahl von Anwendungen zum Einsatz, darunter Bildgenerierung, Textgenerierung, Anomalieerkennung und semantische Segmentierung. \parencite{}
 % Nachteile und Herausforderungen
-Trotz ihres Erfolgs haben auch VAEs einige Nachteile, da ihre zugrundeliegende Architektur ein sogenanntes Bottleneck-Problem aufweist, bei dem alle Informationen in den latenten Variablen komprimiert werden müssen. Es gehen zwangsweise Informationen verloren, was zu einer ungenauen Rekonstruktion der Eingabedaten führen kann. Darüber hinaus kann die Modellierung der Datenverteilung im latenten Raum schwierig sein, insbesondere bei komplexen Datenstrukturen. \parencite{Zhou2021machinelearning} %?
+%
+%Trotz ihres Erfolgs haben auch VAEs einige Nachteile, da ihre zugrundeliegende Architektur ein sogenanntes Bottleneck-Problem aufweist, bei dem alle Informationen in den latenten Variablen komprimiert werden müssen. Es gehen zwangsweise Informationen verloren, was zu einer ungenauen Rekonstruktion der Eingabedaten führen kann. Darüber hinaus kann die Modellierung der Datenverteilung im latenten Raum schwierig sein, insbesondere bei komplexen Datenstrukturen. \parencite{Zhou2021machinelearning} %?
 
 \subsection{Generative Adversarial Networks} \label{subsec:gan}
 
