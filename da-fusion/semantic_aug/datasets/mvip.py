@@ -65,16 +65,23 @@ class MVIPDataset(FewShotDataset):
 
         for class_name in self.class_names:
             root = os.path.join(image_dir, class_name, split_dir[split])
-
-            # Go through every set + orientation + cam, get rgb images & masks
-            for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
-                for orientation in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
-                    for cam in [f for f in os.listdir(os.path.join(root, set, orientation)) if os.path.isdir(os.path.join(root, set, orientation, f))]:
-                        for file in os.listdir(os.path.join(root, set, orientation, cam)):
+            if split == "train": # Go through every set + orientation + cam, get rgb images & masks
+                for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
+                    for orientation in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
+                        for cam in [f for f in os.listdir(os.path.join(root, set, orientation)) if os.path.isdir(os.path.join(root, set, orientation, f))]:
+                            for file in os.listdir(os.path.join(root, set, orientation, cam)):
+                                if file.endswith("rgb.png"):
+                                    class_to_images[class_name].append(os.path.join(root, set, orientation, cam, file))
+                                if file.endswith("rgb_mask_gen.png"):
+                                    class_to_masks[class_name].append(os.path.join(root, set, orientation, cam, file))
+            else: # val & test split have no orientation subfolder
+                for set in [f for f in os.listdir(root) if os.path.isdir(os.path.join(root, f))]:
+                    for cam in [f for f in os.listdir(os.path.join(root, set)) if os.path.isdir(os.path.join(root, set, f))]:
+                        for file in os.listdir(os.path.join(root, set, cam)):
                             if file.endswith("rgb.png"):
-                                class_to_images[class_name].append(os.path.join(root, set, orientation, cam, file))
-                            if file.endswith("rgb_mask_gen.png"):
-                                class_to_masks[class_name].append(os.path.join(root, set, orientation, cam, file))
+                                class_to_images[class_name].append(os.path.join(root, set, cam, file))
+                            elif file.endswith("rgb_mask_gen.png"):
+                                class_to_masks[class_name].append(os.path.join(root, set, cam, file))
 
         # Shuffle dataset by generating a sequence of ids for each class in random order
         rng = np.random.default_rng(seed)
