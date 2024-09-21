@@ -11,43 +11,46 @@
 \addchap{Anhang}
 
 % Abbildungen & Tabellen nicht mehr ins Abbildungs- & Tabellenverzeichnis aufnehmen
-\captionsetup[figure]{justification=centering, list=no}
-\captionsetup[table]{justification=centering, list=no}
+\captionsetup[figure]{justification=centering, format=plain, list=no}
+\captionsetup[table]{format=plain, list=no}
 
-\begin{table}
-	\caption{Auswahl der 20 Klassen aus der Oberklasse "CarComponent" für den MVIP-Teildatensatz.}
-	\begin{tabular}{|l|l|l|l|}
-		\hline
-		\textbf{Klasse} & \textbf{Material} & \textbf{Textur} & \textbf{Gebrauchszustand} \\
-		\hline
-		\detokenize{Repstar_RPS_201300} & 'Iron' & 'Metallic', 'Stains' & 'Dirty' \\
-		\detokenize{bosch_0986040600} & 'Iron', 'Plastik' & 'rough', 'hard' & 'Used', 'Old', 'Dirty' \\
-		\detokenize{eiba_5_4} &  &  &  \\
-		\detokenize{cargo_object} & 'Iron' & 'rough', 'hard', 'rubber' & 'Used', 'Old', 'Rusty' \\
-		\detokenize{bosch_1005831623} & 'Iron' & 'rough', 'hard' & 'Used', 'Old', 'Rusty' \\
-		\detokenize{eiba_Denso_9_3} & 'Iron' & 'Metallic', 'Stains' & 'Old' \\
-		\detokenize{bosch_0123100003} & 'Iron', 'Plastik' & 'rough', 'hard' & 'Used', 'Old', 'Dirty' \\
-		\detokenize{casco_cst10287AS} & 'Iron' & 'Metallic' & 'Used' \\
-		\detokenize{Bosch_eiba_9_1} & 'Iron' & 'Metallic', 'rough' & 'Dirty' \\
-		\detokenize{Bosch_BR28_N1} & 'Iron', 'Plastik' & 'Metallic', 'Stains' & 'Dirty' \\
-		\detokenize{vw_ag_03G_903_023_F} & 'Iron', 'Plastik' & 'Metallic', 'rough' & 'Old', 'Used' \\
-		\detokenize{Denso_83631750} & 'Iron', 'copper' & 'Metallic' & 'Used' \\
-		\detokenize{Prestolite_1121} & 'Iron', 'Plastik' & 'Metallic', 'hard' & 'Used' \\
-		\detokenize{eiba_5_16} & 'Iron' & 'Stains', 'hard', 'rough' & 'Dirty', 'Old', 'Rusty', 'Used' \\
-		\detokenize{eiba_9_5} & 'Iron' & 'Metallic' & 'Dirty' \\
-		\detokenize{VW_AG_068911024H} & 'Iron' & 'Metallic', 'smooth' & 'Dirty' \\
-		\detokenize{hellr_8ea_011610411} & 'Iron', 'Plastik' & 'hard', 'rough' & 'Old', 'Rusty', 'Used' \\
-		\detokenize{Hella_8EA_011_610_221} & 'Iron' & 'Metallic', 'Shiny' & 'Used' \\
-		\detokenize{eiba_7_19} & 'Iron' & 'hard', 'rough' & 'Dirty', 'Old', 'Rusty' \\
-		\detokenize{821128} & 'Iron' & 'Metallic', 'Stains' & 'Dirty' \\
-		\hline
-	\end{tabular}
-	\label{app:subdataset}
-\end{table}
+%\begin{table}
+%	\caption{Auswahl der 20 Klassen aus der Oberklasse "CarComponent" für den MVIP-Teildatensatz.}
+%	\begin{tabular}{|l|l|l|l|}
+%		\hline
+%		\textbf{Klasse} & \textbf{Material} & \textbf{Textur} & \textbf{Gebrauchszustand} \\
+%		\hline
+%		\detokenize{Repstar_RPS_201300} & 'Iron' & 'Metallic', 'Stains' & 'Dirty' \\
+%		\detokenize{bosch_0986040600} & 'Iron', 'Plastik' & 'rough', 'hard' & 'Used', 'Old', 'Dirty' \\
+%		\detokenize{eiba_5_4} &  &  &  \\
+%		\detokenize{cargo_object} & 'Iron' & 'rough', 'hard', 'rubber' & 'Used', 'Old', 'Rusty' \\
+%		\detokenize{bosch_1005831623} & 'Iron' & 'rough', 'hard' & 'Used', 'Old', 'Rusty' \\
+%		\detokenize{eiba_Denso_9_3} & 'Iron' & 'Metallic', 'Stains' & 'Old' \\
+%		\detokenize{bosch_0123100003} & 'Iron', 'Plastik' & 'rough', 'hard' & 'Used', 'Old', 'Dirty' \\
+%		\detokenize{casco_cst10287AS} & 'Iron' & 'Metallic' & 'Used' \\
+%		\detokenize{Bosch_eiba_9_1} & 'Iron' & 'Metallic', 'rough' & 'Dirty' \\
+%		\detokenize{Bosch_BR28_N1} & 'Iron', 'Plastik' & 'Metallic', 'Stains' & 'Dirty' \\
+%		\detokenize{vw_ag_03G_903_023_F} & 'Iron', 'Plastik' & 'Metallic', 'rough' & 'Old', 'Used' \\
+%		\detokenize{Denso_83631750} & 'Iron', 'copper' & 'Metallic' & 'Used' \\
+%		\detokenize{Prestolite_1121} & 'Iron', 'Plastik' & 'Metallic', 'hard' & 'Used' \\
+%		\detokenize{eiba_5_16} & 'Iron' & 'Stains', 'hard', 'rough' & 'Dirty', 'Old', 'Rusty', 'Used' \\
+%		\detokenize{eiba_9_5} & 'Iron' & 'Metallic' & 'Dirty' \\
+%		\detokenize{VW_AG_068911024H} & 'Iron' & 'Metallic', 'smooth' & 'Dirty' \\
+%		\detokenize{hellr_8ea_011610411} & 'Iron', 'Plastik' & 'hard', 'rough' & 'Old', 'Rusty', 'Used' \\
+%		\detokenize{Hella_8EA_011_610_221} & 'Iron' & 'Metallic', 'Shiny' & 'Used' \\
+%		\detokenize{eiba_7_19} & 'Iron' & 'hard', 'rough' & 'Dirty', 'Old', 'Rusty' \\
+%		\detokenize{821128} & 'Iron' & 'Metallic', 'Stains' & 'Dirty' \\
+%		\hline
+%	\end{tabular}
+%	\label{app:subdataset}
+%\end{table}
 
-% DA-Fusion
-%\lstinputlisting[language=python,caption={Begrenzung des Datensatzes auf die 20 "CarComponent" Klassen in der "MVIPDataset"-Klasse.},label=code:da-fusion-mvip]{code_da-fusion_mvip-class-selection.py}
-%\lstinputlisting[language=python,caption={Auslesen der Bilder und Masken in der "MVIPDataset"-Klasse.},label=code:da-fusion-mvip-parsing]{code_da-fusion_mvip-parsing.py}
+\lstinputlisting[language=python,caption={Begrenzung des Datensatzes auf die 20 "CarComponent" Klassen in der "MVIPDataset"-Klasse.},label=app:mvip-classes]{code_da-fusion_mvip-class-selection.py}
+% \lstinputlisting[language=python,caption={Die verwendeten Text-Prompts zur Generierung der Augmentationen.},label=app:mvip-prompts]{code_da-fusion_prompts.py}
+
+\lstinputlisting[language=python,caption={Funktion zum Laden der Augmentationen in der "MVIPDataset"-Klasse von SupCon.},label=app:supcon-mvip-parse-augs]{code_supcon_mvip-parse-augs.py}
+\lstinputlisting[language=python,caption={Vollständige Klasse für die verwendete Verlustfunktion im Supervised Contrastive Learning.},label=app:supcon-loss]{code_supcon_loss.py}
+
 %\lstinputlisting[language=python,caption={Funktion zum Zuschneiden eines Objekts in der "MVIPDataset"-Klasse.},label=code:da-fusion-crop-object]{code_da-fusion_crop-object.py}
 
 %\lstinputlisting[language=python,caption={Python-Skript für die Klasse des MVIP-Teildatensatzes in der Implementierung von DA-Fusion \parencite{Trabucco2024dafusiongithub}.},label=code:da-fusion-mvip]{../da-fusion/semantic_aug/datasets/mvip.py}

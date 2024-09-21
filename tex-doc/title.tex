@@ -1,11 +1,10 @@
 % !TEX root = Bachelorarbeit Synthetische Daten.tex
 \begin{titlepage}
-  % Andere Seitenränder als im Rest der Arbeit
-  \newgeometry{lmargin=2cm,tmargin=10mm,rmargin=15mm,bmargin=1cm}
-  % Hausfarbe der HAW; diese und die folgenden Einstellungen sind lokal und gelten nur innerhalb der Umgebung "titlepage"
-  \color{haw}
-  % Blocksatz für die Titelseite deaktivieren
-  \raggedright
+  % Lokale Einstellungen für die Titelseite
+  \newgeometry{lmargin=2cm,tmargin=10mm,rmargin=15mm,bmargin=1cm} % Andere Seitenränder
+  \color{haw} % Hausfarbe der HAW
+  \raggedright % Blocksatz deaktivieren
+
   % Logos rechtsbündig setzen
   \hspace{\fill}\includegraphics[width=5.00cm]{logo_haw.jpg}\\
   \vspace{0.4cm}
@@ -13,12 +12,8 @@
 
   \vspace{5cm}
 
-  % Hausschrift Open Sans der HAW
-  \setmainfont{Open Sans}
-  % Etwas kleiner als üblich
-  \small
-  % Fett und in Majuskeln
-  \textbf{BACHELORARBEIT}
+  \setmainfont{Open Sans} % Hausschrift Open Sans der HAW
+  \small\textbf{BACHELORARBEIT}
 
   \vspace{8mm}
 
@@ -39,12 +34,12 @@
 
   \vspace{9.2mm}
 
-  vorgelegt am 16. September 2024\\
+  vorgelegt am 23. September 2024\\
   Paul Hofmann
 
   \vspace{3cm}
 
-  % Prüfer*innen & Anschriften
+  % Prüfer*innen
   \hspace*{37mm}
   \begin{minipage}{0.5\linewidth}
     \begin{tabular}{@{}ll}
@@ -52,11 +47,11 @@
       Zweitprüfer: & Prof. Dr. Jan Neuhöfer \\
     \end{tabular}\\
 	
-	% Horizontaler Strich
+	  % Horizontaler Strich
     %\,\rule{9mm}{1mm}\\[1.5mm]
     \vspace{5mm}
 	
-	% Anschrift HAW
+	% Anschrift HAW & Fraunhofer-IPK
 	\begin{tabular}{@{} p{0.75\linewidth} ll} %{p{0.3\linewidth}p{0.3\linewidth}}
     \textbf{HOCHSCHULE FÜR ANGEWANDTE} & \textbf{FRAUNHOFER-INSTITUT FÜR}\\
     \textbf{WISSENSCHAFTEN HAMBURG} & \textbf{PRODUKTIONSANLAGEN UND}\\

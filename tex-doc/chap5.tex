@@ -1,5 +1,5 @@
 % !TEX root = Bachelorarbeit Synthetische Daten.tex
-\chapter{Diskussion} \label{ch:discussion}
+\chapter{Diskussion} \label{ch:discussion} % Textur Learning?
 
 % Einleitung
 In diesem Kapitel werden die Ergebnisse dieser Arbeit interpretiert und im Kontext der Forschungsfragen diskutiert. Dabei wird auf die Eignung von DA-Fusion zur Generierung synthetischer Daten sowie auf die Wirksamkeit von Near Out-of-Distribution-Augmentationen im Supervised Contrastive Learning eingegangen.
@@ -7,7 +7,7 @@ In diesem Kapitel werden die Ergebnisse dieser Arbeit interpretiert und im Konte
 \section{Eignung von DA-Fusion für die synthetische Datengenerierung} \label{sec:da-fusion-discussion}
 
 % Vielversprechend
-Die Ergebnisse zeigen, dass die Anwendung von DA-Fusion zur Generierung synthetischer Daten vielversprechend ist. Die erzeugten Augmentationen wiesen, wie in \autoref{subsec:da-fusion-id-results} beschrieben, eine hohe visuelle Qualität auf, insbesondere ... . Im Vergleich zur Methode Perfusion ist DA-Fusion in der Lage, die Gebrauchszustände akkurat darzustellen und dennoch die Variation innerhalb der Daten zu erhöhen. Der einstellbare Grad der Variation ermöglicht es, die synthetischen Daten an die spezifischen Anforderungen des Anwendungsfalls anzupassen.
+Die Ergebnisse zeigen, dass die Anwendung von DA-Fusion zur Generierung synthetischer Daten vielversprechend ist. Die erzeugten Augmentationen wiesen, wie in \autoref{subsec:da-fusion-id-results} beschrieben, eine hohe visuelle Qualität auf. DA-Fusion ist in der Lage, die Gebrauchszustände akkurat darzustellen und dennoch die Variation innerhalb der Daten zu erhöhen. Der einstellbare Grad der Variation ermöglicht es, die synthetischen Daten an die spezifischen Anforderungen des Anwendungsfalls anzupassen.
 
 % Metriken (Visualisierung fehlt)
 Die Steigerung der Accuracy von 71.4\% auf 77.5\% zeigt, dass die synthetischen Daten einen positiven Einfluss auf die Generalisierung haben können. Dass der Abstand zwischen ID- und OOD-Confidence-Werten vergrößert wurde, deutet darauf hin, dass die synthetischen Daten die Klassifikationsentscheidungen des Modells robuster gemacht haben. Dies könnte darauf hindeuten, dass die synthetischen Daten die Repräsentationen der In-Distribution-Daten verbessert haben, sodass das Modell besser zwischen verschiedenen Klassen unterscheiden kann. Um dies genauer zu untersuchen, könnte eine Visualisierung des erlernten Repräsentationsraums mittels t-SNE \parencite{Vandermaaten2008tsne} oder UMAP \parencite{Mcinnes2020umap} hilfreich sein, was jedoch über den Rahmen dieser Arbeit hinausgeht.

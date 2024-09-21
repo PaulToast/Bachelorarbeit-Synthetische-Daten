@@ -76,7 +76,7 @@ Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind mathematische Modelle
 	%\includegraphics[width=12cm]{figure_mp-neuron.png}
 		% Mit Beschriftung
 		% https://commons.wikimedia.org/w/index.php?curid=224561
-	\includegraphics[width=12cm]{figure_mp-neuron_nd_edited.png}
+	\includegraphics[width=12cm]{figure_mp-neuron_nd_edited1.png}
 		% Ohne Beschriftung, editiert
 		% https://commons.wikimedia.org/wiki/File:ArtificialNeuronModel.png
 	\vspace*{2mm}
@@ -84,45 +84,47 @@ Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind mathematische Modelle
 	\label{fig:neuron}
 \end{figure}
 
-Jedes Neuron empfängt eine Reihe von Eingaben $x_{1 \dots n}$, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es zugehörige Gewichtungen (Weights) $w_{1 \dots n}$, welche die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingaben auf das Neuron bestimmen. Das Neuron berechnet dann die gewichtete Summe aller Eingaben und falls ein bestimmter Schwellenwert (Bias) $\theta$ überschritten wurde, wird das Neuron aktiviert. Die Aktivierung $y$ des Neurons kann dementsprechend wie in \autoref{eq:mp-neuron} beschrieben werden.
+Jedes Neuron empfängt eine Reihe von Eingaben $x_1, x_2, \dots, x_n$, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es zugehörige Gewichtungen (Weights) $w_1, w_2, \dots, w_n$, welche die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingaben auf das Neuron bestimmen. Das Neuron berechnet dann die gewichtete Summe aller Eingaben. Zusätzlich wird ein Bias $\theta$ hinzugefügt, der den Schwellenwert bestimmt. Die Aktivierung $y$ des Neurons kann dementsprechend wie in \autoref{eq:mp-neuron} beschrieben werden.
 
 \begin{equation}
-	y = \varphi \left( \sum_{i=1}^{n} w_{i} x_i - \theta_j \right),
+	y = \varphi \left( \sum_{i=1}^{n} w_{i} x_i + \theta \right),
 	\label{eq:mp-neuron}
 \end{equation}
 
-wobei $\varphi(z)$ die Aktivierungsfunktion ist, die die Ausgabe des Neurons bestimmt. Häufig wird die sogenannte Sigmoid-Funktion (siehe \autoref{eq:sigmoid}) verwendet, die im Gegensatz zu einer einfachen Schwellenwertfunktion kontinuierlich und differenzierbar ist und somit die Optimierung des Netzwerks vereinfacht \parencite{Zhou2021machinelearning}.
+wobei $\varphi$ die Aktivierungsfunktion ist, die die Ausgabe des Neurons bestimmt. Häufig wird die Sigmoid-Funktion verwendet (siehe \autoref{eq:sigmoid}), die, im Gegensatz zu einer einfachen Schwellenwertfunktion, kontinuierlich und differenzierbar ist. Dies vereinfacht die Optimierung des Netzwerks \parencite{Zhou2021machinelearning}.
 
 \begin{equation}
-	\text{Sigmoid}(z) = \frac{1}{1 + e^{-z}},
+	\text{Sigmoid}(x) = \frac{1}{1 + e^{-x}}
 	\label{eq:sigmoid}
 \end{equation}
 
-Die Sigmoid-Funktion eignet sich allerdings nur für binäre Klassifikation, weshalb für die Klassifikation von mehreren Klassen die Softmax-Funktion (siehe \autoref{eq:softmax}) verwendet wird, die eine Wahrscheinlichkeitsverteilung über alle Klassen berechnet \parencite{Goodfellow2016deeplearning}.
+Die Sigmoid-Funktion eignet sich gut für binäre Klassifikationsprobleme. Für Multiklassenprobleme wird jedoch die Softmax-Funktion verwendet, die eine Wahrscheinlichkeitsverteilung über alle Klassen berechnet (siehe \autoref{eq:softmax}) \parencite{Goodfellow2016deeplearning}.
 
 \begin{equation}
-	\text{Softmax}(z)_i = \frac{e^{z_i}}{\sum_{j=1}^{n} e^{z_j}}
+	\text{Softmax}(x)_i = \frac{e^{x_i}}{\sum_{j=1}^{n} e^{x_j}},
 	\label{eq:softmax}
 \end{equation}
+
+wobei $x_i$ die Eingabe für Klasse $i$ ist und $n$ die Anzahl der Klassen.
 
 % Wie neuronale Netze lernen
 Im Training fließen die Eingabedaten in einer Vorwärtsausbreitung (Forward Propagation) durch das Netzwerk, um die Ausgabe zu berechnen, welche sich aus der Aktivierung der Neuronen in der Ausgabeschicht ergibt. Es wird dann eine geeignete Verlustfunktion angewendet, um den Fehler (Loss) des Modells zu berechnen. Das Ziel des Trainings ist es, die Gewichtungen der Neuronen so anzupassen, dass der Fehler minimiert wird.
 
 % Cross Entropy
-Die Wahl der Verlustfunktion hängt von der Art des Problems ab, das gelöst werden soll. Für Klassifikationsprobleme wird häufig die Kreuzentropie (Cross Entropy) verwendet, die den Fehler zwischen den tatsächlichen und den vorhergesagten Wahrscheinlichkeiten berechnet (siehe \autoref{eq:loss-cross-entropy}). \parencite{}
+Die Wahl der Verlustfunktion hängt von der Art des Problems ab, das gelöst werden soll. Für Klassifikationsprobleme wird häufig die Kreuzentropie (Cross Entropy) verwendet, die den Fehler zwischen den tatsächlichen und den vorhergesagten Wahrscheinlichkeiten berechnet (siehe \autoref{eq:cross-entropy}).
 
 \begin{equation}
-	Loss = -\frac{1}{m}\sum_{i=1}^{m} y_i \log(\hat{y}_i),
-	\label{eq:loss-cross-entropy}
+	Loss = - \sum_{c=1}^{N} y_c \log \hat{y}_c,
+	\label{eq:cross-entropy}
 \end{equation}
 
-wobei $y_i$ die tatsächliche Wahrscheinlichkeit und $\hat{y}_i$ die vorhergesagte Wahrscheinlichkeit für Klasse $i$ ist.
+wobei $N$ die Anzahl der Klassen ist, $y_c$ die tatsächliche Wahrscheinlichkeit für Klasse $c$ und $\hat{y}_c$ die vorhergesagte Wahrscheinlichkeit für Klasse $c$.
 
 % Backpropagation und SGD
 Die Optimierung geschieht durch eine Rückwärtsausbreitung (Backpropagation), welche den berechneten Fehler rückwärts durch das Netz propagiert, um die Gewichte und Schwellenwerte um einen geringen Wert in die Richtung anzupassen, die den Fehler minimieren würde. Die Richtung wird bestimmt, indem der Gradient der Verlustfunktion berechnet wird. Die Lernrate (Learning Rate) bestimmt, wie groß die Schritte sind, die entlang des Gradienten gemacht werden. So bewegt sich das Modell iterativ entlang des Gradienten hin zu einem lokalen Minimum der Verlustfunktion. Dieser Algorithmus wird als Gradient Descent (Gradientenabstieg) bezeichnet. Im Maschinellen Lernen kommt hauptsächlich der Stochastic Gradient Descent (SGD) zum Einsatz, der immer nur einen kleinen, zufällig ausgewählten Teil der Trainingsdaten (einen sogenannten Batch) verwendet, um den Gradienten zu berechnen.
 
 % CNN als Beispiel eines Deep Learning-Modells
-\begin{figure}[h]
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=\textwidth]{figure_cnn.png}
 	\caption[Architektur eines Convolutional Neural Networks.]{Architektur eines Convolutional Neural Networks \parencite{Saha2018cnnfigure}.}
@@ -148,7 +150,7 @@ Dabei kann das Modell auch ohne völlig neue Daten zu beschaffen robuster gegen�
 Datenaugmentation hat sich als eine der wichtigsten Ansätze zur Vermeidung von Overfitting und zur Verbesserung der Generalisierungsfähigkeit von Modellen erwiesen. Sie findet in fast allen Methoden des Maschinellen Lernens Anwendung.
 
 % Beispiele
-\begin{figure}[h]
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=\textwidth]{figure_data_augmentation.png}
 	\caption{Einige Beispiele für unterschiedliche Datenaugmentationstechniken\\
@@ -202,14 +204,14 @@ Das Training eines Autoencoders erfolgt durch Minimierung des Rekonstruktionsfeh
 wobei $x_i$ die Eingabedaten und $\hat{x}_i$ die Rekonstruktionen sind.
 
 % Weiterentwicklung durch VAE
-Für die synthetische Datengenerierung sind Autoencoder deshalb interessant, weil man theoretisch durch Auswahl eines beliebigen Punktes im latenten Raum neue Bilder generieren kann, indem man den entsprechenden Darstellungsvektor durch den Decoder laufen lässt. In seiner herkömmlichen Form hat der Autoencoder jedoch einige Schwächen in Bezug auf diese Aufgabe \parencite{Foster2020gendeeplearning}: Da er immer nur einen festen Punkt im latenten Raum für jede Eingabe lernt, entsteht ein diskreter und unstrukturierter latenter Raum. Es ist weder die Kontinuierlichkeit zwischen den Punkten der Eingabedaten noch die Vollständigkeit des latenten Raums sichergestellt, sodass neue Stichproben aus dem latenten Raum nicht unbedingt realistische Daten erzeugen.
+Autoencoder können theoretisch zur Generierung synthetischer Daten verwendet werden, indem ein beliebiger Punkt im latenten Raum gewählt und durch den Decoder rekonstruiert wird. Allerdings hat der herkömmliche Autoencoder einige Schwächen in Bezug auf diese Aufgabe \parencite{Foster2020gendeeplearning}: Da er immer nur einen festen Punkt im latenten Raum für jede Eingabe lernt, entsteht ein diskreter und unstrukturierter latenter Raum. Es ist weder die Kontinuierlichkeit zwischen den Punkten der Eingabedaten noch die Vollständigkeit des latenten Raums sichergestellt, sodass neue Stichproben aus dem latenten Raum nicht unbedingt realistische Daten erzeugen.
 
 Der \emph{Variational Autoencoder} (VAE) \parencite{Kingma2013vae} adressiert die Schwachstellen des Autoencoders und verwendet probabilistische Methoden, um die Datenverteilung im latenten Raum zu modellieren; anstelle eines einzelnen, festen Punktes im latenten Raum wird für jede Eingabe eine Verteilung gelernt, aus der die latenten Variablen stammen. Die Verteilung entspricht dabei einer einfachen, bekannten Verteilung, wie z.B. einer Normalverteilung $\mathcal{N}(0,1)$.
 
-Um die Verteilungen zu lernen, berechnet der Encoder einerseits den Mittelwert $\mu$ und die Standardabweichung $\sigma$, und erzeugt außerdem eine zufällige Stichprobe der Verteilung. Der Decoder nimmt diese Stichprobe und rekonstruiert die Eingabedaten. Beim Training wird nicht nur der Rekonstruktionsfehler minimiert, sondern auch die sogenannte Kullback-Leibler-Divergenz (KL-Divergenz), welche die Ähnlichkeit zwischen zwei Wahrscheinlichkeitsverteilungen $q(x)$ und $p(x)$ misst (siehe \autoref{eq:kl-divergence}), in diesem Fall zwischen der latenten Verteilung und einer Normalverteilung (siehe \autoref{eq:kl-divergence-vae}) \parencite{Foster2020gendeeplearning}.
+Um die Verteilungen zu lernen, berechnet der Encoder einerseits den Mittelwert $\mu$ und die Standardabweichung $\sigma$, und erzeugt außerdem eine zufällige Stichprobe der Verteilung. Der Decoder nimmt diese Stichprobe und rekonstruiert die Eingabedaten. Beim Training wird nicht nur der Rekonstruktionsfehler minimiert, sondern auch die sogenannte Kullback-Leibler-Divergenz (KL-Divergenz), welche die Ähnlichkeit zwischen zwei Wahrscheinlichkeitsverteilungen $Q$ und $P$ misst (siehe \autoref{eq:kl-divergence}), in diesem Fall zwischen der latenten Verteilung und einer Normalverteilung (siehe \autoref{eq:kl-divergence-vae}) \parencite{Foster2020gendeeplearning}.
 
 \begin{equation}
-	D_{KL}\left(q(x) || p(x)\right) = \int q(x) \log \frac{q(x)}{p(x)}dx
+	D_{KL}\left(Q || P\right) = \int q(x) \log \frac{q(x)}{p(x)}dx
 	\label{eq:kl-divergence}
 \end{equation}
 \begin{equation}
@@ -217,116 +219,103 @@ Um die Verteilungen zu lernen, berechnet der Encoder einerseits den Mittelwert $
 	\label{eq:kl-divergence-vae}
 \end{equation}
 
-Die finale Verlustfunktion setzt sich aus dem Rekonstruktionsfehler und der KL-Divergenz zusammen, wie in \autoref{eq:vae-loss} formuliert. Sie sorgt dafür, dass der so genannte Evidence Lower Bound (ELBO) maximiert wird, welche als Näherung der zu maximierenden Log-Likelihood der Daten $p(x)$ dient, also der Wahrscheinlichkeit, dass das Modell die Trainingsdaten richtig beschreibt.
+Durch die Kombination von Rekonstruktionsfehler und KL-Divergenz ergibt sich nun eine Annäherung an die die Log-Likelihood $\log p(x)$ der Daten, also der Wahrscheinlichkeit, dass das Modell die Eingabedaten korrekt rekonstruiert. Diese Annäherung wird als Evidence Lower Bound (ELBO) bezeichnet. Sie ist deshalb notwendig, weil zur direkten Berechnung der Log-Likelihood die Integration über alle möglichen Werte der latenten Variablen $z$ erforderlich wäre, was in der Praxis nicht möglich ist.
+
+Die finale Verlustfunktion, die sowohl den Rekonstruktionsfehler als auch die KL-Divergenz kombiniert, ergibt sich aus der negativen ELBO (siehe \autoref{eq:vae-loss}). Diese Verlustfunktion wird minimiert, um sowohl die Qualität der Rekonstruktionen zu maximieren als auch die latente Verteilung näher an die Normalverteilung anzunähern.
 
 \begin{equation}
-	Loss = \mathbb{E}{q(z|x)}[\log p(x|z)] - D_{KL}(q(z|x) || p(z))
+	Loss = -\mathbb{E}{q(z|x)}[\log p(x|z)] + D_{KL}(q(z|x) || p(z)),
 	\label{eq:vae-loss}
 \end{equation}
 
-%\begin{equation}
-%	p(x) = \int_z p(x|z)p(z)dz,
-%	\label{eq:vae-px}
-%\end{equation}
-%
-% Die ELBO setzt sich aus zwei Teilen zusammen: dem Rekonstruktionsfehler, der die Differenz zwischen den Eingabedaten und den Rekonstruktionen beschreibt, und der Kullback-Leibler-Divergenz (KL-Divergenz) zwischen der latenten Verteilung $q(z|x)$ und der Prior-Verteilung $p(z)$. Die KL-Divergenz ist ein Maß für die Ähnlichkeit zwischen zwei Wahrscheinlichkeitsverteilungen. % und wird in \autoref{eq:kl-divergence} formuliert
-%
-% Vorteile und Anwendungen; DALL-E (1)
-	% VAEs kommen noch immer in einer Vielzahl von Anwendungen zum Einsatz, darunter Bildgenerierung, Textgenerierung, Anomalieerkennung und semantische Segmentierung. \parencite{}
-% Nachteile und Herausforderungen
-%
-%Trotz ihres Erfolgs haben auch VAEs einige Nachteile, da ihre zugrundeliegende Architektur ein sogenanntes Bottleneck-Problem aufweist, bei dem alle Informationen in den latenten Variablen komprimiert werden müssen. Es gehen zwangsweise Informationen verloren, was zu einer ungenauen Rekonstruktion der Eingabedaten führen kann. Darüber hinaus kann die Modellierung der Datenverteilung im latenten Raum schwierig sein, insbesondere bei komplexen Datenstrukturen. \parencite{Zhou2021machinelearning} %?
+wobei $p(z|x)$ die latente Verteilung eines gegebenen Datenpunktes $x$, $p(x|z)$ die Rekonstruktion des Datenpunktes $x$ aus der latenten Darstellung $z$ und $p(z)$ die Prior-Verteilung der latenten Variablen ist.
+
+% Trotz ihres Erfolgs haben auch VAEs einige Nachteile, da ihre zugrundeliegende Architektur ein sogenanntes Bottleneck-Problem aufweist, bei dem alle Informationen in den latenten Variablen komprimiert werden müssen. Es gehen zwangsweise Informationen verloren, was zu einer ungenauen Rekonstruktion der Eingabedaten führen kann. Darüber hinaus kann die Modellierung der Datenverteilung im latenten Raum schwierig sein, insbesondere bei komplexen Datenstrukturen. \parencite{Zhou2021machinelearning} %?
 
 \subsection{Generative Adversarial Networks} \label{subsec:gan}
 
-Ein weiteres berühmtes KI-Modell ist das Generative Adversarial Network (GAN), das in \parencite{Goodfellow2014gan} vorgestellt wurde. GANs bestehen aus einem \emph{Generator}- und einem \emph{Diskriminator}-Modell, die gegeneinander antreten, um realistische synthetische Daten zu erzeugen. 
+Ein weiteres berühmtes KI-Modell ist das Generative Adversarial Network (GAN), das in \parencite{Goodfellow2014gan} vorgestellt wurde. GANs bestehen aus einem \emph{Generator}- und einem \emph{Diskriminator}-Modell, die in einem adversariellen Prozess gegeneinander antreten.
 
-Der Generator nimmt Zufallsrauschen als Eingabe und erzeugt daraus Daten, die möglichst realistisch wirken sollen. Der Diskriminator erhält sowohl echte Daten aus dem Trainingsdatensatz als auch die vom Generator erzeugten Daten. Seine Aufgabe ist es, zwischen echten und künstlichen Daten zu unterscheiden. Der Diskriminator gibt eine Wahrscheinlichkeit aus, dass die Eingabedaten echt sind.
+Der Generator nimmt Zufallsrauschen als Eingabe und erzeugt daraus Daten, die möglichst realistisch wirken sollen. Der Diskriminator erhält sowohl echte Daten aus dem Trainingsdatensatz als auch die vom Generator erzeugten Daten. Seine Aufgabe ist es, zwischen echten und künstlichen Daten zu unterscheiden. Dafür gibt er für einen gegebenen Datenpunkt die Wahrscheinlichkeit aus, dass dieser echt ist. \autoref{fig:gan} gibt einen Überblick über das ganze System.
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{figure_gan.pdf}
-	\caption[Überblick über die GAN-Struktur.]{Überblick über die GAN-Struktur \parencite{GoogleDev2022ganfigure}.}
+	\caption[Überblick über das GAN-Training.]{Überblick über das GAN-Training \parencite{GoogleDev2022ganfigure}.}
 	\label{fig:gan}
 \end{figure}
 
-Der Trainingsprozess eines GANs ist in \autoref{fig:gan} dargestellt und kann als minimax-Spiel zwischen dem Generator und dem Diskriminator formuliert werden: Der Diskriminator wird trainiert, um echte Daten von generierten Daten zu unterscheiden. Dies geschieht durch eine binäre Klassifikation („echt“ oder „synthetisch“). Der Diskriminator passt seine Gewichte an, um die Unterscheidung zu verbessern. Der Generator wird trainiert, um den Diskriminator zu täuschen. Dies geschieht, indem der Generator seine erzeugten Daten durch den Diskriminator laufen lässt und die Rückmeldung (Gradienten) des Diskriminators verwendet, um seine eigenen Parameter zu optimieren. Ziel ist es, den Diskriminator zu überlisten, sodass er die generierten Daten als echt klassifiziert.
-
-% Details zum Training
-Im Detail wird der Generator durch Minimierung der Log-Wahrscheinlichkeit, dass der Diskriminator die generierten Daten als echt klassifiziert, trainiert. Der Diskriminator wird durch Maximierung dieser Wahrscheinlichkeit trainiert. Dies führt zu einem Gleichgewichtszustand, in dem der Generator realistische Daten erzeugt, die den echten Daten ähneln, und der Diskriminator nicht in der Lage ist, zwischen echten und generierten Daten zu unterscheiden.
-
-Als Verlustfunktion wird die sogenannte Jensen-Shannon-Divergenz verwendet, die die Ähnlichkeit zwischen zwei Wahrscheinlichkeitsverteilungen misst:
+Der Diskriminatorverlust ergibt sich aus der Differenz zwischen der Wahrscheinlichkeit, dass echte Daten als echt und künstliche Daten als falsch klassifiziert werden. Der Generatorverlust ergibt sich aus der Differenz zwischen der Wahrscheinlichkeit, dass künstliche Daten als echt klassifiziert werden und der tatsächlichen Wahrscheinlichkeit, dass sie echt sind. Die Verlustfunktionen für den Generator und den Diskriminator sind in \autoref{eq:gan-loss} formuliert.
 
 \begin{equation}
-	D_{JS}(P||Q) = \frac{1}{2} D_{KL}(P||M) + \frac{1}{2} D_{KL}(Q||M),
-	\label{eq:js-divergence}
+	\begin{aligned}
+		Loss_D &= -\mathbb{E}_{x \sim P}[\log D(x)] - \mathbb{E}_{z \sim P(z)}[\log(1 - D(G(z)))] \\
+		Loss_G &= -\mathbb{E}_{z \sim P(z)}[\log D(G(z))]
+	\end{aligned}
+	\label{eq:gan-loss}
 \end{equation}
 
-wobei $P$ und $Q$ die beiden Wahrscheinlichkeitsverteilungen und $M$ der Mittelwert der beiden Verteilungen ist.
-
 % Vorteile & Nachteile
-Besonders in der Bildgenerierung haben GANs eine hohe Qualität erreicht und sind in der Lage, realistische Bilder zu erzeugen, die von echten Bildern kaum zu unterscheiden sind. GANs sind auch flexibel in Bezug auf die Eingangsdaten und können mit verschiedenen Datentypen wie Bildern, Texten oder Audiodaten arbeiten. Dennoch gibt es einige Nachteile. Beispielsweise kann das Training eines GANs sehr instabil sein, da es schwierig ist, ein Gleichgewicht zwischen Generator und Diskriminator zu finden. Es kann auch zum sogenannten Modus-Kollaps kommen, bei dem der Generator nur eine begrenzte Anzahl von Beispielen erzeugt, da der Diskriminator diese als besonders realistisch bewertet. Der Generator lernt dann, nur diese Beispiele zu reproduzieren, anstatt die gesamte Datenverteilung zu lernen. Darüber hinaus sind GANs sehr rechenaufwändig und erfordern leistungsstarke Hardware, um effizient trainiert zu werden.
+Besonders in der Bildgenerierung haben GANs eine hohe Qualität erreicht. GANs sind auch flexibel in Bezug auf die Eingangsdaten und können mit verschiedenen Datentypen wie Bildern, Texten oder Audiodaten arbeiten. Dennoch gibt es einige Nachteile. Beispielsweise kann das Training eines GANs sehr instabil sein, da es schwierig ist, ein Gleichgewicht zwischen Generator und Diskriminator zu finden. Es kann auch zum sogenannten Modus-Kollaps kommen, bei dem der Generator nur eine begrenzte Anzahl von Beispielen erzeugt, da der Diskriminator diese als besonders realistisch bewertet \parencite{Foster2020gendeeplearning}. Der Generator lernt dann, nur diese Beispiele zu reproduzieren, anstatt die gesamte Datenverteilung zu lernen. Auch die Wahl geeigneter Hyperparameter ist eine Herausforderung.
 
 \subsection{Diffusionsmodelle} \label{subsec:diffusion-models}
 
 % Einleitung, Konzept der Diffusion
-Diffusionsmodelle haben in den letzten Jahren zu einem enormen Fortschritt in der Bildgenerierung, insbesondere der Text-to-Image (T2I)-Generierung, geführt. Diese Modelle basieren auf dem Konzept der Diffusion, das aus der Physik stammt. Es beschreibt den Prozess der langsamen Vermischung von Teilchen oder Informationen über die Zeit. Im maschinellen Lernen fand das Konzept erstmals in \parencite{SohlDickstein2015diffusionmodels} Anwendung, mit der Idee, die Struktur von Daten durch Hinzufügen von Rauschen schrittweise aufzulösen und anschließend ein Modell darauf zu trainieren, das ursprüngliche Bild zu rekonstruieren. Seitdem haben sich Diffusionsmodelle als eine neue Klasse von generativen Deep-Learning-Modellen etabliert, die in der Lage sind, noch realistischere Bilder zu generieren als GANs.
+In den letzten Jahren haben Diffusionsmodelle zu einem enormen Fortschritt in der Bildgenerierung, insbesondere der Text-to-Image (T2I)-Generierung, geführt. Diese Modelle basieren auf dem Konzept der Diffusion, das den Prozess der langsamen Vermischung von Teilchen oder Informationen über die Zeit beschreibt. Im maschinellen Lernen fand das Konzept erstmals in \parencite{SohlDickstein2015diffusionmodels} Anwendung, mit der Idee, die Struktur von Daten durch Hinzufügen von Rauschen schrittweise aufzulösen und anschließend ein Modell darauf zu trainieren, das ursprüngliche Bild zu rekonstruieren (siehe \autoref{fig:regular-diffusion}). Seitdem haben sich Diffusionsmodelle als eine neue Klasse von generativen Deep Learning-Modellen etabliert, die in der Lage sind, noch realistischere Bilder zu generieren als GANs.
 
-% Vorwärts- und Rückwärtsdiffusion als Markov-Ketten
+% Vorwärts- und Rückwärtsdiffusion
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=12cm]{figure_stable-diffusion_image.jpg}
-	\caption[Darstellung der Vorwärts- und Rückwärtsdiffusion in einem Diffusionsmodell.]{Darstellung der Vorwärts- und Rückwärtsdiffusion\\in einem Diffusionsmodell.}
+	\includegraphics[width=12cm]{figure_diffusion_image_custom.png}
+	\caption[Darstellung der Vorwärts- und Rückwärtsdiffusion in einem Diffusionsmodell.]{Darstellung der Vorwärts- und Rückwärtsdiffusion in einem Diffusionsmodell.}
 	\label{fig:regular-diffusion}
 \end{figure}
-%\footnotetext{Quelle: \url{https://medium.com/@steinsfu/stable-diffusion-clearly-explained-ed008044e07e} [Aufgerufen: 17.09.2024]}
 
-Das Training von Diffusionsmodelle teilt sich in zwei Phasen auf, die Vorwärts- und die Rückwärtsdiffusion, welche beide als Markov-Ketten modelliert werden können. Markov-Ketten sind stochastische Prozesse, bei denen die zukünftige Entwicklung eines Systems nur von seinem aktuellen Zustand abhängt. Im Bezug auf Diffusionsmodelle repräsentiert jeder Schritt in der Markov-Kette einen Zeitschritt $t$ und die Zustände $x^{(t)}$ sind die Bilder zu diesem Zeitpunkt.
+Das Training von Diffusionsmodelle teilt sich in zwei Phasen auf, die Vorwärts- und die Rückwärtsdiffusion, welche beide als Markov-Ketten modelliert werden können, also stochastische Prozesse, bei denen die zukünftige Entwicklung eines Systems nur von seinem aktuellen Zustand abhängt. Im Bezug auf Diffusionsmodelle repräsentiert jeder Schritt in der Markov-Kette einen Zeitschritt $t$ und die Zustände $x^{(t)}$ sind die Bilder zu diesem Zeitschritt.
 
-In der Vorwärtsdiffusion wird ein Bild schrittweise durch ein Modell, das Rauschen hinzufügt, in ein verrauschtes Bild umgewandelt. Die Wahrscheinlichkeitsdichte des verrauschten Bildes wird durch die Produktregel der bedingten Wahrscheinlichkeiten berechnet:
+In der Vorwärtsdiffusion fügt das Modell einem Bild schrittweise Rauschen hinzu, sodass es sich am Ende des Prozesses wie eine Normalverteilung verhält. Die Wahrscheinlichkeitsdichte des verrauschten Bildes wird durch die Produktregel der bedingten Wahrscheinlichkeiten berechnet (siehe \autoref{eq:forward-diffusion}).
 
 \begin{equation}
 	q \left( x^{(0 \dots T)} \right) = q \left(x^{(0)}\right)\prod_{t=1}^T q \left(x^{(t)}|x^{(t-1)}\right)
 	\label{eq:forward-diffusion}
 \end{equation}
 
-In der Rückwärtsdiffusion wird das Modell darauf trainiert, das verrauschte Bild schrittweise in das ursprüngliche Bild zurückzuwandeln. Die Wahrscheinlichkeitsdichte des ursprünglichen Bildes wird durch die Produktregel der bedingten Wahrscheinlichkeiten berechnet:
+In der Rückwärtsdiffusion wird das Modell darauf trainiert, das verrauschte Bild schrittweise in das ursprüngliche Bild zurückzuwandeln. Die Wahrscheinlichkeitsdichte des ursprünglichen Bildes wird ebenfalls durch die Produktregel der bedingten Wahrscheinlichkeiten berechnet (siehe \autoref{eq:reverse-diffusion}).
 
 \begin{equation}
 	p \left( x^{(0 \dots T)} \right) = p \left(x^{(T)}\right)\prod_{t=1}^T p \left(x^{(t-1)}|x^{(t)}\right)
 	\label{eq:reverse-diffusion}
 \end{equation}
 
-Als Verlustfunktion wird die negative Log-Likelihood verwendet, die die Differenz zwischen der tatsächlichen und der modellierten Wahrscheinlichkeitsdichte misst:
+Das Neuronale Netz, das zur Vorhersage der Zustände $x^{(t-1)}$ aus den verrauschten Zuständen $x^{(t)}$ verwendet wird, ist typischerweise ein Denoising U-Net (siehe \autoref{fig:regular-diffusion}). Es hat eine ähnliche Struktur wie ein Autoencoder, wobei Skip Connections zwischen den Encoder- und Decoder-Schichten bestehen, um die Rekonstruktion des ursprünglichen Bildes zu verbessern. Die Hauptaufgabe des U-Nets besteht darin, das hinzugefügte Rauschen zu schätzen, welches anschließend subtrahiert wird, um das ursprüngliche Bild zu rekonstruieren.
 
-\begin{equation}
-	Loss = -\log p \left( x^{(0 \dots T)} \right)
-	\label{eq:loss-diffusion}
-\end{equation}
+Die Verlustfunktion wird oft als MSE formuliert, um den Unterschied zwischen dem generierten Rauschen und dem tatsächlichen Rauschen zu minimieren.
 
-% Vorteile
 Anders als bei GANs gibt es keine direkten adversarialen Optimierungsmechanismen, die zu einem Ungleichgewicht führen können. Es wird stattdessen explizit die Wahrscheinlichkeitsdichte zwischen den realen Daten und den erzeugten Daten minimiert, was zu einem robusteren und stabileren Trainingsprozess führt.
 
 % DALL-E (2) für Text-to-Image
-Eine entscheidende Weiterentwicklung der Diffusionsmodelle war die Text-Konditionierung des generativen Prozesses. In \parencite{Ramesh2022dalle2} wurde DALL-E 2 vorgestellt, ein Diffusionsmodell, das in der Lage ist, Bilder aus Textbeschreibungen zu generieren. DALL-E 2 verwendet ein Transformer-Modell, um die Textbeschreibungen in eine latente Repräsentation zu kodieren, die dann als Eingabe für den Diffusionsprozess dient. Auf diese Weise können realistische Bilder erzeugt werden, die den Textbeschreibungen entsprechen. % ?
+Eine entscheidende Weiterentwicklung der Diffusionsmodelle war die Text-Konditionierung des generativen Prozesses. In \parencite{Ramesh2022dalle2} wurde DALL-E 2 vorgestellt, welches ein Diffusionsmodell verwendet, das in der Lage ist, Bilder aus Textbeschreibungen zu generieren. DALL-E 2 verwendet das Transformer-Modell \parencite{Vaswani2017transformer}, um die Textbeschreibungen in eine latente Repräsentation zu kodieren, die dann im Diffusionsprozess verwendet wird.
 
 % Stable Diffusion
-Ein besonders einflussreiches Diffusionsmodell ist \textbf{Stable Diffusion} \parencite{Rombach2022stablediffusion}. Die entscheidende Weiterentwicklung von Stable Diffusion liegt darin, dass die Diffusionsprozesse jeweils nur in einem niedrigdimensionalen latenten Raum stattfinden, bevor die Darstellungen wieder in hochauflösende Bilder umgewandelt werden (siehe \autoref{fig:stable-diffusion}). Dies ermöglicht es, die Komplexität des Modells zu reduzieren und gleichzeitig realistische Bilder zu generieren.
+Stable Diffusion ist ein besonders einflussreiches Diffusionsmodell, das sich durch die Verwendung eines latenten Diffusionsprozesses auszeichnet \parencite{Rombach2022stablediffusion}. Anstatt den Diffusionsprozess direkt auf den hochdimensionalen Bildraum anzuwenden, führt Stable Diffusion die Diffusion in einem niedrigdimensionalen latenten Raum durch, der durch ein VAE-ähnliches Netzwerk generiert wird. Diese Technik reduziert die Rechenkosten und beschleunigt den Generierungsprozess erheblich, während gleichzeitig hochauflösende und realistische Bilder erzeugt werden.
 
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=\textwidth]{figure_stable-diffusion_merged.png}
-	\caption[Darstellung des Vorwärts- und Rückwärtsdiffusion in Stable Diffusion: Die Diffusionsprozesse werden auf die latenten Darstellungen der Bilder angewendet (rechts), welche vorher mit einem VAE erstellt wurden (links).]{Darstellung des Vorwärts- und Rückwärtsdiffusion in Stable Diffusion:\\
-		Die	Diffusionsprozesse werden auf die latenten Darstellungen der Bilder\\
-		angewendet (rechts), welche vorher mit einem VAE erstellt wurden (links).}
-	\label{fig:stable-diffusion}
-\end{figure}
-%\footnotetext{Quelle: \url{https://medium.com/@steinsfu/stable-diffusion-clearly-explained-ed008044e07e} [Aufgerufen: 17.09.2024]}
+%\begin{figure}[t] % (siehe \autoref{fig:stable-diffusion})
+%	\centering
+%	\includegraphics[width=\textwidth]{figure_diffusion_merged_custom.png}
+%	\caption[Darstellung des Vorwärts- und Rückwärtsdiffusion in Stable Diffusion: Die Diffusionsprozesse werden auf die latenten Darstellungen der Bilder angewendet (rechts), welche vorher mit einem VAE erstellt wurden (links).]{Darstellung des Vorwärts- und Rückwärtsdiffusion in Stable Diffusion:\\
+%		Die	Diffusionsprozesse werden auf die latenten Darstellungen der Bilder\\
+%		angewendet (rechts), welche vorher mit einem VAE erstellt wurden (links).}
+%	\label{fig:stable-diffusion}
+%\end{figure}
+%
+%\newpage
 
 \subsection{DA-Fusion} \label{subsec:da-fusion}
 
 % Einleitung; Kurze Beschreibung, Versprechen der Methode
-In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine auf Stable Diffusion basierende Methode zur Datenaugmentation vorgestellt, die für diese Arbeit von besonderem Interesse ist. Der traditionelle Ansatz der Datenaugmentation, wie in \autoref{subsec:data-augmentation} beschrieben, hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit von Modellen zu verbessern. Allerdings erfordert dieser Ansatz auch eine gute Intuition in Bezug auf den verwendeten Datensatz, um zu vermeiden, dass Transformationen gewählt werden, durch die Informationen verloren gehen, die für die Aufgabe des zu trainierenden Modells wichtig sind. Wenn beispielsweise Farbinformationen für die Klassifizierung von Blumen wichtig sind, könnte die Datenaugmentation durch zufällige Farbänderungen die Leistung des Modells verschlechtern. Ein weiteres Beispiel sind Objekte, die klein im Bild sind und durch zufällige Ausschnitte des Bildes aus der Sicht des Modells verschwinden können. DA-Fusion hingegen nutzt das Wissen eines vortrainierten Diffusionsmodelle, um den Bildinhalt semantisch zu verstehen und automatisch neue, realistische Variationen zu generieren.
+DA-Fusion \parencite{Trabucco2023dafusion} ordnet sich zwischen den Bereichen der Datenaugmentation und der synthetischen Datengenerierung ein. Es handelt sich um eine Methode zur semantischen Datenaugmentation von Bildern unter Verwendung eines vortrainierten Stable Diffusion-Modells. 
+
+Der traditionelle Ansatz der Datenaugmentation, wie in \autoref{subsec:data-augmentation} beschrieben, hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit von Modellen zu verbessern. Allerdings erfordert dieser Ansatz auch eine gute Intuition in Bezug auf den verwendeten Datensatz, um zu vermeiden, dass Transformationen gewählt werden, durch die Informationen verloren gehen, die für die Aufgabe des zu trainierenden Modells wichtig sind. Wenn beispielsweise Farbinformationen für die Klassifizierung von Blumen wichtig sind, könnte die Datenaugmentation durch zufällige Farbänderungen die Leistung des Modells verschlechtern. Ein weiteres Beispiel sind Objekte, die klein im Bild sind und durch zufällige Ausschnitte des Bildes aus der Sicht des Modells verschwinden können. DA-Fusion hingegen nutzt das Wissen eines vortrainierten Diffusionsmodelle, um den Bildinhalt semantisch zu verstehen und automatisch neue, realistische Variationen zu generieren.
 
 %\begin{figure}[h]
 %	\centering
@@ -337,23 +326,21 @@ In \parencite{Trabucco2023dafusion} wird DA-Fusion, eine auf Stable Diffusion ba
 %\end{figure}
 
 % Fine-tuning mit Textual Inversion
-Es wird zunächst die Methode Textual Inversion aus \parencite{Gal2022textualinversion} angewendet, um ein vortrainiertes Stable Diffusion-Modell auf den gegebenen Datensatz feinabzustimmen. Dazu wird für jedes Konzept bzw. für jede Klasse ein neues Text-Embedding $y$ als Platzhalter in das Modell integriert, das unter Verwendung von Trainings-Prompts wie "a photo of a <$y$>" und den zugehörigen Bilddaten trainiert wird. Entscheidend ist hier, dass nicht das ganze Diffusionsmodell neu trainiert wird, sondern lediglich neue wörter erlernt werden, welche die spezifischen Konzepte repräsentieren, sodass sich bei der Bildgenerierung weiterhin auf das vortrainierte semantische Wissens des Modells gestützt werden kann.
+Dafür wird zunächst die Methode Textual Inversion aus \parencite{Gal2022textualinversion} angewendet, um ein vortrainiertes Stable Diffusion-Modell auf den gegebenen Datensatz feinabzustimmen (Fine-tuning). Für jedes Konzept bzw. für jede Klasse wird ein neues Text-Embedding \lstinline|<y>| als Platzhalter in das Modell integriert, das unter Verwendung von Trainings-Prompts wie \lstinline|"a photo of a <y>"| und den zugehörigen Bilddaten trainiert wird. Entscheidend ist hier, dass nicht das ganze Diffusionsmodell neu trainiert wird, sondern lediglich neue wörter erlernt werden, welche die spezifischen Konzepte repräsentieren, sodass sich bei der Bildgenerierung weiterhin auf das vortrainierte semantische Wissens des Modells gestützt werden kann. % (siehe \autoref{fig:da-fusion-process}).
+
+%\begin{figure}[t]
+%	\centering
+%	\includegraphics[width=\textwidth]{figure_da-fusion_architecture.png}
+%	\caption[Überblick über den Prozess zur Datenaugmentation mit DA-Fusion.]{Überblick über den Prozess zur Datenaugmentation mit\\
+%	DA-Fusion \parencite{Trabucco2023dafusion}.}
+%	\label{fig:da-fusion-process}
+%\end{figure}
 
 % Prozess der Datengenerierung
-Anschließend können die Bilder augmentiert werden, indem ihnen eine geringe Menge an Rauschen hinzugefügt wird, welches dann durch das feinabgestimmte Modell wieder entfernt werden soll. Hier kommen die selben Text-Prompts zum Einsatz. Auf diese Weise müssen keine völlig neuen Bilder generiert werden, denn die grundlegende Struktur wird durch die ursprünglichen Bilder vorgegeben.
+Anschließend können die Bilder augmentiert werden, indem ihnen eine geringe Menge an Rauschen hinzugefügt wird (also ein Prozess der Vorwärtsdiffusion), welches dann durch das feinabgestimmte Modell wieder entfernt werden soll (die Rückwärtsdiffusion, die von dem Modell gelernt wurde). Hier kommen die selben Text-Prompts zum Einsatz, welche die Text-Embeddings der Konzepte beinhalten. Auf diese Weise müssen keine völlig neuen Bilder generiert werden, denn die grundlegende Struktur wird durch die ursprünglichen Bilder vorgegeben. Dieser Prozess bietet die Möglichkeit, den Grad der Augmentation durch die Wahl des Zeitschritts $t$ zu steuern, an dem das Bild in die Rückwärtsdiffusion eingefügt wird und wie stark es dafür vorher verrauscht werden muss. So entstehen stärkere oder subtilere Augmentationen.
 
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{figure_da-fusion_architecture.png}
-	\caption[Überblick über den Prozess zur Datenaugmentation mit DA-Fusion.]{Überblick über den Prozess zur Datenaugmentation mit\\
-	DA-Fusion \parencite{Trabucco2023dafusion}.}
-	\label{fig:da-fusion-process}
-\end{figure}
-
-% Insertion Timestep als Parameter
-Ein Vorteil von DA-Fusion ist die Möglichkeit, den Grad der Augmentation durch die Wahl des Insertion Timesteps zu steuern. Der Insertion Timestep bestimmt, wie weit in den Diffusionsprozess das Bild eingefügt wird und wie stark es dafür vorher verrauscht werden muss. Ein niedriger Timestep führt zu stärkeren Augmentationen, während ein hoher Timestep subtilere Variationen erzeugt.
-
-% DA-Fusion schlägt Prompt-Engineering (Real Guidance) für fine-grained Konzepte, auf die das Diffusion-Modell voraussichtlich noch nicht trainiert wurde
+% Basically SDEdit but with fine-tuned tokens
+Der beschriebene Image-to-Image-Generierungsprozess baut dabei weitgehend auf dem in \parencite{Meng2022sdedit} beschriebenen Ansatz \emph{SDEdit} auf. DA-Fusion unterscheidet sich jedoch dadurch, dass es neue Text-Embeddings für die Konzepte feinabstimmt und somit speziell für die semantische Datenaugmentation zuvor unbekannter Konzepte konzipiert ist.
 
 % Ein paar Details zur Implementierung
 
@@ -366,7 +353,7 @@ Ein zentrales Thema dieser Arbeit ist das Contrastive Learning. Es ordnet sich i
 Das Contrastive Learning stammt ursprünglich aus dem unüberwachten Lernen, wird aber oft als selbstüberwachte Methode bezeichnet, da die Kontrastierung der Daten eine Art Selbstüberwachung darstellt. Die erlernten Repräsentationen haben sich als deutlich genauer als im traditionellen überwachten Lernen herausgestellt, wo diese ausschließlich zur Klassenunterscheidung optimiert werden \parencite{Keshtmand2022contrastood}. Da die Methode nicht auf annotierte Daten angewiesen ist, kann sie ein sehr effizienter Ansatz sein, um Modelle vorzutrainieren, die sich durch Finetuning an spezifische Aufgaben anpassen, während sie gleichzeitig allgemeinere, von der Aufgabe unbeeinflusste Merkmale lernen \parencite{Radford2021learningtransferablevisualmodels}.
 
 % Vermehrt auch überwachte Methoden; *Class* statt *Instance* Discrimination (Keshtmand2022)
-Trotzdem gibt es vermehrt Ansätze, Contrastive Learning auch im überwachten Setting anzuwenden. Hier wird nicht nur zwischen einzelnen Instanzen unterschieden, sondern auch die Klassenzugehörigkeit der Beispiele berücksichtigt.
+Aufgrund des Erfolgs im unüberwachten Lernen gibt es vermehrt Ansätze, Contrastive Learning auch im überwachten Setting anzuwenden. Hier wird nicht nur zwischen einzelnen Instanzen unterschieden, sondern auch die Klassenzugehörigkeit der Beispiele berücksichtigt.
 
 % Folgende Abschnitte
 In den folgenden Abschnitten wird genauer auf die Funktionsweise von sowohl unüberwachten als auch überwachten Varianten des Contrastive Learning eingegangen, die in den letzten Jahren vielversprechende Ergebnisse erzielt haben.
@@ -374,73 +361,67 @@ In den folgenden Abschnitten wird genauer auf die Funktionsweise von sowohl unü
 \subsection{Unsupervised Contrastive Learning} \label{subsec:unsup-contrastive}
 
 % Grundprinzipien, Funktionsweise
-Ob überwacht oder unüberwacht: Im Contrastive Learning soll die Distanz ähnlicher Beispiele in einem latenten Repräsentationsraum minimiert und die Distanz unähnlicher Beispiele maximiert werden. Dabei zieht das Modell verschiedene Ankerbeispiele heran und kontrastiert sie mit positiv- und negativ-Beispielen.
+Im Contrastive Learning soll die Distanz ähnlicher Beispiele in einem latenten Repräsentationsraum minimiert und die Distanz unähnlicher Beispiele maximiert werden. Dabei zieht das Modell verschiedene Ankerbeispiele heran und kontrastiert sie mit positiv- und negativ-Beispielen.
 
 % Loss-Funktionen (Einleitung)
-Es kommen verschiedene Verlustfunktionen zum Einsatz, wobei der Fehler grundsätzlich darüber aussagt, ob ähnliche Beispiele auch im Repräsentationsraum nahe beieinander liegen. Verlustfunktionen unterscheiden sich zum Beispiel in der Wahl der Distanzmetrik, oder der Anzahl der positiven und negativen Beispiele, die für den Vergleich herangezogen werden.
+Es kommen verschiedene Verlustfunktionen zum Einsatz, wobei der Fehler grundsätzlich darüber aussagt, ob ähnliche Beispiele auch im latenten Raum nahe beieinander liegen. Verlustfunktionen unterscheiden sich zum Beispiel in der Wahl der Distanzmetrik, oder der Anzahl der positiven und negativen Beispiele, die für den Vergleich herangezogen werden.
 
 % SimCLR (Chen2020) als prominentes Beispiel
-	% NT-Xent Loss (Normalized Temperature-scaled Cross-Entropy Loss)
-		% Ganzer Batch statt Triplet o.Ä.
-		% Jeder Anchor 2x augmentiert (2 Ansichten): ergibt positives Paar, alle anderen Beispiele im Batch sind negative Beispiele
-		% CNN als Feature Extractor: encodiert die Eingabedaten in eine hochdimensionale Repräsentation
-		% Projection Head: transformiert die features weiter, um einen Repräsentationsraum zu erzeugen, der für die Unterscheidung der Beispiele geeignet ist
-			% 2-Layer MLP mit ReLU-Aktivierung
-		% Similarity Scores: Cosine Similarity zwischen den Repräsentationen der Beispiele
-		% Softmax über die Scores aller Paare im Batch, mit Temperature Scaling, um die Unterscheidung zwischen positiven und negativen Paaren hervorzuheben
-	% Aggressive Data Augmentation (aus der die 2 Ansichten entstehen) entscheidend, um die Robustheit der Repräsentationen zu verbessern
-	% Größere Batch Sizes und längere Trainingszeiten begünstigen die Lernfähigkeit des Modells
-	% Zudem sind Hard Negatives entscheidend für den Erfolg des Modells
-Das wohl prominenteste Beispiel für Contrastive Learning in der visuellen Domäne ist \textbf{SimCLR}, das in \parencite{Chen2020simclr} vorgestellt wurde. SimCLR verwendet den sogenannten NT-Xent Loss (Normalized Temperature-scaled Cross-Entropy Loss), der die Ähnlichkeiten zwischen allen Paaren im Batch berücksichtigt, anstatt nur einzelne Triplets oder Paare. Jedes Beispiel wird dabei zweimal augmentiert, um zwei Ansichten zu erzeugen, welche als positives Paar für das jeweilige Beispiel dienen. Alle anderen Beispiele (bzw. dessen Ansichten) im Batch werden als negativ-Beispiele gesehen.
+Das wohl prominenteste Beispiel für Contrastive Learning in der visuellen Domäne ist \emph{SimCLR}, das in \parencite{Chen2020simclr} vorgestellt wurde. SimCLR verwendet den sogenannten NT-Xent Loss (Normalized Temperature-scaled Cross-Entropy Loss), der die Ähnlichkeiten zwischen allen Paaren im Batch berücksichtigt, anstatt nur einzelne Triplets oder Paare. Jedes Beispiel wird dabei zweimal augmentiert, um ein positives Paar aus zwei Ansichten des Beispiels zu erhalten. Alle anderen Beispiele (bzw. dessen Ansichten) im Batch werden als negativ-Beispiele gesehen.
 
-Die Eingabedaten werden durch ein CNN in eine latente Repräsentation transformiert. Dieser Schritt wird auch als \emph{Feature Extraction} bezeichnet. SimCLR verwendet anschließend einen sogenannten \emph{Projection Head}, der die encodierten Repräsentationen weiter transformiert, um einen Repräsentationsraum zu erzeugen, der für die Unterscheidung der Beispiele geeignet ist. In diesem Representationsraum werden die Ähnlichkeitswerte der Paare berechnet, um den Fehler zu bestimmen.
-
-Dafür wird die Kosinus-Ähnlichkeit $s_{i,j}$ der Paare $z_i$ und $z_j$ berechnet:
+Die Eingabedaten werden durch ein CNN in eine latente Repräsentation transformiert. SimCLR verwendet anschließend einen sogenannten Projection Head, der die encodierten Repräsentationen weiter transformiert, um einen Repräsentationsraum zu lernen, der für die Unterscheidung der Beispiele geeignet ist. In diesem Representationsraum werden die Ähnlichkeitswerte der Paare berechnet, um den Fehler zu bestimmen. Dafür wird die Kosinus-Ähnlichkeit $s_{i,j}$ der Repräsentationen $z_i$ und $z_j$ eines Paares berechnet (siehe \autoref{eq:cosine-similarity}).
 
 \begin{equation}
 	s_{i,j} = \frac{z_i \cdot z_j}{\|z_i\| \cdot \|z_j\|}
 	\label{eq:cosine-similarity}
 \end{equation}
 
-Der Fehler ergibt sich dann aus der Berechnung des Softmax über die Ähnlichkeiten aller Paare im Batch, skaliert mit einem Temperaturparameter, um die Unterscheidung zwischen positiven und negativen Paaren hervorzuheben.
+Der NT-Xent Loss ergibt sich dann aus der Berechnung des Softmax über die Ähnlichkeiten aller Paare in einem Batch mit $N$ Beispielen, skaliert mit einem Temperaturparameter $\tau$, um die Unterscheidung zwischen positiven und negativen Paaren hervorzuheben (siehe \autoref{eq:loss-simclr}).
 
-Durch die Verwendung aggressiver Datenaugmentation zur Erzeugung der zwei Ansichten wird die Robustheit der Repräsentationen verbessert. Größere Batch Sizes und längere Trainingszeiten begünstigen die Lernfähigkeit des Modells. Besonders die Wahl von \emph{Hard Negatives}, also von Paaren, welche ähnliche Konzepte darstellen, aber sehr unterschiedlich aussehen, hat sich als entscheidend für den Erfolg des Modells erwiesen.
+\begin{equation}
+	Loss = - \sum_{i=1}^N \log \frac{\exp(s_{i,i}/\tau)}{\sum_{j=1}^{2N} \exp(s_{i,j}/\tau)},
+	\label{eq:loss-simclr}
+\end{equation} % \frac{1}{N}
+
+wobei $s_{i,i}$ das positive Paar aus den zwei augmentierten Ansichten repräsentiert und $s_{i,j}$ die negativen Paare.
+
+% Aggressive Datenaugmentation, Hard Negatives
+Die Verwendung aggressiver Datenaugmentation zur Erzeugung der zwei Ansichten in \parencite{Chen2020simclr} wurde als entscheidender Faktor identifiziert, um die Robustheit der Repräsentationen zu verbessern. Dabei soll die gemeinsame Information der zwei Ansichten so weit wie möglich minimiert werden, ohne Task-relevante Informationen zu verlieren \parencite{Tian2020goodcontrastiveviews}. \parencite{Chen2020simclr} stellt auch den positiven Effekt von \emph{Hard Negatives} heraus, also von Paaren, welche unterschiedliche Konzepte darstellen, aber sehr ähnlich aussehen. Größere Batch Sizes und längere Trainingszeiten begünstigen ebenfalls die Lernfähigkeit des Modells.
 
 % Eine neuere Variante: StableRep (Tian2023)
-	% Verwendung von synthetischen Daten aus T2I-Modellen, insbesondere Stable Diffusion
-	% Verwendet Bilder, die aus dem selben Prompt generiert wurden, als positive Beispiele voneinander
-	% Kann mit den richtigen Einstellungen auch mit Training nur auf synthetischen Daten die Leistung von SimCLR übertreffen
-	% Noch bessere Ergebnisse bei Einbeziehung von Textsupervision
-Eine neuere Variante von Contrastive Learning ist \textbf{StableRep} \parencite{Tian2023stablerep}. Diese Methode verwendet synthetische Daten, die von Diffusionsmodellen generiert wurden, insbesondere von Stable Diffusion. Dabei werden alle Bilder, die aus dem selben Prompt generiert wurden, als positive Beispiele voneinander betrachtet. Es hat sich gezeigt, dass StableRep mit den richtigen Einstellungen auch mit Training nur auf synthetischen Daten die Leistung von SimCLR übertreffen kann. Noch bessere Ergebnisse werden erzielt, wenn Textsupervision in das Training einbezogen wird.
+% Eine neuere Variante des Contrastive Learning ist \emph{StableRep} \parencite{Tian2023stablerep}. Diese Methode verwendet synthetische Daten, die mit Diffusionsmodellen generiert wurden, insbesondere von Stable Diffusion. Dabei werden alle Bilder, die aus dem selben Prompt generiert wurden, als positive Beispiele voneinander betrachtet. Es hat sich gezeigt, dass StableRep mit den richtigen Einstellungen die Leistung von SimCLR übertreffen kann, auch wenn ausschließlich auf synthetischen Daten trainiert wurde. Noch bessere Ergebnisse wurden durch Einbeziehen von Textsupervision erzielt.
 
 \subsection{Supervised Contrastive Learning} \label{subsec:sup-contrastive}
 
 % Erweiterung der Contrastive Learning-Methode durch Verwendung von Label-Informationen
-Trotz der vielversprechenden Ergebnisse im unüberwachten Kontext, gibt es auch im überwachten Setting vermehrt Interesse an Contrastive Learning. Hierbei wird die Klassenzugehörigkeit der Daten genutzt, um die Repräsentationen der Beispiele zu verbessern. Im Gegensatz zu unüberwachten Methoden, die auf der Unterscheidung von Instanzen basieren, zielen überwachte Methoden darauf ab, die Klassenzugehörigkeit der Beispiele zu berücksichtigen.
+Auch im überwachten Kontext findet Contrastive Learning zunehmend Anwendung, da es das Potenzial hat, die Leistungsfähigkeit von Modellen durch die Nutzung von Label-Informationen zu steigern.
 
 % SupCon (Khosla2020)
-	% Weiterentwicklung der Verlustfunktion, die mehrere positiv-Beispiele pro Anchor-Sample berücksichtigt und das Contrastive Learning auf das Supervised Setting anpasst
-	% Eine rein naive Anpassung wird aber um einige wünschenswerte Anpassungen erweitert
-		% Es wird nicht ein Anchor, ein positiv-Beispiel und viele negativ-Beispiele verwendet; stattdessen kommen im Supervised Contrastive Learning auch viele positiv-Beispiele pro Batch zum Einsatz
-		% Die *vielen* positiv-Beispiele werden zudem nicht mehr als Augmentationen des Anchor-Samples generiert, sondern als Samples der gleichen Klasse herangezogen
-		% So soll auch die Notwendigkeit des Hard-Negative Minings reduziert werden
-		% Trotzdem wird gezeigt, dass der resultierende Loss sowohl von hard-negatives wie auch hard-positives profitiert
-		% Verwendung des Mittelwertes der positiven Repräsentationen stabilisiert das Training und führt zu einer verbesserten Leistung
-In \parencite{Khosla2021supcon} wird \textbf{SupCon} vorgestellt, eine Weiterentwicklung der Verlustfunktion aus SimCLR, die das Contrastive Learning auf das überwachte Setting anpasst und mehrere positiv-Beispiele pro AnkerBeispiel berücksichtigt. Im Gegensatz zu unüberwachten Methoden, die ein Anchor-Beispiel, ein positives Beispiel und viele negative Beispiele verwenden, kommen im Supervised Contrastive Learning auch viele positiv-Beispiele pro Batch zum Einsatz. Diese positiv-Beispiele werden nicht mehr als Augmentationen des Anchor-Samples generiert, sondern als Samples der gleichen Klasse herangezogen. Dadurch soll auch die Notwendigkeit des Hard-Negative Minings reduziert werden. Trotzdem wird gezeigt, dass der resultierende Loss sowohl von hard-negatives wie auch hard-positives profitiert. Die Verwendung des Mittelwertes der positiven Repräsentationen stabilisiert das Training und führt zu einer verbesserten Leistung.
+Mit \emph{SupCon} \parencite{Khosla2021supcon} wird eine Weiterentwicklung der Verlustfunktion aus SimCLR geboten, die das Contrastive Learning auf das überwachte Setting anpasst und mehrere positiv-Beispiele pro Ankerbeispiel berücksichtigt. Dabei werden neben den zwei augmentierten Ansichten des Ankerbeispiels weitere Beispiele der gleichen Klasse als positiv-Beispiele herangezogen. Das soll auch die Notwendigkeit des "Hard Negative-Minings" reduzieren. Trotzdem wird gezeigt, dass das Training sowohl von Hard Negatives wie auch von Hard Positives profitiert.
+
+Die Verlustfunktion von SupCon aus allen $N$ Beispielen im Batch kann wie in \autoref{eq:loss-supcon} formuliert werden.
+
+\begin{equation}
+	% Loss = - \frac{1}{N} \sum_{i=1}^N \log \frac{1}{|\text{P}(i)|} \frac{\sum_{j \in \text{P}(i)} \exp(s_{i,i}/\tau)}{\sum_{j=1}^{N} \exp(s_{i,j}/\tau)},
+	Loss = - \sum_{i=1}^{N} \log \left( \frac{1}{|\text{P}(i)|} \sum_{p \in \text{P}(i)} \frac{\exp(s_{i,p}/\tau)}{\sum_{j=1}^{N} \exp(s_{i,j}/\tau)} \right),
+	\label{eq:loss-supcon}
+\end{equation} % \frac{1}{N}
+
+wobei $\text{P}(i)$ die positiv-Beispiele für das Ankerbeispiel $i$ sind. Die Verwendung des Mittelwertes der positiven Repräsentationen stabilisiert das Training und führt zu einer verbesserten Leistung \parencite{Khosla2021supcon}.
+
+Das Einbeziehen der Klassenzugehörigkeiten verbessert nicht nur die Generalisierungsfähigkeit der Modelle, sondern wirkt sich auch positiv auf die OOD-Detektion aus, insbesondere bei \emph{Near OOD}-Daten, die sich nur geringfügig von den Trainingsdaten unterscheiden \parencite{Keshtmand2022contrastood}.
 
 % Generalized SCL (Kim2022)
-	% Label als Distribution
-Im überwachten Kontext bieten sich auch neue Möglichkeiten zur Weiterentwicklung von Contrastive Learning. In \parencite{Kim2023generalizedsupcon} wird \textbf{Generalized SCL} vorgestellt, eine Methode, die die Label-Informationen als Verteilung betrachtet. Anstatt die Klassenzugehörigkeit als harte Kategorie zu betrachten, wird die Unsicherheit der Labels berücksichtigt. Dies ermöglicht es dem Modell, die Repräsentationen der Beispiele besser zu lernen und die Generalisierungsfähigkeit zu verbessern.
+%Im überwachten Kontext bieten sich auch neue Möglichkeiten zur Weiterentwicklung von Contrastive Learning. In \parencite{Kim2023generalizedsupcon} wird \emph{Generalized SCL} vorgestellt. Diese Methode betrachtet die Label-Informationen nicht als harte Kategorien, sondern als Verteilungen. Indem sie die Unsicherheit der Labels berücksichtigt, ermöglicht Generalized SCL dem Modell, differenziertere Repräsentationen zu lernen. Dies führt zu einer besseren Generalisierungsfähigkeit, insbesondere in Szenarien mit überlappenden Klassen oder in Fällen, in denen Datenpunkte nicht klar einer einzigen Klasse zugeordnet werden können.
 
 % Supervised Contrastive Learning with Hard Negatives (Jiang2022)
-	% Zusätzliche Einschränkung des Negative Samplings für Auswahl von Hard Negatives (Nähe im Repräsentationsraums)
-Eine weitere Methode zur Verbesserung des Supervised Contrastive Learning ist \textbf{SCL with Hard Negatives} \parencite{Jiang2024supconhardnegatives}. Hier wird eine zusätzliche Einschränkung des Negative Samplings vorgenommen, um Hard Negatives zu selektieren. Diese sind Beispiele, die zwar unähnlich zum Anchor-Beispiel sind, aber dennoch nah genug im Repräsentationsraum, um die Repräsentationen zu verbessern. Diese Strategie hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit der Modelle zu verbessern.
+Im überwachten Kontext bieten sich auch neue Möglichkeiten zur Weiterentwicklung des Contrastive Learning. So wird beim \emph{SCL with Hard Negatives} \parencite{Jiang2024supconhardnegatives} eine zusätzliche Einschränkung in der Kontrastierung der Beispiele vorgenommen, um ausschließlich Hard Negatives als negativ-Beispiele für ein gegebenes Ankerbeispiel zu selektieren. Dies wird erreicht, indem die negativ-Beispiele im Repräsentationsraum nahe am Ankerbeispiel liegen müssen. Die Strategie hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit der Modelle zu verbessern.
 
-\section{Klassifikation von Gebrauchsgegenständen für die Recyclingwirtschaft} \label{sec:recycling-classification} %Integration von DA-Fusion und Supervised Contrastive Learning
+\section{Klassifikation von Gebrauchsgegenständen in der Recyclingwirtschaft} \label{sec:recycling-classification} %Integration von DA-Fusion und Supervised Contrastive Learning
 
-Der Anwendungsfall, auf den sich diese Arbeit bezieht, ist die Klassifikation verschiedener industrieller Objekte und Gebrauchsgegenstände für die Recyclingwirtschaft. Grundlage dafür ist das Forschungsprojekt “Sensorische \textbf{E}rfassung, automatisierte \textbf{I}dentifikation und \textbf{B}ewertung von \textbf{A}ltteilen anhand von Produktdaten sowie Informationen über bisherige Lieferungen” (EIBA), das im Rahmen der Fördermaßnahme "Ressourceneffiziente Kreislaufwirtschaft \textemdash Innovative Produktkreisläufe (ReziProK)" des Bundesministeriums für Bildung und Forschung entstand \parencite{Wagner2022reziprok}. Neben dem Fraunhofer-IPK waren auch die Technische Universität Berlin, die Deutsche Akademie der Technikwissenschaften (acatech), sowie die Circular Economy Solutions GmbH beteiligt.
+Der konkrete Anwendungsfall, auf den sich diese Arbeit bezieht, ist die Klassifikation verschiedener industrieller Objekte und Gebrauchsgegenstände in der Recyclingwirtschaft. Grundlage dafür ist das Forschungsprojekt “Sensorische \textbf{E}rfassung, automatisierte \textbf{I}dentifikation und \textbf{B}ewertung von \textbf{A}ltteilen anhand von Produktdaten sowie Informationen über bisherige Lieferungen” (EIBA), das im Rahmen der Fördermaßnahme "Ressourceneffiziente Kreislaufwirtschaft \textemdash Innovative Produktkreisläufe (ReziProK)" des Bundesministeriums für Bildung und Forschung entstand \parencite{Wagner2022reziprok}. Neben dem Fraunhofer-IPK waren auch die Technische Universität Berlin, die Deutsche Akademie der Technikwissenschaften (acatech), sowie die Circular Economy Solutions GmbH beteiligt.
 
-Das Ziel des Projekts war die Entwicklung eines KI-gestützten Systems, welches Daten aus verschiedenen digitalen Sensoren, sowie Kontextdaten aus dem Geschäftsprozess verarbeitet, um bei der Identifikation, Inspektion und Sortierung von Altteilen zu unterstützen. Dabei betont das Projekt die Rolle der KI zur \emph{Unterstützung} des Menschen, nicht zur vollständigen Automatisierung \parencite{Wagner2022reziprok}. %In \autoref{fig:eiba-process} wird veranschaulicht, wie sich das System in die genannten Prozesse integriert.
+Das Ziel des Projekts war die Entwicklung eines KI-gestützten Systems, welches Daten aus verschiedenen digitalen Sensoren, sowie Kontextdaten aus dem Geschäftsprozess verarbeitet, um bei der Identifikation, Inspektion und Sortierung von Altteilen zu unterstützen. % Dabei betont das Projekt die Rolle der KI zur \emph{Unterstützung} des Menschen, nicht zur vollständigen Automatisierung \parencite{Wagner2022reziprok}. In \autoref{fig:eiba-process} wird veranschaulicht, wie sich das System in die genannten Prozesse integriert.
 
 %\begin{figure}[h]
 %	\centering
@@ -451,7 +432,7 @@ Das Ziel des Projekts war die Entwicklung eines KI-gestützten Systems, welches 
 %	\label{fig:eiba-process}
 %\end{figure}
 
-Viele der Altteile sind sehr ähnlich und erfordern Expertenwissen, um sie korrekt zu identifizieren und den Beschädigungsgrad zu bewerten. Die Beschriftungen und Barcodes sind oft nicht mehr lesbar, sodass die Identifikation rein visuell erfolgen muss \parencite{Wagner2022reziprok}. Hier setzt das KI-System an, um den Menschen zu unterstützen. Es werden dafür multimodale Sensordaten verwendet, unter anderem Tiefenkameras (RGB-D) und eine Waage zur Erfassung des Gewichts zum Einsatz. In \autoref{fig:eiba-interface} ist die Mensch-Maschine-Schnittstelle einer mobilen Teststation des Systems dargestellt.
+Viele der Altteile sind sehr ähnlich und erfordern Expertenwissen, um sie korrekt zu identifizieren und den Beschädigungsgrad zu bewerten, wobei die Beschriftungen und Barcodes oft nicht mehr lesbar sind. Hier setzt das KI-System an, um den Menschen zu unterstützen. Es werden dafür multimodale Sensordaten verwendet, unter anderem Tiefenkameras (RGB-D) und eine Waage zur Erfassung des Gewichts zum Einsatz. In \autoref{fig:eiba-interface} ist die Mensch-Maschine-Schnittstelle einer mobilen Teststation des Systems dargestellt.
 
 \begin{figure}[t]
 	\centering
@@ -461,62 +442,53 @@ Viele der Altteile sind sehr ähnlich und erfordern Expertenwissen, um sie korre
 \end{figure}
 
 % Ergebnisse vielversprechend, aber vorerst nur im Labor; Generalisierung verbessern
-Das System wurde am Beispiel von gebrauchten Fahrzeugteilen entwickelt und konnte bei Tests basierend auf Bilddaten von ca. 1.400 Altteilen über 98\% Accuracy erreichen \parencite{ReziProK2019eiba}. Da die Tests jedoch unter Laborbedingungen stattfanden, wird weiterhin nach Möglichkeiten gesucht, die Generalisierungsfähigkeit des Modells zu verbessern. Insbesondere die Klassifikation von Objekten in verschiedenen Gebrauchszuständen, wie z.B. beschädigte oder verschmutzte Teile, stellt eine Herausforderung dar.
-
-In den vorherigen Abschnitten wurden verschiedene Methoden zur Verbesserung der Generalisierungsfähigkeit und Robustheit von Modellen vorgestellt. Sowohl die synthetische Datengenerierung als auch das Contrastive Learning konnten jeweils vielversprechende Ergebnisse erzielen. In dieser Arbeit wird nun ein Ansatz zur Kombination beider Methoden vorgestellt, welcher eine neuartige Verwendung von synthetischen Daten im Contrastive Learning ermöglichen könnte.
+Das System konnte am Beispiel von gebrauchten Fahrzeugteilen bereits eine gute Accuracy erreichen. Die Beschaffung einer ausreichenden Menge an Beispielbildern\textemdash sowohl für das Training als auch für die Validierung\textemdash mist jedoch äußerst schwierig. Dadurch werden die Objektklassen nicht mit ausreichend Variation repräsentiert, was die Generalisierungsfähigkeit der Modelle beeinträchtigen könnte.
 
 \subsection{Herausforderungen bei der Generierung synthetischer Daten} \label{subsec:challenges-synt-data}
 
-Zunächst soll auf eine Reihe von Herausforderungen bei der Generierung synthetischer Daten im Kontext des vorgestellten Anwendungsfalls aufmerksam gemacht werden. Für herkömmliche Methoden zur Bildgenerierung, wie GANs oder Diffusionsmodelle, ergeben sich hier nämlich spezielle Herausforderungen:
+Um die Datenvielfalt zu erhöhen, bietet sich die Generierung von synthetischen Daten an. In \autoref{sec:synt-data} wurden bereits verschiedene Methoden zur Bildgenerierung vorgestellt, die sich für diesen Zweck eignen. Dabei ergeben sich jedoch eine Reihe von Herausforderungen im Kontext des vorgestellten Anwendungsfalls, auf die zunächst aufmerksam gemacht werden sollte. Der Anwendungsfall zeichnet sich durch folgende Eigenschaften aus, die die Generierung synthetischer Daten erschweren:
 
-% Herausforderungen
-\begin{itemize}
-	\item Die Objekte weisen teilweise eine sehr hohe \emph{Komplexität} auf, etwa bei Motoren oder Generatoren mit vielen Details. Auch moderne Methoden zur Bildgenerierung können daran scheitern, diese Details korrekt zu erlenrn und zu reproduzieren \textemdash insbesondere, wenn nur wenige Beispielbilder gegeben sind.
-	\item Es gibt oft nur \emph{feine Unterschiede} zwischen den Klassen, die es zu berücksichtigen gilt. Sind die generierten Daten nicht akkurat genug, kann es zu Fehlklassifikationen kommen.
-	\item Auf Grund des Multiview-Setups haben die Bilder nur \emph{wenig Variation}, vor allem in den Hintergründen. Auch die Objekte selbst sind zwar aus verschiedenen Perspektiven aufgenommen, bieten aber pro Klasse nicht viel Variation in Bezug auf die Beschaffenheit, die Farbe, usw.
-\end{itemize}
+\begin{enumerate}
+	\item Die Objekte weisen teilweise eine sehr hohe Komplexität auf, etwa bei Motoren oder Generatoren mit vielen Details. 
+	\item Es gibt oft nur feine Unterschiede zwischen den Klassen, die es zu berücksichtigen gilt.
+	\item Die Bilder haben nur wenig Variation, vor allem in den Hintergründen. Auch die Objekte selbst sind zwar aus verschiedenen Perspektiven aufgenommen, bieten aber pro Klasse nicht viel Variation.
+\end{enumerate}
 
-% Anforderungen
-Es ergeben sich also hohe Anforderungen an die Generierung der synthetischen Daten. Einerseits muss die Genauigkeit der generierten Daten gewährleistet sein, um die Klassifikation der Modelle nicht zu beeinträchtigen. Trotzdem muss genügend Variation ermöglicht werden, um die Generalisierungsfähigkeit der Modelle zu verbessern.
+Dies führt bei der Verwendung herkömmlicher Methoden zur synthetischen Datengenerierung zu Problemen. Einerseits scheitern viele dieser Methoden bei der Generierung komplexer Konzepte \parencite{Lu2024syntheticdatareview}, was aufgrund der feinen Unterschiede zwischen den Klassen besonders problematisch ist. Auch die Verwendung von "Off-the-shelf"-Modellen zur T2I-Generierung sind deshalb oft nicht in der Lage spezifische Konzepte eines Anwendungsfalls akkurat wiederzugeben \parencite{Fan2023scalingsyntheticimages}. Wenn synthetische Daten mit mangelhafter Qualität auf naive Weise in das Training integriert werden, kann sich dann die Leistung der Modelle verschlechtern \parencite{VanBreugel2023syntheticdatarealerrors}.
+
+Es ergeben sich also hohe Anforderungen. Einerseits muss die Genauigkeit der generierten Daten gewährleistet sein, um die Klassifikation der Modelle nicht zu beeinträchtigen. Andererseits muss genügend Variation ermöglicht werden, um die Generalisierungsfähigkeit der Modelle zu verbessern.
+
+DA-Fusion soll deshalb in dieser Arbeit als Methode zur Generierung synthetischer Daten untersucht werden. Sie bietet womöglich eine Lösung für die genannten Probleme, indem die Bilder nicht von Grund auf neu generiert werden, sondern die Struktur der echten Daten beibehalten. Dadurch könnte die Genauigkeit der generierten Daten erhöht und gleichzeitig die Variation der Daten verbessert werden.
 
 \subsection{Synthetische Daten als negativ-Beispiele im Contrastive Learning} \label{subsec:synt-ood-contrastive}
 
 % Herausforderungen -> Forschungslücke ?
-Aus den spezifischen Herausforderungen bei der Generierung synthetischer Daten, zusammen mit den Besonderheiten des Contrastive Learning, ergibt sich eine interessante Forschungslücke: Ist es möglich, auch aus \emph{mangelhaften} synthetischen Daten zu lernen, wenn sie ausschließlich als negativ-Beispiele im Contrastive Learning verwendet werden? Genauer, lässt sich so die Leistung eines Modells bei der Klassifikation von echten Daten verbessern und gleichzeitig die Robustheit gegenüber OOD-Daten erhöhen?
+Neben der Generierung von synthetischen Daten stellt sich die Frage, wie diese effektiv in das Training von Modellen integriert werden können.
 
-% SimCLR profitierte besonders von hard negatives, um gute Repräsentationen zu lernen
-	% Synt Daten dürfen also nicht zu entfernt sein: CL lernt vor allem aus HARD Negatives
-Die bisherigen Erfolge von Contrastive Learning, insbesondere von SimCLR, zeigen, dass das Modell besonders von Hard Negatives profitiert \parencite{Chen2020simclr}, also von unähnlichen Beispielen, die aber nur schwer zu unterscheiden sind. Auch \parencite{Jiang2024supconhardnegatives} baut auf dieser Erkenntnis auf und führt eine Strategie zum Hard Negative Sampling im Supervised Contrastive Learning ein, jedoch ohne Verwendung von synthetischen Daten. Was wäre also, wenn anstatt die Negativ-Beispiele aus der Nähe im Darstellungsraum auszuwählen, Near OOD-Augmentationen der Anchor-Klasse verwendet werden?
+Mit Blick auf die Herausforderungen bei der Generierung synthetischer Daten, zusammen mit den Besonderheiten des Contrastive Learning, ergibt sich eine interessante Forschungslücke: Ist es möglich, auch aus \emph{mangelhaften} synthetischen Daten zu lernen, wenn sie ausschließlich als negativ-Beispiele im Contrastive Learning verwendet werden? Lässt sich so die Leistung eines Modells bei der Klassifikation von echten Daten verbessern und gleichzeitig die Robustheit gegenüber OOD-Daten erhöhen?
 
-Um effektiv als Hard Negatives zu wirken, dürften die synthetischen Daten also nicht zu weit entfernt von den echten Daten sein. Sie könnten deshalb als \emph{Near OOD}-Beispiele bezeichnet werden, wobei sie noch OOD genug sein müssen, um die Distanz zwischen den ID- und OOD-Daten zu maximieren. Ob sich diese synthetischen Near OOD-Daten tatsächlich als gute Hard Negatives herausstellen, wird in dieser Arbeit untersucht.
+Bisherige Ansätze im Contrastive Learning, wie etwa \parencite{Khosla2021supcon}, haben sich weitgehend auf reale Daten als negative Beispiele verlassen. Die Idee, synthetische Daten gezielt als negativ-Beispiele zu nutzen, stellt einen neuen Ansatz dar. Dies könnte besonders dann interessant sein, wenn die generierten OOD-Daten visuell ähnlich zu den ID-Daten sind. Solche Near OOD-Daten könnten für die ID-Daten eine ähnliche Funktion wie Hard Negatives erfüllen und gleichzeitig die Fehlklassifikation von OOD-Daten reduzieren.
 
-% StableRep: Synthetische Diffusion-Daten im Contrastive Learning, aber nur normale ID-Beispiele
-	% Stable Diffusion "off-the-shelf" ist nicht akkurat genug
-		% Objekte zu komplex
-		% Zu ähnlich; feine Unterschiede
-	% Auch die gleichbleibenden Hintergründe sind fatal
-	% Außerdem: Unsupervised
-Synthetische Daten aus Diffusionsmodellen wurden bereits in \parencite{Tian2023stablerep} im Contrastive Learning verwendet, jedoch nur als normale ID-Beispiele. Die Autoren stellten fest, dass Stable Diffusion "off-the-shelf" oftmals nicht in der Lage ist, spezifische Konzepte akkurat wiederzugeben. Zudem handelt es sich um ein unüberwachtes Verfahren, das nicht von den Label-Informationen profitiert, die im verwendeten Datensatz vorhanden sind.
+% SimCLR profitierte besonders von hard negatives; Synt. Daten dürfen also nicht zu entfernt sein
+Die bisherigen Erfolge von Contrastive Learning, insbesondere von SimCLR, zeigen, dass das Modell von Hard Negatives besonders stark profitiert \parencite{Chen2020simclr}. Auch \parencite{Jiang2024supconhardnegatives} baut auf dieser Erkenntnis auf und führt eine Strategie zum Hard Negative Sampling im Supervised Contrastive Learning ein\textemdash jedoch ohne Verwendung von synthetischen Daten.
 
-% Was wenn: Anstatt Negatives aus Nähe im Darstellungsraum zu samplen, Near OOD-Augmentationen aus Anchor-Klasse?
+Es gilt also zu untersuchen, ob ein Modell durch den Einsatz von synthetischen negativ-Beispielen, die mittels Diffusionsmodellen oder ähnlichen Techniken generiert wurden, seine Fähigkeit zur Generalisierung verbessern kann. Insbesondere stellt sich die Frage, ob diese synthetischen Daten die Robustheit gegenüber echten OOD-Daten erhöhen können.
 
 \subsection{Integration von DA-Fusion und Supervised Contrastive Learning} \label{subsec:da-fusion-supcon}
 
-% DA-Fusion zur Generierung von ID- und Near OOD-Daten
-In dieser Arbeit wird ein Ansatz vorgestellt, der die Generierung von synthetischen Daten durch DA-Fusion mit dem Supervised Contrastive Learning kombiniert. DA-Fusion ermöglicht es, sowohl ID- als auch Near OOD-Daten zu generieren, die als Hard Negatives im Contrastive Learning verwendet werden können.
+Im Rahmen dieser Arbeit wird ein Ansatz vorgestellt, bei dem synthetische Augmentationen, die mit DA-Fusion generiert wurden, gezielt in das Supervised Contrastive Learning eingebunden werden. Die Grundidee besteht darin, sowohl ID-Daten (In-Distribution) als auch Near OOD-Daten (Near Out-of-Distribution) durch eine kontrollierte Anpassung der Augmentationsstärke zu erzeugen. Die Near OOD-Daten werden dabei im Contrastive Learning als Hard Negatives verwendet, um die Repräsentationen des Modells zu verbessern.
 
-% Einfach den strength-Parameter der DA-Fusion-Augmentationen erhöhen
-Um die synthetischen Daten als Near OOD-Daten zu generieren, wird der Parameter für die Augmentationsstärke in DA-Fusion erhöht. Dadurch werden die Daten stärker verändert, sodass sie sich von den echten Daten unterscheiden.
+% DA-Fusion; strength-Parameter
+Wie bereits bezüglich der Herausforderungen in der synthetischen Datengenerierung erwähnt, stellt DA-Fusion im genannten Anwendungsfall eine vielversprechende Methode dar. Durch die Erhöhung des Parameters für die Augmentationsstärke können zunehmend komplexe und variierende Beispiele generiert werden. Für die Generierung der ID-Daten werden nur moderate Augmentationen angewendet. Demgegenüber werden die Near OOD-Daten durch eine stärkere Augmentation erzeugt, wobei noch ausreichend Ähnlichkeit zu den ID-Daten bestehen bleibt, um als Hard Negative zu gelten.
 
-% Supervised Contrastive Learning mit eigener Sampling-Strategie für Near OOD-Negatives
-Im Contrastive Learning wird eine eigene Sampling-Strategie für die Near OOD-Negatives eingeführt. Diese sollen sich von den ID-Beispielen unterscheiden, aber dennoch nah genug sein, um als Hard Negatives zu wirken. Die synthetischen Near OOD-Daten werden dabei als Negativ-Beispiele für die ID-Daten verwendet.
+% Supervised Contrastive Learning mit eigener Sampling-Strategie
+Im Kontext des Supervised Contrastive Learning wird eine eigene Sampling-Strategie für Near OOD-Daten entwickelt. Diese Daten werden nicht wahllos als negativ-Beispiele verwendet, sondern gezielt aus Augmentationen derselben Klasse des Ankerbeispiels generiert. Dies stellt sicher, dass die negativen Beispiele in den gleichen semantischen Raum fallen, aber durch die Augmentationen genug variieren, um als OOD-Daten zu gelten. Die Idee ist, dass diese Near OOD-Daten dem Modell helfen, feinere Unterschiede innerhalb und außerhalb der Klasse zu lernen, wodurch die Generalisierungsfähigkeit gegenüber realen Daten verbessert wird.
 
-% Potenzielle Vorteile
-	% Bessere Generalisierung trotz Limitationen in der Datengenerierung
-		% OOD-Augmentationen müssen an sich keine spezifischen Klassen akkurat repräsentieren, sind aber dennoch nah genug an den echten Daten, um dessen Repräsentationen zu verbessern
-	% Bessere OOD-Detektion
-		% OOD-Detection profitiert von einer guten Repräsentation der Daten, um die Distanz zwischen In-Distribution und OOD-Daten zu maximieren
-Als potenzielle Vorteile dieser Methode werden eine bessere Generalisierungsfähigkeit der Modelle trotz Limitationen in der Datengenerierung erwartet. Die OOD-Detection könnte ebenfalls verbessert werden, da die synthetischen Near OOD-Daten die Distanz zwischen den ID- und OOD-Daten maximieren.
+Die Formulierung der Verlustfunktion aus dem Supervised Contrastive Learning (siehe \autoref{eq:loss-supcon}) wird entsprechend der Verwendung von Near OOD-Daten leicht angepasst (siehe \autoref{eq:loss-da-fusion-supcon}).
 
-% Potenzielle Herausforderungen
-Heruasforderungen könnten sich jedoch aus der Wahl der Augmentationsstärke ergeben. Wenn die synthetischen Daten zu stark verändert werden, könnten sie sich zu sehr von den echten Daten unterscheiden und als schlechte Negativ-Beispiele wirken. Es gilt also, den "sweet spot" für die Augmentationsstärke zu finden.
+\begin{equation}
+	Loss = - \sum_{i=1}^{N} \log \left( \frac{1}{|\text{P}(i)|} \sum_{p \in \text{P}(i)} \frac{\exp(s_{i,p}/\tau)}{\sum_{j \in \text{J}(i)} \exp(s_{i,j}/\tau)} \right),
+	\label{eq:loss-da-fusion-supcon}
+\end{equation} % \frac{1}{N}
+
+wobei $\text{J}(i)$ die negativ-Beispiele für das Ankerbeispiel $i$ sind (ID und OOD), welche gefiltert wurden, um von den OOD-Augmentationen nur solche zu verwenden, die aus der Klasse des Ankerbeispiels generiert wurden und somit als Near OOD gelten.

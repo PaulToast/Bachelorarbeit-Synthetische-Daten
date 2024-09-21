@@ -6,24 +6,23 @@ Dieses Kapitel präsentiert die Ergebnisse der Arbeit. Es wird auf die generiert
 \section{Die generierten synthetischen Daten} \label{sec:da-fusion-results}
 
 % Einleitung
-Im Folgenden werden die generierten synthetischen Daten vorgestellt, aufgeteilt in In-Distribution- und Near Out-of-Distribution-Augmentationen. Es wird auf die Qualität der Daten durch menschliche Evaluierung eingegangen. Die Generierung wurde im vorherigen Kapitel im Detail behandelt (siehe \autoref{subsec:da-fusion-setup}).
-
-% Validation Images; stetiges Verbessern (Gemeinsames Finetuning)
-Beide Arten von Augmentationen wurden mit den selben Text-Embeddings generiert, die mit Textual Inversion erlernt wurden. Die Validierungsbilder aus dem Training dieser Embeddings wiesen dabei eine angemessene Qualität auf.
+Im Folgenden werden sowohl die In-Distribution- als auch die Near Out-of-Distribution-Augmentationen betrachtet. Es wird auf die Qualität der Daten eingegangen und Beispiele für gelungene und weniger gelungene Augmentationen gezeigt.
 
 \subsection{In-Distribution} \label{subsec:da-fusion-id-results}
 
-In \autoref{fig:id-augs-good} sind Beispiele der synthetischen In-Distribution-Daten zu sehen. Die Bilder sind überwiegend sehr überzeugend und realistisch. Da der \lstinline{strength}-Parameter der Augmentationen auf 0.2 gesetzt wurde, sind die Unterschiede sehr subtil. Die Form und Struktur der Objekte blieb erhalten, während Veränderungen in der Textur der Oberflächen erkennbar sind.
+Einige Beispiele der synthetischen In-Distribution-Daten sind in \autoref{fig:id-augs-good} zu sehen. Die Bilder sind überwiegend überzeugend und realistisch. Die Unterschiede sind auf den ersten Blick sehr subtil, vor allem, wenn die Bilder Seite an Seite betrachtet werden.
+
+Dennoch sind Veränderungen in der Textur der Oberflächen erkennbar. Während selten auffällige Änderungen in der Beschaffenheit der Objekte generiert wurden, sind unterschiedliche Verteilungen von Rost und Verschmutzung zu erkennen.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.48\textwidth]{figure_results_id-augs_good_1.png}%
-	\hspace{0.02\textwidth}\includegraphics[width=0.48\textwidth]{figure_results_id-augs_good_2.png}
+	\hspace{0.02\textwidth}\includegraphics[width=0.48\textwidth]{figure_results_id-augs_good_2.png}%
 	\caption{Vergrößerte Ausschnitte von einigen der In-Distribution-Augmentationen.}
 	\label{fig:id-augs-good}
 \end{figure}
 
-In einigen Fällen sind die Ergebnisse jedoch weniger überzeugend. In \autoref{fig:id-augs-bad} sind Beispiele für mangelhafte In-Distribution-Daten zu sehen. Die synthetischen Objekte sind in diesen Fällen nicht realistisch und weisen deutliche Artefakte auf. Die Qualität der Daten hängt dabei nicht nur von der Art des Objekts, sondern auch von der Größe des Objektes im Originalbild (was auch die Auflösung des ROI-Crops entscheidet). Bei glatten Oberflächen und einfachen Formen sind die Ergebnisse besser als bei komplexen Strukturen und unregelmäßigen Oberflächen.
+In einigen Fällen sind die Ergebnisse jedoch weniger überzeugend. In \autoref{fig:id-augs-bad} sind Beispiele für mangelhafte In-Distribution-Daten zu sehen. Die synthetischen Objekte sind in diesen Fällen nicht realistisch und weisen deutliche Artefakte auf. Oftmals hängt die Qualität der Daten mit Größe des Objektes im Originalbild zusammen (was auch die Auflösung des ROI-Crops entscheidet). %Bei kleineren Objekten fällt die Augmentation relativ gesehen stärker aus, was zu einer stärkeren Verzerrung führen kann.
 
 \begin{figure}
 	\centering
@@ -35,7 +34,7 @@ In einigen Fällen sind die Ergebnisse jedoch weniger überzeugend. In \autoref{
 
 \subsection{Near Out-of-Distribution} \label{subsec:da-fusion-ood-results}
 
-Die synthetischen Near Out-of-Distribution-Daten sind in \autoref{fig:ood-augs-good} dargestellt. Die Qualität der Daten ist insgesamt etwas schlechter als bei den In-Distribution-Daten, was auf Grund des größeren \lstinline{strength}-Parameters von 0.5 zu erwarten war. Die Objekte wirken weniger realistisch, aber dennoch plausibel. Die Wirksamkeit der Beispiele im Training kann jedoch an dieser Stelle noch nicht beurteilt werden.
+Beispiele für die synthetischen Near Out-of-Distribution-Daten sind in \autoref{fig:ood-augs-good} dargestellt. Die meisten Objekte wirken etwas weniger realistisch, aber dennoch plausibel. Vor allem ist hier der Einfluss der unterschiedlichen Text-Prompts zur Augmentation deutlicher erkennbar, wodurch die Objekte in unterschiedlichen Zuständen dargestellt werden.
 
 \begin{figure}
 	\centering
@@ -46,16 +45,18 @@ Die synthetischen Near Out-of-Distribution-Daten sind in \autoref{fig:ood-augs-g
 	\label{fig:ood-augs-good}
 \end{figure}
 
-Auch hier gibt es Beispiele, die weniger überzeugend sind (siehe \autoref{fig:ood-augs-bad}). Die synthetischen Objekte weisen in diesen Fällen deutliche Artefakte auf oder sind vollständig vom ursprünglichen Konzept entkoppelt.
+Allerdings gibt es hier deutlich mehr Beispiele, die weniger überzeugend sind (siehe \autoref{fig:ood-augs-bad}). Die synthetischen Objekte weisen in diesen Fällen deutliche Artefakte auf oder sind vollständig vom ursprünglichen Konzept entkoppelt.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.48\textwidth]{figure_results_ood-augs_bad_1.png}%
-	\hspace{0.02\textwidth}\includegraphics[width=0.48\textwidth]{figure_results_ood-augs_bad_2.png}\vspace{0.01\textwidth}
-	\includegraphics[width=0.98\textwidth]{figure_results_ood-augs_bad_4.png}
+	\hspace{0.02\textwidth}\includegraphics[width=0.48\textwidth]{figure_results_ood-augs_bad_2.png}%\vspace{0.01\textwidth}
+	%\includegraphics[width=0.98\textwidth]{figure_results_ood-augs_bad_4.png}
 	\caption{Beispiele für mangelhafte Out-of-Distribution-Augmentationen.}
 	\label{fig:ood-augs-bad}
 \end{figure}
+
+\newpage
 
 \section{Trainings- und Testergebnisse} \label{sec:supcon-results}
 
@@ -82,37 +83,7 @@ Versuch 3 zeigt auf den Trainingsdaten einen insgesamt deutlich niedrigeren Fehl
 
 \subsection{Lineare Klassifikation} \label{subsec:supcon-lin-results}
 
-Die Trainingskurven der linearen Klassifikation sind in \autoref{fig:supcon-lin-loss-acc} (Fehler und Accuracy) und \autoref{fig:supcon-lin-ood-detection} (ID- und OOD-Confidence) zu sehen.
-
-In allen Versuchen zeigt sich eine gute Konvergenz der Trainings- und Validierungskurven. Die Trainings- und Validierungsfehler sind dabei sehr niedrig und stabil, wobei der Validierungsfehler im Vergleich zum Trainingsfehler etwas höher ist. Die Trainings- und Validierungsgenauigkeiten sind ebenfalls sehr hoch und stabil, wobei die Validierungsgenauigkeit im Vergleich zur Trainingsgenauigkeit etwas niedriger ist. Die ID- und OOD-Confidence sind ebenfalls relativ hoch, es gibt jedoch einen klaren Abstand zwischen ID-Confidence und OOD-Confidence.
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-train-loss.png}%
-	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-val-loss.png}
-	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-train-acc.png}%
-	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-val-acc.png}
-	\caption[Trainings- und Validierungsfehler bzw. -Accuracy während der linearen Klassifikation.]{Trainings- und Validierungsfehler bzw. -Accuracy während der linearen Klassifikation. \textcolor{exp1}{Lila}: Versuch 1, \textcolor{exp2}{Grün}: Versuch 2, \textcolor{exp3}{Gelb}: Versuch 3.}
-	\label{fig:supcon-lin-loss-acc}
-\end{figure}
-\begin{figure}[]
-	\centering
-	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-id-conf.png}%
-	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-ood-conf.png}
-	\caption[ID- und OOD-Confidence während der linearen Klassifikation.]{ID- und OOD-Confidence während der linearen Klassifikation (\textcolor{exp1}{Lila}: Versuch 1, \textcolor{exp2}{Grün}: Versuch 2, \textcolor{exp3}{Gelb}: Versuch 3).}
-	\label{fig:supcon-lin-ood-detection}
-\end{figure}
-
-% Viel höherer Fehler bei Versuch 3
-Die Trainingskurven der linearen Klassifikation zeigen sehr geringe Trainingsfehler für Versuch 1 und 2, aber einen viel höheren Fehler bei Versuch 3. Die Validierungsfehler der Versuche nähern sich wieder etwas an, wobei weiterhin ein deutlicer Abstand zwischen Versuch 3 und den anderen Versuchen besteht. Während der Validierungsfehler bei den Versuchen 1 und 2 also höher ist als der Trainingsfehler, ist es bei Versuch 3 umgekehrt.
-
-% Viel geringere Trainingsgenauigkeit bei Versuch 3, dann ber doch hohe Validierungsgenauigkeit (?)
-Ähnliches kann in Bezug auf die Top-1 Accuracy beobachtet werden. Die Trainingsgenauigkeit ist bei Versuch 3 deutlich niedriger als bei den anderen Versuchen, während die Validierungsgenauigkeit ein ähnlich hohes Niveau erreicht.
-
-% Versuch 3 mit Abstand die niedrigsten Confidence-Werte (ID & OOD), und sogar den niedrigsten Abstand
-Die ID-Confidence ist bei Versuch 2 deutlich höher als bei Versuch 1, während die OOD-Confidence bei beiden Versuchen vergleichbar bleibt. Versuch 3 zeigt jedoch die niedrigsten Confidence-Werte, sowohl für ID als auch für OOD, und hat auch den niedrigsten Abstand zwischen den beiden Werten. In der Trainingskurve ist dabei kaum Konvergenz zu erkennen.
-
-In \autoref{tab:supcon-lin-results} sind die Testergebnisse der linearen Klassifikation zusammengefasst.
+Die finalen Testergebnisse der linearen Klassifikation auf den Validierungsdaten sind in \autoref{tab:supcon-lin-results} zusammengefasst. Die Trainingskurven sind in \autoref{fig:supcon-lin-loss} (Fehler), \autoref{fig:supcon-lin-acc} (Top-1 Accuracy) und \autoref{fig:supcon-lin-ood-detection} (ID- und OOD-Confidence) zu sehen.
 
 \begin{table}[h]
 	%\centering
@@ -128,6 +99,37 @@ In \autoref{tab:supcon-lin-results} sind die Testergebnisse der linearen Klassif
 	\end{tabular}
 	\label{tab:supcon-lin-results}
 \end{table}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-train-loss.png}%
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-val-loss.png}
+	\caption[Trainings- und Validierungsfehler der linearen Klassifikation.]{Trainings- und Validierungsfehler der linearen Klassifikation. \textcolor{exp1}{Lila}: Versuch 1, \textcolor{exp2}{Grün}: Versuch 2, \textcolor{exp3}{Gelb}: Versuch 3.}
+	\label{fig:supcon-lin-loss}
+\end{figure}
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-train-acc.png}%
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-val-acc.png}
+	\caption[Trainings- und Validierungs-Accuracy während der linearen Klassifikation.]{Trainings- und Validierungs-Accuracy während der linearen Klassifikation. \textcolor{exp1}{Lila}: Versuch 1, \textcolor{exp2}{Grün}: Versuch 2, \textcolor{exp3}{Gelb}: Versuch 3.}
+	\label{fig:supcon-lin-acc}
+\end{figure}
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-id-conf.png}%
+	\includegraphics[width=0.5\textwidth]{figure_results_supcon-lin_avg-ood-conf.png}
+	\caption[ID- und OOD-Confidence während der linearen Klassifikation.]{ID- und OOD-Confidence während der linearen Klassifikation (\textcolor{exp1}{Lila}: Versuch 1, \textcolor{exp2}{Grün}: Versuch 2, \textcolor{exp3}{Gelb}: Versuch 3).}
+	\label{fig:supcon-lin-ood-detection}
+\end{figure}
+
+% Viel höherer Fehler bei Versuch 3
+Die Trainingskurven zeigen sehr geringe Trainingsfehler für Versuch 1 und 2, aber einen viel höheren Fehler bei Versuch 3. Die Validierungsfehler der Versuche nähern sich wieder etwas an, wobei weiterhin ein deutlicer Abstand zwischen Versuch 3 und den anderen Versuchen besteht. Während der Validierungsfehler bei den Versuchen 1 und 2 also höher ist als der Trainingsfehler, ist es bei Versuch 3 umgekehrt.
+
+% Viel geringere Trainingsgenauigkeit bei Versuch 3, dann ber doch hohe Validierungsgenauigkeit (?)
+Ähnliches kann in Bezug auf die Top-1 Accuracy beobachtet werden. Die Trainingsgenauigkeit ist bei Versuch 3 deutlich niedriger als bei den anderen Versuchen, während die Validierungsgenauigkeit ein ähnlich hohes Niveau erreicht.
+
+% Versuch 3 mit Abstand die niedrigsten Confidence-Werte (ID & OOD), und sogar den niedrigsten Abstand
+Die ID-Confidence ist bei Versuch 2 deutlich höher als bei Versuch 1, während die OOD-Confidence bei beiden Versuchen vergleichbar bleibt. Versuch 3 zeigt jedoch die niedrigsten Confidence-Werte, sowohl für ID als auch für OOD, und hat auch den niedrigsten Abstand zwischen den beiden Werten. In der Trainingskurve ist dabei kaum Konvergenz zu erkennen.
 
 \section{Vergleich der Ergebnisse} \label{sec:results-comparison}
 
