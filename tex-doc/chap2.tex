@@ -58,17 +58,17 @@ Heutzutage bilden Deep Learning-Modelle die Grundlage für viele Anwendungen der
 \subsection{Neuronale Netze} \label{subsec:neural-networks}
 
 % Einleitung und grundlegender Aufbau
-Während die rasante Entwicklung von Deep Learning in den vergangenen Jahren besonders spürbar geworden ist, sind die zugrundeliegenden Algorithmen und Konzepte schon seit Jahrzehnten bekannt. Das Künstliche Neuronale Netz (KNN) bildet dabei die Grundlage der allermeisten Deep Learning-Modelle. Es ist inspiriert von der Struktur und Funktionsweise des menschlichen Gehirns und besteht aus einer Vielzahl von miteinander verbundenen Knoten (Neuronen), die in Schichten organisiert sind. Die Schichten teilen sich auf in eine Eingabeschicht (Input Layer), eine oder mehrere versteckte Schichten (Hidden Layers) und eine Ausgabeschicht (Output Layer).
+Während die rasante Entwicklung von Deep Learning in den vergangenen Jahren besonders spürbar geworden ist, sind die zugrundeliegenden Algorithmen und Konzepte schon seit Jahrzehnten bekannt \parencite{Goodfellow2016deeplearning}. Das Künstliche Neuronale Netz (KNN) bildet dabei die Grundlage der allermeisten Deep Learning-Modelle. Es ist inspiriert von der Struktur und Funktionsweise des menschlichen Gehirns und besteht aus einer Vielzahl von miteinander verbundenen Neuronen, die in Schichten organisiert sind. Die Schichten teilen sich auf in eine Eingabeschicht (Input Layer), eine oder mehrere versteckte Schichten (Hidden Layers) und eine Ausgabeschicht (Output Layer).
 
-%\begin{figure}[t]
+%\begin{figure}[h]
 %	\centering
-%	\includegraphics[width=11cm]{figure_ffn.png}
+%	\includegraphics[width=12cm]{figure_ffn.png}
 %	\caption{Darstellung eines einfachen neuronalen Netzes \parencite{Oshea2015cnnintro}.}
 %	\label{fig:ffn}
 %\end{figure}
 
 % Einzelnes Neuron im Detail
-Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind mathematische Modelle des biologischen Neurons. Sie wurden erstmals 1943 von Warren McCulloh und Walter Pitts vorgestellt, wobei sich die heute verwendeten Neuronenmodelle kaum unterscheiden \parencite{Zhou2021machinelearning}. In \autoref{fig:neuron} ist ein solches Neuronenmodell dargestellt.
+Bei den einzelnen Neuronen handelt es sich um mathematische Modellierungen des biologischen Neurons, die erstmals in \parencite{McCulloch1943nn} vorgestellt wurden, wobei sich die heute verwendeten Neuronenmodelle kaum unterscheiden. In \autoref{fig:neuron} ist ein solches Neuronenmodell dargestellt.
 
 \begin{figure}[h]
 	\centering
@@ -84,14 +84,14 @@ Die einzelnen Neuronen, auf dem diese Netze aufbauen, sind mathematische Modelle
 	\label{fig:neuron}
 \end{figure}
 
-Jedes Neuron empfängt eine Reihe von Eingaben $x_1, x_2, \dots, x_n$, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es zugehörige Gewichtungen (Weights) $w_1, w_2, \dots, w_n$, welche die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingaben auf das Neuron bestimmen. Das Neuron berechnet dann die gewichtete Summe aller Eingaben. Zusätzlich wird ein Bias $\theta$ hinzugefügt, der den Schwellenwert bestimmt. Die Aktivierung $y$ des Neurons kann dementsprechend wie in \autoref{eq:mp-neuron} beschrieben werden.
+Jedes Neuron empfängt eine Reihe von Eingaben $x_1, x_2, \dots, x_n$, entweder von externen Quellen oder von den Ausgaben anderer Neuronen. Für jede dieser Eingaben gibt es zugehörige Gewichtungen (Weights) $w_1, w_2, \dots, w_n$, welche die Stärke und Richtung (positiv oder negativ) des Einflusses der jeweiligen Eingaben auf das Neuron bestimmen. Das Neuron berechnet dann die gewichtete Summe aller Eingaben. Zusätzlich wird ein Schwellenwert (Bias) $\theta$ hinzugefügt. Die Aktivierung $y$ des Neurons kann dementsprechend wie in \autoref{eq:mp-neuron} beschrieben werden.
 
 \begin{equation}
 	y = \varphi \left( \sum_{i=1}^{n} w_{i} x_i + \theta \right),
 	\label{eq:mp-neuron}
 \end{equation}
 
-wobei $\varphi$ die Aktivierungsfunktion ist, die die Ausgabe des Neurons bestimmt. Häufig wird die Sigmoid-Funktion verwendet (siehe \autoref{eq:sigmoid}), die, im Gegensatz zu einer einfachen Schwellenwertfunktion, kontinuierlich und differenzierbar ist. Dies vereinfacht die Optimierung des Netzwerks \parencite{Zhou2021machinelearning}.
+wobei $\varphi$ eine Aktivierungsfunktion ist, die die Ausgabe des Neurons bestimmt. Häufig wird die Sigmoid-Funktion verwendet (siehe \autoref{eq:sigmoid}), die, im Gegensatz zu einer einfachen Schwellenwertfunktion, kontinuierlich und differenzierbar ist. Dies vereinfacht die Optimierung des Netzwerks \parencite{Zhou2021machinelearning}.
 
 \begin{equation}
 	\text{Sigmoid}(x) = \frac{1}{1 + e^{-x}}
@@ -101,11 +101,11 @@ wobei $\varphi$ die Aktivierungsfunktion ist, die die Ausgabe des Neurons bestim
 Die Sigmoid-Funktion eignet sich gut für binäre Klassifikationsprobleme. Für Multiklassenprobleme wird jedoch die Softmax-Funktion verwendet, die eine Wahrscheinlichkeitsverteilung über alle Klassen berechnet (siehe \autoref{eq:softmax}) \parencite{Goodfellow2016deeplearning}.
 
 \begin{equation}
-	\text{Softmax}(x)_i = \frac{e^{x_i}}{\sum_{j=1}^{n} e^{x_j}},
+	\text{Softmax}(x)_i = \frac{e^{x_i}}{\sum_{j=1}^{N} e^{x_j}},
 	\label{eq:softmax}
 \end{equation}
 
-wobei $x_i$ die Eingabe für Klasse $i$ ist und $n$ die Anzahl der Klassen.
+wobei $N$ die Anzahl der Klassen ist.
 
 % Wie neuronale Netze lernen
 Im Training fließen die Eingabedaten in einer Vorwärtsausbreitung (Forward Propagation) durch das Netzwerk, um die Ausgabe zu berechnen, welche sich aus der Aktivierung der Neuronen in der Ausgabeschicht ergibt. Es wird dann eine geeignete Verlustfunktion angewendet, um den Fehler (Loss) des Modells zu berechnen. Das Ziel des Trainings ist es, die Gewichtungen der Neuronen so anzupassen, dass der Fehler minimiert wird.
@@ -114,11 +114,11 @@ Im Training fließen die Eingabedaten in einer Vorwärtsausbreitung (Forward Pro
 Die Wahl der Verlustfunktion hängt von der Art des Problems ab, das gelöst werden soll. Für Klassifikationsprobleme wird häufig die Kreuzentropie (Cross Entropy) verwendet, die den Fehler zwischen den tatsächlichen und den vorhergesagten Wahrscheinlichkeiten berechnet (siehe \autoref{eq:cross-entropy}).
 
 \begin{equation}
-	Loss = - \sum_{c=1}^{N} y_c \log \hat{y}_c,
+	Loss = - \sum_{i=1}^{N} y_i \log \hat{y}_i,
 	\label{eq:cross-entropy}
 \end{equation}
 
-wobei $N$ die Anzahl der Klassen ist, $y_c$ die tatsächliche Wahrscheinlichkeit für Klasse $c$ und $\hat{y}_c$ die vorhergesagte Wahrscheinlichkeit für Klasse $c$.
+wobei $N$ die Anzahl der Klassen ist, $y_i$ die tatsächliche Wahrscheinlichkeit für Klasse $i$ und $\hat{y}_i$ die vorhergesagte Wahrscheinlichkeit.
 
 % Backpropagation und SGD
 Die Optimierung geschieht durch eine Rückwärtsausbreitung (Backpropagation), welche den berechneten Fehler rückwärts durch das Netz propagiert, um die Gewichte und Schwellenwerte um einen geringen Wert in die Richtung anzupassen, die den Fehler minimieren würde. Die Richtung wird bestimmt, indem der Gradient der Verlustfunktion berechnet wird. Die Lernrate (Learning Rate) bestimmt, wie groß die Schritte sind, die entlang des Gradienten gemacht werden. So bewegt sich das Modell iterativ entlang des Gradienten hin zu einem lokalen Minimum der Verlustfunktion. Dieser Algorithmus wird als Gradient Descent (Gradientenabstieg) bezeichnet. Im Maschinellen Lernen kommt hauptsächlich der Stochastic Gradient Descent (SGD) zum Einsatz, der immer nur einen kleinen, zufällig ausgewählten Teil der Trainingsdaten (einen sogenannten Batch) verwendet, um den Gradienten zu berechnen.
@@ -132,9 +132,9 @@ Die Optimierung geschieht durch eine Rückwärtsausbreitung (Backpropagation), w
 \end{figure}
 
 % CNN als Deep Learning-Beispiel eines NN
-Deep Learning mit neuronalen Netzen kann gut am Beispiel des Convolutional Neural Networks (CNN) veranschaulicht werden, welches speziell für die Verarbeitung von Bildern entwickelt wurde (siehe \autoref{fig:cnn}). Ein CNN besteht aus mehreren Schichten, darunter Convolutional Layers, Pooling Layers und Fully Connected Layers. Die Convolutional Layers extrahieren sogenannte \emph{Feature Maps} aus den Eingabebildern, indem sie Faltungskerne über das Bild schieben und die gewichteten Summen der Pixel berechnen. Die Pooling Layers reduzieren die Dimensionalität der Feature Maps, indem sie die Größe der Merkmale reduzieren. Die Fully Connected Layers kombinieren die extrahierten Merkmale, um die endgültige Klassifikation vorzunehmen.
+Deep Learning mit neuronalen Netzen kann gut am Beispiel des Convolutional Neural Networks (CNN) veranschaulicht werden, welches speziell für die Verarbeitung von Bildern entwickelt wurde (siehe \autoref{fig:cnn}). Mit Backpropagation trainierte CNNs wurden erstmals in \parencite{LeCun1989cnnbackprop} behandelt, bilden aber auch heute noch die Grundlage von zahlreichen Anwendungen im ML.
 
-Mit Backpropagation trainierte CNNs wurden erstmals in \parencite{LeCun1989cnnbackprop} behandelt, bilden aber auch heute noch die Grundlage von zahlreichen Deep Learning-Anwendungen und Methoden. Sie sind vor allem deshalb so erfolgreich in der Bildverarbeitung, weil sie die räumliche Struktur von Bildern berücksichtigen und dadurch effektiv Muster und Merkmale in den Daten erkennen können.
+Ein CNN besteht aus mehreren Schichten, darunter Convolutional Layers, Pooling Layers und Fully Connected Layers. Die Convolutional Layers extrahieren sogenannte \emph{Feature Maps} aus den Eingabebildern, indem sie Faltungskerne über das Bild schieben und die gewichteten Summen der Pixel berechnen. Die Pooling Layers reduzieren die Dimensionalität der Feature Maps und die Fully Connected Layers kombinieren die extrahierten Features, um die endgültige Klassifikation vorzunehmen. Dadurch berücksichtigen sie auf effektive Weise die räumliche Struktur von Bildern und können benötigen dabei weniger Parameter als herkömmliche neuronale Netze \parencite{Goodfellow2016deeplearning}.
 
 \subsection{Datenaugmentation} \label{subsec:data-augmentation}
 
@@ -164,10 +164,10 @@ Datenaugmentation hat sich als eine der wichtigsten Ansätze zur Vermeidung von 
 Wenn ein KI-Modell mit Daten konfrontiert wird, die außerhalb des Bereichs liegen, den es während des Trainings gesehen hat, spricht man von Out-of-Distribution (OOD)-Daten. Es handelt sich also um Datenpunkte oder Muster, die sich signifikant von den Trainingsdaten unterscheiden. Dies kann zu Problemen führen, da das Modell möglicherweise nicht in der Lage ist, angemessene Vorhersagen oder Entscheidungen für diese Daten zu treffen. Die Erkennung von OOD-Daten ist daher ein wichtiges Forschungsgebiet im maschinellen Lernen, da sie dazu beitragen kann, die Zuverlässigkeit und Sicherheit von KI-Systemen zu verbessern.
 
 % Schwellenwert
-Im Idealfall gibt ein Neuronales Netz höhere Softmax-Wahrscheinlichkeiten für In-Distribution (ID)-Daten und niedrigere Wahrscheinlichkeiten für OOD-Daten aus. Tatsächlich sind die Wahrscheinlichkeiten für OOD-Daten fast immer sehr hoch, meist reicht aber der Abstand zwischen ID- und OOD-Daten aus, um OOD-Instanzen frühzeitig zu identifizieren \parencite{Hendrycks2018baselineooddetection}.
+Grundsätzlich sollte ein Neuronales Netz höhere Softmax-Wahrscheinlichkeiten für In-Distribution (ID)-Daten und niedrigere Wahrscheinlichkeiten für OOD-Daten ausgeben. Tatsächlich sind die Wahrscheinlichkeiten für OOD-Daten fast immer sehr hoch, meist reicht aber der Abstand zwischen ID- und OOD-Daten aus, um OOD-Instanzen frühzeitig zu identifizieren \parencite{Hendrycks2018baselineooddetection}.
 
 % Andere Ansätze
-Oftmals ist die OOD-Detektion aber weniger trivial, etwa wenn sich ID- und OOD-Daten sehr ähnlich sind. Es wird daher stets nach alternativen Ansätzen gesucht, um die OOD-Detektion zu verbessern. In \parencite{Hendrycks2018baselineooddetection} wird dabei ein Klassifikator erweitert, um Rekonstruktionen der Eingabedaten zu erstellen und den Fehler zwischen den Original- und Rekonstruktionsdaten zu messen. Ein hoher Rekonstruktionsfehler kann auf OOD-Daten hinweisen. Auch das Temperature Scaling \parencite{Guo2017tempscaling}, welches die Softmax-Wahrscheinlichkeiten kalibriert und somit den Abstand zwischen ID- und OOD-Daten vergrößert, kann zusammen mit kleinen Störungen in den Eingabedaten für zuverlässigere OOD-Detektion sorgen \parencite{Liang2020odin}.
+Oftmals ist die OOD-Detektion aber weniger trivial, etwa wenn sich ID- und OOD-Daten sehr ähnlich sind. Es wird daher stets nach alternativen Ansätzen gesucht, um die OOD-Detektion zu verbessern. In \parencite{Hendrycks2018baselineooddetection} wird beispielsweise ein Klassifikator erweitert, um Rekonstruktionen der Eingabedaten zu erstellen und den Fehler zwischen den Original- und Rekonstruktionsdaten zu messen. Ein hoher Rekonstruktionsfehler kann auf OOD-Daten hinweisen. %Auch das Temperature Scaling \parencite{Guo2017tempscaling}, welches die Softmax-Wahrscheinlichkeiten kalibriert und somit den Abstand zwischen ID- und OOD-Daten vergrößert, kann zusammen mit kleinen Störungen in den Eingabedaten für zuverlässigere OOD-Detektion sorgen \parencite{Liang2020odin}.
 
 \section{Synthetische Daten} \label{sec:synt-data}
 
@@ -234,7 +234,7 @@ wobei $p(z|x)$ die latente Verteilung eines gegebenen Datenpunktes $x$, $p(x|z)$
 
 \subsection{Generative Adversarial Networks} \label{subsec:gan}
 
-Ein weiteres berühmtes KI-Modell ist das Generative Adversarial Network (GAN), das in \parencite{Goodfellow2014gan} vorgestellt wurde. GANs bestehen aus einem \emph{Generator}- und einem \emph{Diskriminator}-Modell, die in einem adversariellen Prozess gegeneinander antreten.
+Ein weiteres berühmtes KI-Modell ist das \emph{Generative Adversarial Network} (GAN), das in \parencite{Goodfellow2014gan} vorgestellt wurde. GANs bestehen aus einem \emph{Generator}- und einem \emph{Diskriminator}-Modell, die in einem adversariellen Prozess gegeneinander antreten.
 
 Der Generator nimmt Zufallsrauschen als Eingabe und erzeugt daraus Daten, die möglichst realistisch wirken sollen. Der Diskriminator erhält sowohl echte Daten aus dem Trainingsdatensatz als auch die vom Generator erzeugten Daten. Seine Aufgabe ist es, zwischen echten und künstlichen Daten zu unterscheiden. Dafür gibt er für einen gegebenen Datenpunkt die Wahrscheinlichkeit aus, dass dieser echt ist. \autoref{fig:gan} gibt einen Überblick über das ganze System.
 
@@ -294,26 +294,26 @@ Die Verlustfunktion wird oft als MSE formuliert, um den Unterschied zwischen dem
 Anders als bei GANs gibt es keine direkten adversarialen Optimierungsmechanismen, die zu einem Ungleichgewicht führen können. Es wird stattdessen explizit die Wahrscheinlichkeitsdichte zwischen den realen Daten und den erzeugten Daten minimiert, was zu einem robusteren und stabileren Trainingsprozess führt.
 
 % DALL-E (2) für Text-to-Image
-Eine entscheidende Weiterentwicklung der Diffusionsmodelle war die Text-Konditionierung des generativen Prozesses. In \parencite{Ramesh2022dalle2} wurde DALL-E 2 vorgestellt, welches ein Diffusionsmodell verwendet, das in der Lage ist, Bilder aus Textbeschreibungen zu generieren. DALL-E 2 verwendet das Transformer-Modell \parencite{Vaswani2017transformer}, um die Textbeschreibungen in eine latente Repräsentation zu kodieren, die dann im Diffusionsprozess verwendet wird.
+Eine entscheidende Weiterentwicklung der Diffusionsmodelle war die Text-Konditionierung des generativen Prozesses. In \parencite{Ramesh2022dalle2} wurde \emph{DALL-E 2} vorgestellt, welches ein Diffusionsmodell verwendet, das in der Lage ist, Bilder aus Textbeschreibungen zu generieren. DALL-E 2 verwendet das Transformer-Modell \parencite{Vaswani2017transformer}, um die Textbeschreibungen in eine latente Repräsentation zu kodieren, die dann im Diffusionsprozess verwendet wird.
 
 % Stable Diffusion
-Stable Diffusion ist ein besonders einflussreiches Diffusionsmodell, das sich durch die Verwendung eines latenten Diffusionsprozesses auszeichnet \parencite{Rombach2022stablediffusion}. Anstatt den Diffusionsprozess direkt auf den hochdimensionalen Bildraum anzuwenden, führt Stable Diffusion die Diffusion in einem niedrigdimensionalen latenten Raum durch, der durch ein VAE-ähnliches Netzwerk generiert wird. Diese Technik reduziert die Rechenkosten und beschleunigt den Generierungsprozess erheblich, während gleichzeitig hochauflösende und realistische Bilder erzeugt werden.
+\emph{Stable Diffusion} ist ein besonders einflussreiches Diffusionsmodell, das sich durch die Verwendung eines latenten Diffusionsprozesses auszeichnet \parencite{Rombach2022stablediffusion}. Anstatt den Diffusionsprozess direkt auf den hochdimensionalen Bildraum anzuwenden, führt Stable Diffusion die Diffusion in einem niedrigdimensionalen latenten Raum durch, der durch ein VAE-ähnliches Netzwerk generiert wird (siehe \autoref{fig:stable-diffusion}). Diese Technik reduziert die Rechenkosten und beschleunigt den Generierungsprozess erheblich, während gleichzeitig hochauflösende und realistische Bilder erzeugt werden.
 
-%\begin{figure}[t] % (siehe \autoref{fig:stable-diffusion})
-%	\centering
-%	\includegraphics[width=\textwidth]{figure_diffusion_merged_custom.png}
-%	\caption[Darstellung des Vorwärts- und Rückwärtsdiffusion in Stable Diffusion: Die Diffusionsprozesse werden auf die latenten Darstellungen der Bilder angewendet (rechts), welche vorher mit einem VAE erstellt wurden (links).]{Darstellung des Vorwärts- und Rückwärtsdiffusion in Stable Diffusion:\\
-%		Die	Diffusionsprozesse werden auf die latenten Darstellungen der Bilder\\
-%		angewendet (rechts), welche vorher mit einem VAE erstellt wurden (links).}
-%	\label{fig:stable-diffusion}
-%\end{figure}
-%
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=\textwidth]{figure_diffusion_merged_custom.png}
+	\caption[Darstellung des Vorwärts- und Rückwärtsdiffusion in Stable Diffusion: Die Diffusionsprozesse werden auf die latenten Darstellungen der Bilder angewendet (rechts), welche vorher mit einem VAE erstellt wurden (links).]{Darstellung des Vorwärts- und Rückwärtsdiffusion in Stable Diffusion:\\
+		Die	Diffusionsprozesse werden auf die latenten Darstellungen der Bilder\\
+		angewendet (rechts), welche vorher mit einem VAE erstellt wurden (links).}
+	\label{fig:stable-diffusion}
+\end{figure}
+
 %\newpage
 
 \subsection{DA-Fusion} \label{subsec:da-fusion}
 
 % Einleitung; Kurze Beschreibung, Versprechen der Methode
-DA-Fusion \parencite{Trabucco2023dafusion} ordnet sich zwischen den Bereichen der Datenaugmentation und der synthetischen Datengenerierung ein. Es handelt sich um eine Methode zur semantischen Datenaugmentation von Bildern unter Verwendung eines vortrainierten Stable Diffusion-Modells. 
+\emph{DA-Fusion} \parencite{Trabucco2023dafusion} ordnet sich zwischen den Bereichen der Datenaugmentation und der synthetischen Datengenerierung ein. Es handelt sich um eine Methode zur semantischen Datenaugmentation von Bildern unter Verwendung eines vortrainierten Stable Diffusion-Modells. 
 
 Der traditionelle Ansatz der Datenaugmentation, wie in \autoref{subsec:data-augmentation} beschrieben, hat sich als effektiv erwiesen, um die Generalisierungsfähigkeit von Modellen zu verbessern. Allerdings erfordert dieser Ansatz auch eine gute Intuition in Bezug auf den verwendeten Datensatz, um zu vermeiden, dass Transformationen gewählt werden, durch die Informationen verloren gehen, die für die Aufgabe des zu trainierenden Modells wichtig sind. Wenn beispielsweise Farbinformationen für die Klassifizierung von Blumen wichtig sind, könnte die Datenaugmentation durch zufällige Farbänderungen die Leistung des Modells verschlechtern. Ein weiteres Beispiel sind Objekte, die klein im Bild sind und durch zufällige Ausschnitte des Bildes aus der Sicht des Modells verschwinden können. DA-Fusion hingegen nutzt das Wissen eines vortrainierten Diffusionsmodelle, um den Bildinhalt semantisch zu verstehen und automatisch neue, realistische Variationen zu generieren.
 
@@ -326,15 +326,15 @@ Der traditionelle Ansatz der Datenaugmentation, wie in \autoref{subsec:data-augm
 %\end{figure}
 
 % Fine-tuning mit Textual Inversion
-Dafür wird zunächst die Methode Textual Inversion aus \parencite{Gal2022textualinversion} angewendet, um ein vortrainiertes Stable Diffusion-Modell auf den gegebenen Datensatz feinabzustimmen (Fine-tuning). Für jedes Konzept bzw. für jede Klasse wird ein neues Text-Embedding \lstinline|<y>| als Platzhalter in das Modell integriert, das unter Verwendung von Trainings-Prompts wie \lstinline|"a photo of a <y>"| und den zugehörigen Bilddaten trainiert wird. Entscheidend ist hier, dass nicht das ganze Diffusionsmodell neu trainiert wird, sondern lediglich neue wörter erlernt werden, welche die spezifischen Konzepte repräsentieren, sodass sich bei der Bildgenerierung weiterhin auf das vortrainierte semantische Wissens des Modells gestützt werden kann. % (siehe \autoref{fig:da-fusion-process}).
+Dafür wird zunächst die Methode Textual Inversion aus \parencite{Gal2022textualinversion} angewendet, um ein vortrainiertes Stable Diffusion-Modell auf den gegebenen Datensatz feinabzustimmen (Fine-tuning). Für jedes Konzept bzw. für jede Klasse wird ein neues Text-Embedding \lstinline|<y>| als Platzhalter in das Modell integriert, das unter Verwendung von Trainings-Prompts wie \lstinline|"a photo of a <y>"| und den zugehörigen Bilddaten trainiert wird. Entscheidend ist hier, dass nicht das ganze Diffusionsmodell neu trainiert wird, sondern lediglich neue wörter erlernt werden, welche die spezifischen Konzepte repräsentieren, sodass sich bei der Bildgenerierung weiterhin auf das vortrainierte semantische Wissens des Modells gestützt werden kann (siehe \autoref{fig:da-fusion-process}).
 
-%\begin{figure}[t]
-%	\centering
-%	\includegraphics[width=\textwidth]{figure_da-fusion_architecture.png}
-%	\caption[Überblick über den Prozess zur Datenaugmentation mit DA-Fusion.]{Überblick über den Prozess zur Datenaugmentation mit\\
-%	DA-Fusion \parencite{Trabucco2023dafusion}.}
-%	\label{fig:da-fusion-process}
-%\end{figure}
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=\textwidth]{figure_da-fusion_architecture.png}
+	\caption[Überblick über den Prozess zur Datenaugmentation mit DA-Fusion.]{Überblick über den Prozess zur Datenaugmentation mit\\
+	DA-Fusion \parencite{Trabucco2023dafusion}.}
+	\label{fig:da-fusion-process}
+\end{figure}
 
 % Prozess der Datengenerierung
 Anschließend können die Bilder augmentiert werden, indem ihnen eine geringe Menge an Rauschen hinzugefügt wird (also ein Prozess der Vorwärtsdiffusion), welches dann durch das feinabgestimmte Modell wieder entfernt werden soll (die Rückwärtsdiffusion, die von dem Modell gelernt wurde). Hier kommen die selben Text-Prompts zum Einsatz, welche die Text-Embeddings der Konzepte beinhalten. Auf diese Weise müssen keine völlig neuen Bilder generiert werden, denn die grundlegende Struktur wird durch die ursprünglichen Bilder vorgegeben. Dieser Prozess bietet die Möglichkeit, den Grad der Augmentation durch die Wahl des Zeitschritts $t$ zu steuern, an dem das Bild in die Rückwärtsdiffusion eingefügt wird und wie stark es dafür vorher verrauscht werden muss. So entstehen stärkere oder subtilere Augmentationen.
@@ -369,7 +369,7 @@ Es kommen verschiedene Verlustfunktionen zum Einsatz, wobei der Fehler grundsät
 % SimCLR (Chen2020) als prominentes Beispiel
 Das wohl prominenteste Beispiel für Contrastive Learning in der visuellen Domäne ist \emph{SimCLR}, das in \parencite{Chen2020simclr} vorgestellt wurde. SimCLR verwendet den sogenannten NT-Xent Loss (Normalized Temperature-scaled Cross-Entropy Loss), der die Ähnlichkeiten zwischen allen Paaren im Batch berücksichtigt, anstatt nur einzelne Triplets oder Paare. Jedes Beispiel wird dabei zweimal augmentiert, um ein positives Paar aus zwei Ansichten des Beispiels zu erhalten. Alle anderen Beispiele (bzw. dessen Ansichten) im Batch werden als negativ-Beispiele gesehen.
 
-Die Eingabedaten werden durch ein CNN in eine latente Repräsentation transformiert. SimCLR verwendet anschließend einen sogenannten Projection Head, der die encodierten Repräsentationen weiter transformiert, um einen Repräsentationsraum zu lernen, der für die Unterscheidung der Beispiele geeignet ist. In diesem Representationsraum werden die Ähnlichkeitswerte der Paare berechnet, um den Fehler zu bestimmen. Dafür wird die Kosinus-Ähnlichkeit $s_{i,j}$ der Repräsentationen $z_i$ und $z_j$ eines Paares berechnet (siehe \autoref{eq:cosine-similarity}).
+Die Eingabedaten werden durch ein CNN in eine latente Repräsentation encodiert. SimCLR verwendet anschließend einen sogenannten Projection Head, der die Repräsentationen weiter transformiert, um einen Repräsentationsraum zu lernen, der für die Unterscheidung der Beispiele geeignet ist. In diesem Representationsraum werden die Ähnlichkeitswerte der Paare berechnet, um den Fehler zu bestimmen. Dafür wird die Kosinus-Ähnlichkeit $s_{i,j}$ der Repräsentationen $z_i$ und $z_j$ eines Paares berechnet (siehe \autoref{eq:cosine-similarity}).
 
 \begin{equation}
 	s_{i,j} = \frac{z_i \cdot z_j}{\|z_i\| \cdot \|z_j\|}
@@ -386,7 +386,7 @@ Der NT-Xent Loss ergibt sich dann aus der Berechnung des Softmax über die Ähnl
 wobei $s_{i,i}$ das positive Paar aus den zwei augmentierten Ansichten repräsentiert und $s_{i,j}$ die negativen Paare.
 
 % Aggressive Datenaugmentation, Hard Negatives
-Die Verwendung aggressiver Datenaugmentation zur Erzeugung der zwei Ansichten in \parencite{Chen2020simclr} wurde als entscheidender Faktor identifiziert, um die Robustheit der Repräsentationen zu verbessern. Dabei soll die gemeinsame Information der zwei Ansichten so weit wie möglich minimiert werden, ohne Task-relevante Informationen zu verlieren \parencite{Tian2020goodcontrastiveviews}. \parencite{Chen2020simclr} stellt auch den positiven Effekt von \emph{Hard Negatives} heraus, also von Paaren, welche unterschiedliche Konzepte darstellen, aber sehr ähnlich aussehen. Größere Batch Sizes und längere Trainingszeiten begünstigen ebenfalls die Lernfähigkeit des Modells.
+Die Verwendung aggressiver Datenaugmentation zur Erzeugung der zwei Ansichten in \parencite{Chen2020simclr} wurde als entscheidender Faktor identifiziert, um die Robustheit der Repräsentationen zu verbessern. Dabei soll die gemeinsame Information der zwei Ansichten so weit wie möglich minimiert werden, ohne Task-relevante Informationen zu verlieren \parencite{Tian2020goodcontrastiveviews}. Es wurde auch der positive Effekt von \emph{Hard Negatives} herausgestellt, also von Paaren, welche unterschiedliche Konzepte darstellen, aber sehr ähnlich aussehen. Größere Batch Sizes und längere Trainingszeiten begünstigen ebenfalls die Lernfähigkeit des Modells.
 
 % Eine neuere Variante: StableRep (Tian2023)
 % Eine neuere Variante des Contrastive Learning ist \emph{StableRep} \parencite{Tian2023stablerep}. Diese Methode verwendet synthetische Daten, die mit Diffusionsmodellen generiert wurden, insbesondere von Stable Diffusion. Dabei werden alle Bilder, die aus dem selben Prompt generiert wurden, als positive Beispiele voneinander betrachtet. Es hat sich gezeigt, dass StableRep mit den richtigen Einstellungen die Leistung von SimCLR übertreffen kann, auch wenn ausschließlich auf synthetischen Daten trainiert wurde. Noch bessere Ergebnisse wurden durch Einbeziehen von Textsupervision erzielt.
@@ -431,22 +431,23 @@ Das Ziel des Projekts war die Entwicklung eines KI-gestützten Systems, welches 
 %	von Altteilen \parencite{Wagner2022reziprok}.}
 %	\label{fig:eiba-process}
 %\end{figure}
-
-Viele der Altteile sind sehr ähnlich und erfordern Expertenwissen, um sie korrekt zu identifizieren und den Beschädigungsgrad zu bewerten, wobei die Beschriftungen und Barcodes oft nicht mehr lesbar sind. Hier setzt das KI-System an, um den Menschen zu unterstützen. Es werden dafür multimodale Sensordaten verwendet, unter anderem Tiefenkameras (RGB-D) und eine Waage zur Erfassung des Gewichts zum Einsatz. In \autoref{fig:eiba-interface} ist die Mensch-Maschine-Schnittstelle einer mobilen Teststation des Systems dargestellt.
-
-\begin{figure}[t]
+\begin{figure}[b!]
 	\centering
 	\includegraphics[width=\textwidth]{figure_eiba_interface.png}
 	\caption[Die Mensch-Maschine-Schnittstelle des Systems.]{Die Mensch-Maschine-Schnittstelle des Systems \parencite{Wagner2022reziprok}.}
 	\label{fig:eiba-interface}
 \end{figure}
 
+Viele der Altteile sind sehr ähnlich und erfordern Expertenwissen, um sie korrekt zu identifizieren und den Beschädigungsgrad zu bewerten, wobei die Beschriftungen und Barcodes oft nicht mehr lesbar sind. Hier setzt das KI-System an, um den Menschen zu unterstützen. Es werden dafür multimodale Sensordaten verwendet, unter anderem Tiefenkameras (RGB-D) und eine Waage zur Erfassung des Gewichts zum Einsatz. In \autoref{fig:eiba-interface} ist die Mensch-Maschine-Schnittstelle einer mobilen Teststation des Systems dargestellt.
+
 % Ergebnisse vielversprechend, aber vorerst nur im Labor; Generalisierung verbessern
 Das System konnte am Beispiel von gebrauchten Fahrzeugteilen bereits eine gute Accuracy erreichen. Die Beschaffung einer ausreichenden Menge an Beispielbildern\textemdash sowohl für das Training als auch für die Validierung\textemdash mist jedoch äußerst schwierig. Dadurch werden die Objektklassen nicht mit ausreichend Variation repräsentiert, was die Generalisierungsfähigkeit der Modelle beeinträchtigen könnte.
 
 \subsection{Herausforderungen bei der Generierung synthetischer Daten} \label{subsec:challenges-synt-data}
 
-Um die Datenvielfalt zu erhöhen, bietet sich die Generierung von synthetischen Daten an. In \autoref{sec:synt-data} wurden bereits verschiedene Methoden zur Bildgenerierung vorgestellt, die sich für diesen Zweck eignen. Dabei ergeben sich jedoch eine Reihe von Herausforderungen im Kontext des vorgestellten Anwendungsfalls, auf die zunächst aufmerksam gemacht werden sollte. Der Anwendungsfall zeichnet sich durch folgende Eigenschaften aus, die die Generierung synthetischer Daten erschweren:
+Um die Datenvielfalt zu erhöhen, bietet sich die Generierung von synthetischen Daten an. Dabei steht vor allem die Darstellung unterschiedlicher Gebrauchszustände im Vordergrund, die in der Realität nur schwer zu beschaffen sind. In \autoref{sec:synt-data} wurden bereits verschiedene Methoden zur Bildgenerierung vorgestellt, die sich für diesen Zweck eignen. Dabei ergeben sich jedoch eine Reihe von Herausforderungen, die bereits in der Einleitung angesprochen wurden.
+
+Der Anwendungsfall zeichnet sich durch folgende Eigenschaften aus, die die Generierung synthetischer Daten erschweren:
 
 \begin{enumerate}
 	\item Die Objekte weisen teilweise eine sehr hohe Komplexität auf, etwa bei Motoren oder Generatoren mit vielen Details. 
@@ -479,12 +480,12 @@ Es gilt also zu untersuchen, ob ein Modell durch den Einsatz von synthetischen n
 Im Rahmen dieser Arbeit wird ein Ansatz vorgestellt, bei dem synthetische Augmentationen, die mit DA-Fusion generiert wurden, gezielt in das Supervised Contrastive Learning eingebunden werden. Die Grundidee besteht darin, sowohl ID-Daten (In-Distribution) als auch Near OOD-Daten (Near Out-of-Distribution) durch eine kontrollierte Anpassung der Augmentationsstärke zu erzeugen. Die Near OOD-Daten werden dabei im Contrastive Learning als Hard Negatives verwendet, um die Repräsentationen des Modells zu verbessern.
 
 % DA-Fusion; strength-Parameter
-Wie bereits bezüglich der Herausforderungen in der synthetischen Datengenerierung erwähnt, stellt DA-Fusion im genannten Anwendungsfall eine vielversprechende Methode dar. Durch die Erhöhung des Parameters für die Augmentationsstärke können zunehmend komplexe und variierende Beispiele generiert werden. Für die Generierung der ID-Daten werden nur moderate Augmentationen angewendet. Demgegenüber werden die Near OOD-Daten durch eine stärkere Augmentation erzeugt, wobei noch ausreichend Ähnlichkeit zu den ID-Daten bestehen bleibt, um als Hard Negative zu gelten.
+Wie bereits erwähnt, ist DA-Fusion für die Generierung von Augmentationen vielversprechend. Durch die Erhöhung des Parameters für die Augmentationsstärke können zunehmend variierende Beispiele generiert werden. Für die ID-Daten wird eine moderate Augmentationsstärke verwendet. Demgegenüber werden die Near OOD-Daten durch eine stärkere Augmentation erzeugt, wobei noch ausreichend Ähnlichkeit zu den ID-Daten bestehen bleibt, um als Hard Negative zu gelten.
 
 % Supervised Contrastive Learning mit eigener Sampling-Strategie
-Im Kontext des Supervised Contrastive Learning wird eine eigene Sampling-Strategie für Near OOD-Daten entwickelt. Diese Daten werden nicht wahllos als negativ-Beispiele verwendet, sondern gezielt aus Augmentationen derselben Klasse des Ankerbeispiels generiert. Dies stellt sicher, dass die negativen Beispiele in den gleichen semantischen Raum fallen, aber durch die Augmentationen genug variieren, um als OOD-Daten zu gelten. Die Idee ist, dass diese Near OOD-Daten dem Modell helfen, feinere Unterschiede innerhalb und außerhalb der Klasse zu lernen, wodurch die Generalisierungsfähigkeit gegenüber realen Daten verbessert wird.
+Im Kontext des Supervised Contrastive Learning wird eine eigene Sampling-Strategie für Near OOD-Daten entwickelt. Diese Daten werden nicht wahllos als negativ-Beispiele verwendet, sondern gezielt aus den Augmentationen derselben Klasse des Ankerbeispiels ausgewählt. Dies stellt sicher, dass die negativen Beispiele in den gleichen semantischen Raum fallen, aber durch die Augmentationen genug variieren, um als OOD-Daten zu gelten. Die Idee ist, dass so feinere Unterschiede innerhalb und außerhalb der Klasse gelernt werden, wodurch die Generalisierungsfähigkeit gegenüber realen Daten verbessert wird.
 
-Die Formulierung der Verlustfunktion aus dem Supervised Contrastive Learning (siehe \autoref{eq:loss-supcon}) wird entsprechend der Verwendung von Near OOD-Daten leicht angepasst (siehe \autoref{eq:loss-da-fusion-supcon}).
+Die Formulierung der Verlustfunktion aus dem Supervised Contrastive Learning in \autoref{eq:loss-supcon} wird entsprechend der Verwendung von Near OOD-Daten in \autoref{eq:loss-da-fusion-supcon} leicht angepasst.
 
 \begin{equation}
 	Loss = - \sum_{i=1}^{N} \log \left( \frac{1}{|\text{P}(i)|} \sum_{p \in \text{P}(i)} \frac{\exp(s_{i,p}/\tau)}{\sum_{j \in \text{J}(i)} \exp(s_{i,j}/\tau)} \right),

@@ -1,34 +1,24 @@
 % !TEX root = Bachelorarbeit Synthetische Daten.tex
 \chapter{Fazit} \label{ch:conclusion}
 
-Die synthetische Datengenerierung hat sich in den letzten Jahren als effektive Methode zur Verbesserung der Bildklassifikation etabliert. In dieser Arbeit wurde untersucht, wie sich Stable Diffusion-basierte Datenaugmentationen und Supervised Contrastive Learning (SCL) auf die Klassifikationsleistung auswirken. Durch den Einsatz von DA-Fusion zur Generierung von synthetischen Daten konnte eine signifikante Verbesserung der Modellgenauigkeit für In-Distribution-Daten (ID) erzielt werden. Die synthetischen Augmentationen trugen zur Steigerung der Modellgenauigkeit bei, indem sie die Generalisierungsfähigkeit des Modells verbesserten. Allerdings zeigte sich, dass Near Out-of-Distribution (OOD) Augmentationen im SCL nicht die erwartete Leistungssteigerung erbrachten, sondern die Klassifikationsgenauigkeit negativ beeinflussten.
+Eine Vielzahl von Entwicklungen im Bereich des Maschinellen Lernens, vor allem in Bezug auf generative Modelle, haben zu neuen Möglichkeiten in der synthetischen Datengenerierung geführt. Diese Arbeit untersuchte die Eignung von Diffusionsmodellen, insbesondere DA-Fusion, in Kombination mit Supervised Contrastive Learning zur Verbesserung der Bildklassifikation. Ziel war es, einen Ansatz zu finden, der die Herausforderung der synthetischen Datengenerierung für komplexe Objekte mit feinen Unterschieden adressiert.
 
 \section{Zusammenfassung der wichtigsten Erkenntnisse} \label{sec:summary}
 
-In dieser Arbeit wurde untersucht, wie sich Stable Diffusion-basierte Datenaugmentationen und Supervised Contrastive Learning (SCL) auf die Bildklassifikation auswirken. Durch den Einsatz von DA-Fusion zur synthetischen Datengenerierung konnte eine signifikante Verbesserung der Klassifikationsleistung für In-Distribution-Daten (ID) festgestellt werden. Die synthetischen Augmentationen zeigten eine hohe visuelle Qualität und trugen zur Steigerung der Modellgenauigkeit bei, indem sie die Generalisierungsfähigkeit des Modells verbesserten. Allerdings zeigte sich, dass Near Out-of-Distribution (OOD) Augmentationen im SCL nicht die erwartete Leistungssteigerung erbrachten, sondern die Klassifikationsgenauigkeit negativ beeinflussten.
+Die durchgeführten Experimente zeigten, dass DA-Fusion bei der Generierung von ID-Augmentationen deutliche Verbesserungen der Modellleistung erzielte. Durch die Erzeugung synthetischer Gebrauchszustände und die Erhöhung der Variabilität innerhalb der Daten konnte die Top-1-Accuracy um etwa 6 Prozentpunkte gesteigert werden, was auf eine bessere Generalisierungsfähigkeit des Modells hindeutet.
 
-Die Hauptgründe hierfür liegen in der mangelhaften Qualität der OOD-Daten und der Herausforderung, diese korrekt in die kontrastive Lernstrategie zu integrieren. Während ID-Augmentationen erfolgreich in das Training eingebunden werden konnten, führten Near OOD-Daten zu einer Verschlechterung der Repräsentationen, was auf die Komplexität ihrer Implementierung und die Auswahl der Hard Negatives im SCL zurückzuführen ist.
+Allerdings traten Schwierigkeiten auf, als Near OOD-Augmentationen als negativ-Beispiele genutzt wurden. Statt der erwarteten Leistungssteigerung verschlechterte sich die Top-1-Accuracy, was auf mehrere Faktoren zurückzuführen ist, darunter die Qualität der generierten OOD-Daten und die Komplexität der Implementierung der Sampling-Strategie im Supervised Contrasitve Learning. Viele der synthetischen Near OOD-Daten wiesen Artefakte auf oder entfernten sich zu weit von den ID-Daten, sodass sie keine geeigneten negativ-Beispiele mehr darstellten.
 
 \section{Beantwortung der Forschungsfragen} \label{sec:research-questions-answers}
 
-Die Forschungsfragen dieser Arbeit lauteten:
+Die erste Forschungsfrage befasste sich mit der Frage, ob DA-Fusion zur Generierung synthetischer Daten geeignet ist und wie sich diese Daten auf die Generalisierungsfähigkeit des Modells auswirken. Die Experimente zeigten, dass DA-Fusion erfolgreich ID-Augmentationen generieren kann, die die Generalisierungsfähigkeit verbessern. Diese Augmentationen ermöglichten eine größere Variabilität innerhalb der Daten und stärkten die Robustheit des Modells gegenüber feinen Unterschieden in den Klassen.
 
-\begin{enumerate}
-    \item Wie gut eignet sich DA-Fusion zur Generierung synthetischer Daten für die Bildklassifikation? \item Inwiefern tragen Near Out-of-Distribution-Augmentationen im Supervised Contrastive Learning zur Verbesserung der Modellgenauigkeit bei?
-\end{enumerate}
-
-Zur ersten Forschungsfrage konnte gezeigt werden, dass DA-Fusion eine vielversprechende Methode zur Generierung von In-Distribution-Augmentationen darstellt. Diese synthetischen Daten führten zu einer klaren Verbesserung der Modellgenauigkeit und der Robustheit gegen Datenvariationen.
-
-Die zweite Forschungsfrage ergab hingegen, dass Near OOD-Augmentationen im gewählten Ansatz nicht effektiv waren. Statt einer Verbesserung der Klassifikationsergebnisse führten sie zu einer Reduktion der Modellgenauigkeit, was insbesondere auf die unzureichende Qualität der OOD-Daten und die Herausforderung der Loss-Funktion beim Umgang mit Near OOD-Daten im SCL zurückzuführen ist.
+Die zweite Forschungsfrage beschäftigte sich damit, ob Near OOD-Augmentationen im Supervised Contrastive Learning als Hard Negatives dienen können. Hier konnte die erwartete Leistungssteigerung nicht bestätigt werden. Stattdessen führte der Einsatz von Near OOD-Daten zu einer Verschlechterung der Modellleistung. Dies lag vermutlich an der geringen Qualität der generierten OOD-Daten, die oft zu weit von den ID-Daten entfernt waren. Sie fungierten nicht mehr als semantisch nahe negative Beispiele, was den Lernprozess im SCL negativ beeinflusste.
 
 \section{Ausblick und potenzielle Weiterentwicklungen} \label{sec:outlook}
 
-Diese Arbeit zeigt Potenziale und Herausforderungen bei der Verwendung von synthetischen Augmentationen im Kontext des Contrastive Learning auf. Zukünftige Forschungen könnten folgende Aspekte untersuchen:
+Die Ergebnisse dieser Arbeit eröffnen mehrere potenzielle Ansätze für zukünftige Forschung. Ein Schwerpunkt sollte auf der Verbesserung der generierten OOD-Daten liegen, um nicht zu weit von den ID-Daten abzuweichen und tatsächlich herausfordernde negativ-Beispiele zu bieten. Hier könnten alternative Techniken zum Fine-tuning des in DA-Fusion verwendeten Stable Diffusion-Modells verwendet werden.
 
-\begin{itemize}
-    \item \emph{Verbesserung der OOD-Datenqualität:} Eine präzisere Kontrolle über die Erzeugung von Near OOD-Daten könnte die Robustheit des Modells erhöhen. Der Einsatz fortgeschrittener Techniken zur Qualitätssicherung synthetischer Daten wäre ein vielversprechender Ansatz.
-    \item \emph{Optimierung der kontrastiven Lernstrategie:} Die Integration von Methoden wie Hard Negative Sampling könnte die Effektivität der Near OOD-Augmentationen erhöhen. Auch die Anpassung der Loss-Funktion könnte helfen, die Balance zwischen ID- und OOD-Daten besser zu steuern.
-    \item \emph{Transfer auf reale Szenarien:} Die Anwendung der generierten synthetischen Daten auf reale Bildklassifikationsprobleme wäre ein weiterer Schritt, um die Generalisierung der Modelle zu validieren. Hierbei wäre es interessant zu sehen, wie gut die synthetischen Augmentationen unter variierenden realen Bedingungen funktionieren.
-\end{itemize}
+Darüber hinaus könnte die Implementierung von Near OOD-Daten als Hard Negatives im Supervised Contrastive Learning weiter optimiert werden. Dabei könnten fortgeschrittenere Sampling-Strategien entwickelt werden. 
 
-Abschließend bleibt festzuhalten, dass Stable Diffusion-basierte Datenaugmentationen das Potenzial haben, die Bildklassifikation signifikant zu verbessern. Die Herausforderungen bei der Einbindung von Near OOD-Daten erfordern jedoch weiterführende Forschung, um ihr volles Potenzial im Supervised Contrastive Learning auszuschöpfen.
+Auch die Forschung zur Frage, wie Modelle aus minderwertigen synthetischen Daten lernen können, könnte weiter vertieft werden. Hier könnten neue Ansätze untersucht werden, um die Robustheit von Modellen gegenüber Artefakten oder fehlerhaften Daten zu erhöhen. Möglicherweise könnten reguläre Methoden, die in generativen Modellen wie Variational Autoencoders (VAEs) genutzt werden, weiterentwickelt werden, um selbst aus suboptimalen synthetischen Daten wertvolle Repräsentationen zu lernen.
