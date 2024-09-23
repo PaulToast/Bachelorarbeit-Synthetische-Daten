@@ -1,0 +1,112 @@
+% !TEX root = Bachelorarbeit Synthetische Daten.tex
+
+% Dokumentklasse "scrreprt" von KOMA-Script (entspricht in etwa der Standardklasse "report", bietet allerdings wesentlich mehr Möglichkeiten und ist im gewissen "moderner")
+% Ausführliche Dokumentation: http://mirrors.ctan.org/macros/latex/contrib/koma-script/doc/scrguide.pdf
+\documentclass[
+  fontsize=12pt,
+  paper=A4,
+  bibliography=totoc, % Literaturverzeichnis ins Inhaltsverzeichnis
+  listof=totoc, % Andere Verzeichnisse ebenfalls ins Inhaltsverzeichnis
+  %fleqn, % Abgesetzte Formeln linksbündig
+  DIV=12, % Für die Satzspiegelkonstruktion - siehe KOMA-Doku
+  BCOR=1mm, % Druck: Bindekorrektur (linker Rand) - evtl. anpassen
+  english,ngerman, % Die im Text verwendeten Sprachen (u.a. für das Paket babel); die letztgenannte (!) Sprache ist die Standardsprache; "n"german steht für die neue Rechtschreibung
+  usegeometry, % Weil (s.u.) das Paket geometr verwendet wird
+  parskip=half- % Absätze ohne Einzug, halbe Zeile Abstand
+]{scrreprt}
+
+\usepackage{caption}
+\captionsetup[figure]{justification=centering, format=plain, list=yes}
+\captionsetup[table]{format=plain, list=yes}
+% Beschriftungen für Tabellen kommen linksbündig über die Tabelle
+\KOMAoption{captions}{tableheading,nooneline}
+%\setcaptionalignment[figure]{c}
+%\setcaptionalignment[table]{l}
+
+% Für die Titelseite benötigt
+\usepackage{geometry}
+
+% Standardpaket für Lokalisation, siehe Option "ngerman" oben
+\usepackage{babel}
+% Optimierten Trennmuster
+\babelprovide[hyphenrules=ngerman-x-latest]{ngerman}
+
+% Standardpaket für mathematische Zusatzfunktionen
+\usepackage{amsmath}
+
+% Hauptschrift Libertinus
+\usepackage{libertinus-otf}
+% "Schreibmaschinenschrift" Anonymous Pro, angepasst
+\usepackage{AnonymousPro}
+\setmonofont{AnonymousPro}[Scale=MatchLowercase,FakeStretch=0.85]
+
+% Etwas größerer Zeilenabstand als im Buchsatz
+\linespread{1.1}
+
+% Paket für Feinkorrekturen an der Typographie für ausgewogeneres Schriftbild
+\usepackage{microtype}
+
+% Paket für kontextsensitive Anführungszeichen
+\usepackage{csquotes}
+% Shortcut, damit aus " richtige Anführungszeichen werden, je nach Sprache
+\MakeOuterQuote{"}
+
+% Paket, das den Befehl \includegraphics ermöglicht
+\usepackage{graphicx}
+
+% Komfortablere Aufzählungen als in Standard-LaTeX
+\usepackage{enumitem}
+
+% Paket für eigene Farbdefinitionen
+\usepackage[dvipsnames]{xcolor}
+% "Hausfarben" der HAW
+\definecolor{haw}{HTML}{003CA0}
+\definecolor{haw2}{HTML}{0096D2}
+\definecolor{haw3}{HTML}{A0BEDC}
+% Farben für die Versuchsreihen
+\definecolor{exp1}{HTML}{7D54B2}
+\definecolor{exp2}{HTML}{479A5F}
+\definecolor{exp3}{HTML}{EDB732}
+
+% Typographisch anspruchsvolle Tabellen
+\usepackage{booktabs}
+
+% Erstellen des Literaturverzeichnisses; Stil APA eingestellt
+\usepackage[style=apa]{biblatex}
+% Bibtex-Datei mit den Literaturangaben
+\addbibresource{library.bib}
+
+% Erzeugung von Grafiken mit PGF/TikZ
+%\usepackage{tikz}
+%\usetikzlibrary{calc,intersections,angles,3d}
+
+% Codeblöcke
+\usepackage{listings}
+% Anpassung des Erscheinungsbildes des Codeblocks
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{gray!20},
+    keywordstyle=\color{haw2},
+    numberstyle=\footnotesize\color{haw},
+    basicstyle=\ttfamily\small,
+    captionpos=t,
+    frame=single,
+    framerule=0pt,
+    keepspaces=true,
+    numbers=left,
+    numbersep=6pt,
+    belowcaptionskip=1em,
+    aboveskip=\bigskipamount,
+}
+\lstset{style=mystyle}
+% Damit es "Codeblock" und nicht "Listing" heißt
+\renewcommand{\lstlistingname}{Codeblock}
+
+% Verlinkung innerhalb des PDF-Dokuments, für PDF-Lesezeichen und PDF-Metadaten; dieses Paket sollte üblicherweise immer als letztes geladen werden
+\usepackage[colorlinks=true,allcolors=haw,hyperfootnotes=false,pageanchor=true,linktoc=all]{hyperref}
+
+% Druck: obige Zeile durch folgende ersetzen, damit Links nicht blau dargestellt werden:
+%\usepackage[draft]{hyperref}
+
+% Metadaten des PDF-Dokumentes
+\hypersetup{pdfauthor={Paul Hofmann}}
+\hypersetup{pdftitle={Contrastive Learning mit Stable Diffusion-basierter Datenaugmentation}}

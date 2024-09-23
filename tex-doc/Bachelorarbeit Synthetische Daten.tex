@@ -1,13 +1,10 @@
 % Dies ist die Hauptdatei, von der aus das Gesamtdokument erzeugt wird
 
 % Alle globalen LaTeX-spezifischen Einstellungen in defs.tex
-\input{defs}
+\input{defs_digital}
 
-% \includeonly{title}
-
-% Hier beginnt das eigentliche Dokument
 \begin{document}
-    \include{title}
+    \include{title_digital}
     \include{toc}
     \include{chap1} % Einleitung
     \include{chap2} % Theoretische Grundlagen
@@ -17,14 +14,3 @@
     \include{chap6} % Fazit
     \include{appendix}
 \end{document}
-
-% Ein paar Formatierungen:
-%
-% \parencite{} = (\cite{})
-% \emph{...}
-% \footnote{...}
-% \textbf{Fett}
-% \textit{Kursiv}
-% \textsc{Kapitälchen}
-% \href{https://de.wikipedia.org/wiki}{Linktext}
-% \LaTeX\

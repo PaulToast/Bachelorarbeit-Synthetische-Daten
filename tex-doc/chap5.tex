@@ -28,8 +28,10 @@ Ein Nachteil von DA-Fusion ist der Rechen- und Zeitaufwand, der sich aus dem Fin
 % Zusammenfassung
 Zusammenfassend lässt sich feststellen, dass DA-Fusion eine vielversprechende Methode zur Generierung synthetischer Daten ist. Es bietet nicht nur eine realistische Darstellung von Gebrauchszuständen, sondern kann auch gezielt auf die Anforderungen des jeweiligen Anwendungsfalls abgestimmt werden. Allerdings ist der Rechenaufwand und die Abstimmung des Fine-Tunings nicht zu unterschätzen, und zukünftige Arbeiten könnten sich darauf konzentrieren, hier effizientere Verfahren anzuwenden.
 
+Eine mögliche Weiterentwicklung für die Datenaugmentaion mit DA-Fusion in Bezug auf den untersuchten Anwendungsfall wäre die Begrenzung der Augmentation auf bestimmte Regionen des Objektes. Während in den durchgeführten Experimenten bereits Segmentierungsmasken verwendet wurden, um die Bilder auf das Objekt zu beschränken, könnten weitere, kleinere Masken verwendet werden, um nur bestimmte Bereiche des Objektes zu augmentieren. Womöglich könnten so auch stärkere Augmentationen durchgeführt werden, ohne die gesamte Struktur des Objektes zu verändern.
+
 % DA-Fusion für Multi-View Augmentation im CL?
-Die Anwendung von DA-Fusion im Contrastive Learning eröffnet darüber hinaus eine weitere spannende Forschungslücke. DA-Fusion wurde primär als Methode zur Datenaugmentation entwickelt. Es wäre deshalb interessant zu untersuchen, wie sich das Lernen der Repräsentationen verhält, wenn DA-Fusion direkt zur Generierung der zwei unterschiedlichen Ansichten eines Bildes verwendet wird, anstatt die generierten Augmentationen mit den originalen Trainingsbildern zu mischen.
+Es eröffnet sich außerdem eine spannende Forschungslücke durch die Anwendung von DA-Fusion im Contrastive Learning. DA-Fusion wurde primär als Methode zur Datenaugmentation entwickelt. Es wäre deshalb interessant zu untersuchen, wie sich das Lernen der Repräsentationen verhält, wenn DA-Fusion direkt zur Generierung der zwei unterschiedlichen Ansichten eines Bildes verwendet wird, anstatt die generierten Augmentationen mit den originalen Trainingsbildern zu mischen.
 
 \section{Wirksamkeit von Near Out-of-Distribution-Augmentationen im Supervised Contrastive Learning} \label{sec:ood-discussion}
 

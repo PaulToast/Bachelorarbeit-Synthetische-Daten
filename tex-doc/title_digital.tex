@@ -1,0 +1,97 @@
+% !TEX root = Bachelorarbeit Synthetische Daten.tex
+\begin{titlepage}
+  % Lokale Einstellungen für die Titelseite
+  \newgeometry{lmargin=2cm,tmargin=10mm,rmargin=15mm,bmargin=1cm} % Andere Seitenränder
+  \color{haw} % Hausfarbe der HAW
+  \raggedright % Blocksatz deaktivieren
+
+  % Logos rechtsbündig setzen
+  \hspace{\fill}\includegraphics[width=5.00cm]{logo_haw.jpg}\\
+  \vspace{0.4cm}
+  \hspace{\fill}\includegraphics[width=4.30cm]{logo_fraunhofer-ipk.png}\\
+
+  \vspace{5cm}
+
+  \setmainfont{Open Sans} % Hausschrift Open Sans der HAW
+  \small\textbf{BACHELORARBEIT}
+
+  \vspace{8mm}
+
+  % Titel der Arbeit
+  \begin{minipage}{0.8\linewidth}
+    % Haupttitel
+    \setmainfont{Martel Heavy} \LARGE
+    Contrastive Learning\\[1mm] % [1mm] für etwas größeren Durchschuss
+    mit Stable Diffusion-basierter\\[1mm]
+    Datenaugmentation\\[4mm]
+    % Untertitel
+    \setmainfont{Open Sans} \Large
+    Verbesserung der Bildklassifikation\\[1mm]
+    durch synthetische Daten\\[1mm]
+    % Horizontaler Strich
+    \,\rule{11mm}{1.2mm}
+  \end{minipage}
+
+  \vspace{9.2mm}
+
+  vorgelegt am 23. September 2024\\
+  Paul Hofmann
+
+  \vspace{3cm}
+
+  % Prüfer*innen
+  \hspace*{37mm}
+  \begin{minipage}{0.5\linewidth}
+    \begin{tabular}{@{}ll}
+      Erstprüferin: & Prof. Dr. Larissa Putzar\\[-.3mm]
+      Zweitprüfer: & Prof. Dr. Jan Neuhöfer \\
+    \end{tabular}\\
+	
+	  % Horizontaler Strich
+    %\,\rule{9mm}{1mm}\\[1.5mm]
+    \vspace{5mm}
+	
+	% Anschrift HAW & Fraunhofer-IPK
+	\begin{tabular}{@{} p{0.75\linewidth} ll} %{p{0.3\linewidth}p{0.3\linewidth}}
+    \textbf{HOCHSCHULE FÜR ANGEWANDTE} & \textbf{FRAUNHOFER-INSTITUT FÜR}\\
+    \textbf{WISSENSCHAFTEN HAMBURG} & \textbf{PRODUKTIONSANLAGEN UND}\\
+    Department Medientechnik & \textbf{KONSTRUKTIONSTECHNIK IPK}\\
+    Finkenau 35 & Pascalstraße 8–9\\
+    22081 Hamburg & 10587 Berlin
+	\end{tabular}\\
+  \end{minipage}
+\end{titlepage}
+% Setzt Geometrie wieder auf Standardwerte zurück
+\restoregeometry
+
+% Seite mit dem Abstract ohne Seitenzahl ausgeben
+\thispagestyle{empty}
+
+% Abstract
+\section*{Zusammenfassung}
+
+Diese Bachelorarbeit untersucht die Verbesserung der Bildklassifikation durch synthetische Daten im Supervised Contrastive Learning (SCL). Ziel ist es, die Eignung von DA-Fusion, einer Stable Diffusion-basierten Methode zur Datenaugmentation, für die Generierung synthetischer Daten in einem Anwendungsfall aus der Recyclingwirtschaft zu evaluieren. Darüber hinaus wird untersucht, wie generierte Near Out-of-Distribution (OOD)-Daten in das Supervised Contrastive Learning integriert werden können, um als negativ-Beispiele zu dienen und die Repräsentationen der In-Distribution-Daten weiter zu verbessern. Die Ergebnisse zeigen, dass DA-Fusion geeignete In-Distribution-Augmentationen liefert, welche die Klassifikationsleistung verbessern. Jedoch führte die Integration von Near OOD-Daten im SCL zu einer Verschlechterung der Modellgenauigkeit, da die Beispiele oft zu weit von den In-Distribution-Daten entfernt waren. Die Arbeit hebt die Herausforderungen bei der Generierung und Nutzung synthetischer Daten hervor und bietet Ansätze zur Optimierung von Contrastive Learning in diesem Kontext.
+
+% In Englisch
+{
+  \begin{otherlanguage}{english}
+    \section*{Abstract}
+
+      This bachelor thesis investigates how image classification can be improved using synthetic data for Supervised Contrastive Learning (SCL). The aim is to evaluate the suitability of DA-Fusion, a stable diffusion-based data augmentation method, for generating synthetic data in a use case from the recycling industry. It also investigates how synthetic near out-of-distribution (OOD) images can be integrated into supervised contrastive learning to serve as negative examples in order to further improve the representation of in-distribution data. The results show that DA-Fusion provides suitable in-distribution augmentations that improve classification performance. However, the integration of near OOD data in SCL led to a deterioration of model accuracy, as the examples were often too dissimilar from the in-distribution data. The thesis highlights the challenges of generating and using synthetic data and offers approaches to optimize contrastive learning in this context.
+  \end{otherlanguage}
+}
+
+\newpage
+\thispagestyle{empty}
+
+\chapter*{Danksagung}
+
+An erster Stelle möchte ich mich herzlich bei meiner Erstprüferin und Betreuerin, Frau Prof. Dr. Larissa Putzar, für ihre kontinuierliche Unterstützung und fachliche Begleitung während meiner Bachelorarbeit bedanken.
+
+Außerdem gilt ein besonderer Dank Herrn Prof. Dr. Jan Neuhöfer, meinem Zweitprüfer, der mich bereits während meines Praktikums am Fraunhofer-IPK begleitet hat.
+
+Ebenso möchte ich mich bei meinem Betreuer am Fraunhofer-IPK, Herrn Paul Koch, für seine Unterstützung und die konstruktive Zusammenarbeit bedanken. Sein wertvolles Feedback hat wesentlich dazu beigetragen, diese Arbeit erfolgreich abzuschließen.
+
+Darüber hinaus danke ich dem Fraunhofer-IPK für die Möglichkeit, mein Praktikum am Institut zu absolvieren und diese Arbeit in enger Kooperation durchzuführen. Die gewonnenen Einblicke und die technische Unterstützung haben diese Arbeit entscheidend geprägt.
+
+Nicht zuletzt möchte ich mich bei meinen Freunden und meiner Familie bedanken. Ihr Zuspruch und ihre Unterstützung haben mir geholfen, auch in schwierigen Phasen motiviert zu bleiben und diese Arbeit erfolgreich zu beenden.
