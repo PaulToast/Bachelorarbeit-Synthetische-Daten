@@ -1,7 +1,7 @@
 % !TEX root = Bachelorarbeit Synthetische Daten.tex
 \chapter{Methodisches Vorgehen} \label{ch:methodology}
 
-In diesem Kapitel wird das methodische Vorgehen der Arbeit beschrieben. Als Basis für die Untersuchung der Forschungsfragen wird zunächst der MVIP-Datensatz vorgestellt, auf dem die Experimente durchgeführt werden. Anschließend wird die Implementierung der Modelle DA-Fusion und Supervised Contrastive Learning erläutert. Schließlich wird der Versuchsaufbau für die Generierung der synthetischer Daten mit DA-Fusion und die Trainings- und Testdurchläufe mit Supervised Contrastive Learning beschrieben.
+In diesem Kapitel wird das methodische Vorgehen zur Untersuchung des vorgestellten Ansatzes im Bezug auf die Forschungsfragen beschrieben. Als Basis dafür wird zunächst der MVIP-Datensatz vorgestellt, auf dem die Experimente durchgeführt werden. Anschließend wird die Implementierung der Modelle DA-Fusion und Supervised Contrastive Learning erläutert. Schließlich wird der Versuchsaufbau für die Generierung der synthetischen Daten mit DA-Fusion und die Trainings- und Testdurchläufe mit Supervised Contrastive Learning beschrieben.
 
 \section{MVIP-Datensatz} \label{sec:dataset}
 
@@ -78,7 +78,7 @@ Für die Verwendung von Near OOD-Daten als negativ-Beispiele war die Anpassung d
 Das trainierte Modell, welches im Verlauf des Pre-Trainings gespeichert wird, kann anschließend mit dem Skript \lstinline{main_linear.py} für die lineare Klassifikation verwendet werden. Dabei wird das Modell mit einem neuen Head initialisiert, der die latenten Repräsentationen in die Klassenlabels überführt. Das Training erfolgt dann mit einer klassischen Cross Entropy-Verlustfunktion, die die Repräsentationen auf die Klassen abbildet.
 
 % Metriken
-Als Metriken wurden ursprünglich nur der Loss und die Accuracy ausgegeben, welche jeweils über eine Epoche gemittelt werden. Zusätzlich wurden im Rahmen dieser Arbeit die ID- und OOD-Confidence als Metriken implementiert (siehe \autoref{subsec:evaluation}). Dazu wird eine zusätzliche Validierungsepoche durchlaufen, welche ausschließlich die OOD-Augmentationen verwendet. Die Softmax-Wahrscheinlichkeiten der Vorhersagen werden dann getrennt für die ID- und OOD-Daten gemittelt und ausgegeben.
+Als Metriken wurden ursprünglich nur der Loss und die Accuracy ausgegeben, welche jeweils über eine Epoche gemittelt werden, wobei immer eine Trainingsepoche und anschließend eine Validierungsepoche durchlaufen werden. Zusätzlich wurden im Rahmen dieser Arbeit die ID- und OOD-Confidence als Metriken implementiert (siehe \autoref{subsec:evaluation}). Dazu wird eine zusätzliche Validierungsepoche durchlaufen, welche ausschließlich die OOD-Augmentationen verwendet. Die Softmax-Wahrscheinlichkeiten der Vorhersagen werden dann getrennt für die ID- und OOD-Daten gemittelt und ausgegeben.
 
 \section{Versuchsaufbau} \label{sec:experiment-setup}
 
@@ -134,12 +134,12 @@ Die Trainings- und Testdurchläufe mit Supervised Contrastive Learning sind in d
 % Hyperparameter
 Für das Pre-Training wurde eine Batch Size von 16, eine Lernrate von 0.001 mit Kosinus-Annealing und einer Dauer von 110 Epochen verwendet. Die Bilddaten wurden im Rahmen der herkömmlichen Augmentation, welche die zwei Ansichten eines Beispiels erzeugt, auf eine Größe von 224x224 Pixeln zugeschnitten und normalisiert.
 
-Bei der linearen Klassifikation sind die Hyperparameter identisch, jedoch mit einer Dauer von nur 25 Epochen. Nach jeder Trainingsepoche werden die Modelle für eine Validierungsepoche auf den (echten) Testdaten evaluiert.
+Bei der linearen Klassifikation sind die Hyperparameter identisch, jedoch mit einer Dauer von nur 25 Epochen. Nach jeder Trainingsepoche werden die Modelle für eine Validierungsepoche auf den (echten) Validierungsdaten evaluiert.
 
 \subsection{Evaluationsmethoden und Metriken} \label{subsec:evaluation}
 
 % Accuracy, ID- und OOD-Confidence des SCL Klassifikators
-Die drei Versuchsreihen werden ausgewertet, indem folgende Metriken beim Test der linearen Klassifikation auf den Testdaten gemessen werden:
+Die drei Versuchsreihen wurden ausgewertet, indem folgende Metriken beim Test der linearen Klassifikation auf den Testdaten gemessen werden:
 
 \begin{itemize}
 	\item \emph{Top-1 Accuracy}: Der Anteil der korrekt klassifizierten Bilder. Top-1 bedeutet, dass das Modell die Klasse mit der höchsten Wahrscheinlichkeit als Vorhersage ausgibt.
@@ -149,3 +149,5 @@ Die drei Versuchsreihen werden ausgewertet, indem folgende Metriken beim Test de
 
 % Menschliche Evaluierung der Augmentationen selbst
 Vor der Auswertung der Versuchsreihen wurde eine menschliche Evaluierung der synthetischen Daten durchgeführt. Dabei wurde bewertet, ob die Objekte in den Bildern in ihrer Form und Struktur unverändert bleiben, während die Farben und Texturen variieren können und sollen. Bei den OOD-Augmentationen wurde darauf geachtet, dass die Objekte so stark verändert werden, dass eine Klassifizierung in die ursprüngliche Objektklasse als fehlerhaft angesehen wird. Gleichzeitig sollten die OOD-Beispiele noch genug Ähnlichkeit aufweisen, um herausfordernde negative Beispiele zu sein.
+
+%Zur Beantwortung der Forschungsfragen wurden die gemessenen Metriken miteinander verglichen. Die Unterschiede zwischen Versuchen 1 und 2 wurden analysiert, um die Auswirkungen der ID-Augmentationen zu untersuchen. Anschließend wurden die Unterschiede zwischen Versuchen 2 und 3 analysiert, um die Auswirkungen der Near OOD-Augmentationen zu untersuchen.
