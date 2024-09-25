@@ -47,20 +47,19 @@
 
 \section{Implementierung} \label{sec:app1}
 
-\lstinputlisting[language=python,caption={Begrenzung des Datensatzes auf die 20 "CarComponent" Klassen in der "MVIPDataset"-Klasse.}, label=lst:mvip-classes]{code_da-fusion_mvip-class-selection.py}
-% \lstinputlisting[language=python,caption={Die verwendeten Text-Prompts zur Generierung der Augmentationen.},label=lst:mvip-prompts]{code_da-fusion_prompts.py}
+\lstinputlisting[language=python,caption={Begrenzung des Datensatzes auf die 20 "CarComponent" Klassen in der "MVIPDataset"-Klasse.}, label=lst:mvip-classes]{code/code_da-fusion_mvip-class-selection.py}
+% \lstinputlisting[language=python,caption={Die verwendeten Text-Prompts zur Generierung der Augmentationen.},label=lst:mvip-prompts]{code/code_da-fusion_prompts.py}
 
-\lstinputlisting[language=python,caption={Funktion zum Laden der Augmentationen in der "MVIPDataset"-Klasse von SupCon.},label=lst:supcon-mvip-parse-augs]{code_supcon_mvip-parse-augs.py}
-\lstinputlisting[language=python,caption={Vollständige Klasse für die verwendete Verlustfunktion im Supervised Contrastive Learning.},label=lst:supcon-loss]{code_supcon_loss.py}
+\lstinputlisting[language=python,caption={Funktion zum Laden der Augmentationen in der "MVIPDataset"-Klasse von SupCon.},label=lst:supcon-mvip-parse-augs]{code/code_supcon_mvip-parse-augs.py}
+\lstinputlisting[language=python,caption={Vollständige Klasse für die verwendete Verlustfunktion im Supervised Contrastive Learning.},label=lst:supcon-loss]{code/code_supcon_loss.py}
 
-%\lstinputlisting[language=python,caption={Funktion zum Zuschneiden eines Objekts in der "MVIPDataset"-Klasse.},label=lst:da-fusion-crop-object]{code_da-fusion_crop-object.py}
+%\lstinputlisting[language=python,caption={Funktion zum Zuschneiden eines Objekts in der "MVIPDataset"-Klasse.},label=lst:da-fusion-crop-object]{code/code_da-fusion_crop-object.py}
 
 %\lstinputlisting[language=python,caption={Python-Skript für die Klasse des MVIP-Teildatensatzes in der Implementierung von DA-Fusion \parencite{Trabucco2024dafusiongithub}.},label=lst:da-fusion-mvip]{../da-fusion/semantic_aug/datasets/mvip.py}
 %\lstinputlisting[language=python,caption={Python-Skript für das Textual Inversion Finetuning in DA-Fusion.},label=lst:da-fusion-finetune]{../da-fusion/fine_tune_upstream.py}
 %\lstinputlisting[language=python,caption={Python-Skript zum Merging der gelernten Text-Embeddings.},label=lst-da-fusion-aggregate]{../da-fusion/aggregate_embeddings.py}
 %\lstinputlisting[language=python,caption={Python-Skript zur Generierung der Augmentationen mit DA-Fusion.},label=lst:da-fusion-generate]{../da-fusion/generate_augmentations.py}
 
-% SupCon
 %\lstinputlisting[language=python,caption={Python-Skript für die Klasse des MVIP-Teildatensatzes in der Implementierung von Supervised Contrastive Learning \parencite{Tian2023supcongithub}.},label=lst:supcon-mvip]{../sup-contrast/mvip.py}
 %\lstinputlisting[language=python,caption={Python-Skript für die Verlustfunktion in der Implementierung von Supervised Contrastive Learning \parencite{Tian2023supcongithub}.},label=lst:supcon-loss]{../sup-contrast/losses.py}
 
@@ -70,14 +69,14 @@
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=\textwidth]{figure_results_id-augs_good_1a.png}
+  \includegraphics[width=\textwidth]{images/figure_results_id-augs_good_1a.png}
   \caption{Beispiele der In-Distribution-Augmentationen.}
   \label{fig:id-augs-good-1}
 \end{figure}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.48\textwidth]{figure_results_id-augs_good_1.png}%
+  \includegraphics[width=0.48\textwidth]{images/figure_results_id-augs_good_1.png}%
   \hspace{0.02\textwidth}\includegraphics[width=0.48\textwidth]{figure_results_id-augs_good_2.png}%
   \caption{Vergrößerte Ausschnitte von einigen der In-Distribution-Augmentationen.}
   \label{fig:id-augs-good-2}
@@ -85,8 +84,8 @@
 
 \begin{figure}[h]
   \centering
-  %\includegraphics[width=\textwidth]{figure_results_id-augs_bad_2a.png}
-  \includegraphics[width=0.48\textwidth]{figure_results_id-augs_bad_1.png}%
+  %\includegraphics[width=\textwidth]{images/figure_results_id-augs_bad_2a.png}
+  \includegraphics[width=0.48\textwidth]{images/figure_results_id-augs_bad_1.png}%
   \hspace{0.02\textwidth}\includegraphics[width=0.48\textwidth]{figure_results_id-augs_bad_2.png}
   \caption{Beispiele für mangelhafte In-Distribution-Augmentationen.}
   \label{fig:id-augs-bad}
@@ -94,8 +93,8 @@
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.48\textwidth]{figure_results_ood-augs_good_1.png}%
-  \hspace{0.02\textwidth}\includegraphics[width=0.48\textwidth]{figure_results_ood-augs_good_3.png}\vspace{0.01\textwidth}
+  \includegraphics[width=0.48\textwidth]{images/figure_results_ood-augs_good_1.png}%
+  \hspace{0.02\textwidth}\includegraphics[width=0.48\textwidth]{images/figure_results_ood-augs_good_3.png}\vspace{0.01\textwidth}
   \includegraphics[width=0.98\textwidth]{figure_results_ood-augs_good_4.png}
   \caption{Beispiele der Near Out-of-Distribution-Augmentationen.}
   \label{fig:ood-augs-good}
@@ -103,8 +102,8 @@
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.48\textwidth]{figure_results_ood-augs_bad_1.png}%
-  \hspace{0.02\textwidth}\includegraphics[width=0.48\textwidth]{figure_results_ood-augs_bad_2.png}\vspace{0.01\textwidth}
+  \includegraphics[width=0.48\textwidth]{images/figure_results_ood-augs_bad_1.png}%
+  \hspace{0.02\textwidth}\includegraphics[width=0.48\textwidth]{images/figure_results_ood-augs_bad_2.png}\vspace{0.01\textwidth}
   \includegraphics[width=0.98\textwidth]{figure_results_ood-augs_bad_4.png}
   \caption{Beispiele für mangelhafte Out-of-Distribution-Augmentationen.}
   \label{fig:ood-augs-bad}
@@ -126,8 +125,6 @@ Passagen, die ich wörtlich aus der Literatur oder aus anderen Quellen wie
 z.\,B. Internetseiten übernommen habe, habe ich deutlich als Zitat mit Angabe
 der Quelle kenntlich gemacht.
 
-\vspace{1cm}
-
-\includegraphics[width=4cm]{Unterschrift.jpg}
+\vspace{2cm}
 
 Hamburg, 23.\ September 2024

@@ -169,6 +169,7 @@ sup-contrast/datasets/
 
 # TeX files
 tex-doc/*
+!tex-doc/*/
 !tex-doc/*.tex
 !tex-doc/*.bib
 !tex-doc/*.pdf
