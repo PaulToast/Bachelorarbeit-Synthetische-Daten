@@ -12,12 +12,8 @@ from scipy.ndimage import maximum_filter
 from collections import defaultdict
 
 import importlib
-FewShotDataset = importlib.import_module(
-    "da-fusion.semantic_aug.few_shot_dataset"
-    ).FewShotDataset
-GenerativeAugmentation = importlib.import_module(
-    "da-fusion.semantic_aug.generative_augmentation"
-    ).GenerativeAugmentation
+FewShotDataset = importlib.import_module("da-fusion").semantic_aug.few_shot_dataset.FewShotDataset
+GenerativeAugmentation = importlib.import_module("da-fusion").semantic_aug.generative_augmentation.GenerativeAugmentation
 
 
 MVIP_DIR = "/mnt/HDD/MVIP/sets"
