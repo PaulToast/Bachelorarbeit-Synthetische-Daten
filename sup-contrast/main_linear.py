@@ -16,7 +16,7 @@ from util import adjust_learning_rate, warmup_learning_rate, accuracy
 from util import set_optimizer, save_model
 from networks.resnet_big import SupConResNet, LinearClassifier
 
-from mvip import MVIPDataset
+from mvip_dataset import MVIPDatasetSupCon
 
 try:
     import apex
@@ -178,7 +178,7 @@ def set_loader(args, split="train", aug_mode=None):
                                     transform=transform,
                                     download=True)
     elif args.dataset == "mvip":
-        dataset = MVIPDataset(split=split,
+        dataset = MVIPDatasetSupCon(split=split,
                               aug_mode=aug_mode,
                               aug_dir_id=args.aug_dir_id,
                               aug_dir_ood=args.aug_dir_ood,

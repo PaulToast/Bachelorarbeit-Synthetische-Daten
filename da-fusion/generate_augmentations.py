@@ -2,9 +2,8 @@ from semantic_aug.datasets.coco import COCODataset
 from semantic_aug.datasets.spurge import SpurgeDataset
 from semantic_aug.datasets.imagenet import ImageNetDataset
 from semantic_aug.datasets.pascal import PASCALDataset
-from semantic_aug.datasets.mvip import MVIPDataset
-from semantic_aug.datasets.mvip import crop_object
-from semantic_aug.datasets.mvip_mini import MVIPMiniDataset
+
+from mvip_dataset import MVIPDataset, MVIPMiniDataset, crop_object
 
 from semantic_aug.augmentations.compose import ComposeParallel
 from semantic_aug.augmentations.compose import ComposeSequential

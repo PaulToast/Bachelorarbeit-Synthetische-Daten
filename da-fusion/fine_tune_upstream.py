@@ -65,9 +65,8 @@ from semantic_aug.datasets.imagenet import ImageNetDataset
 from semantic_aug.datasets.pascal import PASCALDataset
 from semantic_aug.datasets.caltech101 import CalTech101Dataset
 from semantic_aug.datasets.flowers102 import Flowers102Dataset
-from semantic_aug.datasets.mvip import MVIPDataset
-from semantic_aug.datasets.mvip import crop_object
-from semantic_aug.datasets.mvip_mini import MVIPMiniDataset
+
+from mvip_dataset import MVIPDataset, MVIPMiniDataset, crop_object
 
 
 DATASETS = {

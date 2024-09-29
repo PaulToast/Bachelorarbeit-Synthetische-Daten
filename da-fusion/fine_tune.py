@@ -15,11 +15,12 @@ import torch.nn.functional as F
 import torch.utils.checkpoint
 from torch.utils.data import Dataset
 
-from semantic_aug.datasets.mvip import MVIPDataset
 from semantic_aug.datasets.coco import COCODataset
 from semantic_aug.datasets.spurge import SpurgeDataset
 from semantic_aug.datasets.imagenet import ImageNetDataset
 from semantic_aug.datasets.pascal import PASCALDataset
+
+from mvip_dataset import MVIPDataset, MVIPMiniDataset, crop_object
 
 import datasets
 import diffusers

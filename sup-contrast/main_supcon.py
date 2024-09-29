@@ -16,7 +16,7 @@ from util import set_optimizer, save_model
 from networks.resnet_big import SupConResNet
 from losses import SupConLoss
 
-from mvip import MVIPDataset
+from mvip_dataset import MVIPDatasetSupCon
 
 from diffusers.utils import check_min_version, is_wandb_available
 if is_wandb_available():
@@ -178,7 +178,7 @@ def set_loader(args, split="train", aug_mode=None):
                                     transform=TwoCropTransform(transform),
                                     download=True)
     elif args.dataset == "mvip":
-        dataset = MVIPDataset(split=split,
+        dataset = MVIPDatasetSupCon(split=split,
                               aug_mode=aug_mode,
                               aug_dir_id=args.aug_dir_id,
                               aug_dir_ood=args.aug_dir_ood,
