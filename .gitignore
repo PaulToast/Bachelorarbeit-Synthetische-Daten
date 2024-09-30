@@ -164,16 +164,3 @@ cython_debug/
 # DA-Fusion & SupCon outputs
 output/
 wandb/
-da-fusion/datasets/
-sup-contrast/datasets/
-
-# TeX files
-tex-doc/*
-!tex-doc/*/
-!tex-doc/*.tex
-!tex-doc/*.bib
-!tex-doc/*.pdf
-!tex-doc/*.png
-!tex-doc/*.jpg
-!tex-doc/*.webp
-!tex-doc/*.py

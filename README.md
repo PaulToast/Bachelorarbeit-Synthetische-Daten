@@ -1,7 +1,9 @@
 Bachelorarbeit im Studiengang Medientechnik an der [HAW Hamburg](https://www.haw-hamburg.de/)
 # Contrastive Learning mit Stable Diffusion-basierter Datenaugmentation: Verbesserung der Bildklassifikation durch synthetische Daten
 
-Mit dieser Methode wird ein [Supervised Contrastive Learning](https://arxiv.org/abs/2004.11362)-Klassifikator trainiert, der mit [DA-Fusion](https://arxiv.org/abs/2302.07944) generierte synthetische Augmentationen Training integriert. Es können sowohl In-Distribution- also auch Out-of-Distribution-Daten generiert und verwendet werden. Die OOD-Daten dienen dabei nur als negativ-Beispiele im Contrastive Learning. Die Experimente dieser Arbeit zeigten, dass die synthetischen ID-Daten zu einer Verbesserung der Klassifikation beitragen, die OOD-Daten jedoch nicht.
+Es wurde ein [Supervised Contrastive Learning](https://arxiv.org/abs/2004.11362)-Klassifikator trainiert, der synthetische Daten verwendet, welche zuvor mit [DA-Fusion](https://arxiv.org/abs/2302.07944) generiert wurden. DA-Fusion ist eine Methode zur Stable Diffusion-basierten Datenaugmentation, welche semantisch sinnvolle Variationen von Bildern generieren kann.
+
+Mit DA-Fusion wurden sowohl In-Distribution- also auch (Near) Out-of-Distribution-Daten generiert, indem die Stärke der Augmentation unterschiedlich eingestellt wurde. Die OOD-Daten sollten dabei nur als negativ-Beispiele im Contrastive Learning dienen, um die Repräsentationen der ID-Daten weiter zu verbessern. Die Experimente der Arbeit zeigten, dass die synthetischen ID-Daten zu einer Verbesserung der Klassifikation beitragen, die OOD-Daten jedoch nicht.
 
 ## Installation
 
@@ -16,12 +18,12 @@ huggingface-cli login
 
 ## Verwendung
 
-Pipelines:
+Vollständige Pipelines für den [MVIP](https://fordatis.fraunhofer.de/handle/fordatis/358)-Datensatz:
 
 - `mvip_generate.augs.sh` zur Generierung synthetischer ID- & OOD-Augmentationen
 - `mvip_run_experiments.sh` zum Ausführen drei unterschiedlicher Trainingsdurchläufe mit Supervised Contrastive Learning, um den Einfluss der Augmentationen auf die Klassifikation zu untersuchen
 
-Die Ausführlichen READMEs:
+Die Ausführlichen READMEs zu den beiden verwendeten Methoden:
 
 - [DA-Fusion](da-fusion/README.md)
 - [Supervised Contrastive Learning](sup-contrast/README.md)
