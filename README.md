@@ -8,13 +8,15 @@ Mit DA-Fusion wurden sowohl In-Distribution- also auch (Near) Out-of-Distributio
 ## Installation
 
 ```bash
-conda create -n synt-contrast python=3.7 pytorch==1.12.1 torchvision==0.13.1 cudatoolkit=11.6 -c nvidia -c pytorch -c conda-forge
+conda create -n synt-contrast python=3.7 pytorch==1.12.1 torchvision==0.13.1 cudatoolkit=11.6
 conda activate synt-contrast
 pip install diffusers["torch"] transformers pycocotools pandas matplotlib seaborn scipy
 pip install -e da-fusion
 pip install --upgrade huggingface_hub
 huggingface-cli login
 ```
+
+(Conda-Channels: `nvidia`, `pytorch`, `conda-forge`)
 
 ## Verwendung
 
@@ -25,5 +27,5 @@ Vollständige Pipelines für den [MVIP](https://fordatis.fraunhofer.de/handle/fo
 
 Die Ausführlichen READMEs zu den beiden verwendeten Methoden:
 
-- [DA-Fusion](da-fusion/README.md)
-- [Supervised Contrastive Learning](sup-contrast/README.md)
+- [DA-Fusion](da_fusion/README.md)
+- [Supervised Contrastive Learning](sup_contrast/README.md)
